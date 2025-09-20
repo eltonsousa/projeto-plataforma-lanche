@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1758086927178,
+    "nome": "Hamburguer Artesanal",
+    "descricao": "Um hambúrguer suculento feito com 180 g de carne bovina selecionada, pão brioche macio, e queijo.",
+    "preco": 35.99,
+    "imagem": "assets/hamburguer-artesanal.jpg"
+  },
+  {
+    "id": 1758086995519,
+    "nome": "Batata frita",
+    "descricao": "Batatas crocantes por fora e macias por dentro, servidas bem quentinhas e salpicadas com sal.",
+    "preco": 10.99,
+    "imagem": "assets/batata-frita.webp"
+  },
+  {
+    "id": 1758087046739,
+    "nome": "Hotdog",
+    "descricao": "Pão macio com salsicha tipo Frankfurt, purê de batata, milho, ervilha, batata palha, ketchup...",
+    "preco": 12.99,
+    "imagem": "assets/hotdog.webp"
+  },
+  {
+    "id": 1758087118330,
+    "nome": "Milk Shake",
+    "descricao": "Bebida cremosa e gelada, feita com sorvete, leite integral e calda sabor chocolate, morango...",
+    "preco": 22.69,
+    "imagem": "assets/milkshake.png"
+  },
+  {
+    "id": 1758147213710,
+    "nome": "Fanta 350ml",
+    "descricao": "Fanta vários sabores",
+    "preco": 6.99,
+    "imagem": "assets/fanta.webp"
+  },
+  {
+    "id": 1758148845926,
+    "nome": "X-tudo",
+    "descricao": "Pão, Molho, 2 Carnes, 2 Fatias de Queijo, 2 Fatias de Presunto, 4x Bacon, 2 Ovos, Salada e Batata Palha",
+    "preco": 22.99,
+    "imagem": "assets/x-tudo.png"
+  },
+  {
+    "id": 1758148972478,
+    "nome": "X-Salada",
+    "descricao": "Pão, Carne, Maionese, Queijo, Salada e Batata Palha",
+    "preco": 7.99,
+    "imagem": "assets/x-salada.jpg"
+  },
+  {
+    "id": 1758149653667,
+    "nome": "Yakissoba",
+    "descricao": "Tamanho da porção 4 porções",
+    "preco": 45.9,
+    "imagem": "assets/Yakissoba-tradicional.png"
+  }
+]

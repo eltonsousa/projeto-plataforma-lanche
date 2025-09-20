@@ -1,0 +1,335 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.painel-admin header {
+    background-color: #3f51b5;
+    color: white;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.painel-admin h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.painel-admin p {
+    margin: 0.5rem 0 0;
+    font-size: 1.2rem;
+}
+
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 1rem;
+}
+
+.nav-menu button {
+    background-color: #5c6bc0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.nav-menu button:hover {
+    background-color: #7986cb;
+}
+
+.lista-pedidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.titulo-pedidos-recebidos{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    text-align: center;
+}
+
+.pedido-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 300px;
+    border-left: 5px solid #3f51b5;
+}
+
+.pedido-card h3 {
+    margin-top: 0;
+    color: #3f51b5;
+}
+
+.pedido-card ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.pedido-card li {
+    background-color: #f8f8f8;
+    margin-bottom: 5px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Estilos para os botões de status do pedido */
+.status-botoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.status-btn {
+  background-color: #f0f2f5;
+  color: #666;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilo para o botão de status ativo */
+.active-status-btn {
+  background-color: #3f51b5; /* Cor principal */
+  color: white;
+  border-color: #3f51b5;
+  font-weight: bold;
+}
+
+.status-btn:hover {
+  background-color: #cdd5ff;
+  color: #3f51b5;
+}
+
+/* Estilos para o status de texto */
+.status-em-preparação {
+  color: white;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #ff9800;
+  padding: 5px 10px;
+}
+
+.status-pronto-para-entrega {
+  color: white;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #2d81f0;
+  padding: 5px 10px;
+}
+
+.status-entregue {
+  color: white;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #4caf50;
+  padding: 5px 10px;
+}
+
+.concluir-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.loading-state, .error-state, .sem-pedidos {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error-state {
+  color: #c0392b;
+}
+
+/* Novo estilo para o painel de cardápio */
+.painel-cardapio {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.painel-cardapio h2 {
+  color: #3f51b5;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.cardapio-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.cardapio-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardapio-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.cardapio-form button {
+  padding: 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cardapio-lista {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-cardapio-admin {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.item-cardapio-admin:last-child {
+  border-bottom: none;
+}
+
+.item-cardapio-admin img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.item-info-admin {
+  flex-grow: 1;
+}
+
+.item-botoes-admin {
+  display: flex;
+  gap: 10px;
+}
+
+.item-botoes-admin button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.item-botoes-admin button:first-child {
+  background-color: #ff9800; /* Laranja para Editar */
+  color: white;
+}
+
+.item-botoes-admin button:last-child {
+  background-color: #f44336; /* Vermelho para Remover */
+  color: white;
+}
+
+/* Estilos para a tela de login/registro */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.auth-container h2 {
+    color: #3f51b5;
+    margin-bottom: 2rem;
+}
+
+.auth-container form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.password-input-container input {
+    flex-grow: 1;
+    margin-bottom: 0;
+    padding-right: 40px;
+}
+
+.auth-container input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.mostrar-senha-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+}
+
+.auth-container button[type="submit"] {
+    padding: 10px;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.auth-container p.toggle-auth {
+    margin-top: 1rem;
+    color: #3f51b5;
+    cursor: pointer;
+    text-decoration: underline;
+}
