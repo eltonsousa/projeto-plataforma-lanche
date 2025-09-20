@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 
+// COMPONENTE: Ícone do carrinho no cabeçalho
+const CartIcon = ({ count, onClick }) => (
+  <button className="carrinho-icon-btn" onClick={onClick}>
+    🛒
+    {count > 0 && <span className="carrinho-count">{count}</span>}
+  </button>
+);
+
 function App() {
   const [carrinho, setCarrinho] = useState([]);
   const [mostraCheckout, setMostraCheckout] = useState(false);
@@ -11,9 +19,11 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ESTADO: Controla se a visualização do carrinho (lateral) está aberta
+  const [mostraCarrinho, setMostraCarrinho] = useState(false);
+
   const fetchCardapio = async () => {
     try {
-      // Agora o fetch é feito a partir do servidor
       const response = await fetch("/api/cardapio");
       if (!response.ok) {
         throw new Error("Erro ao buscar o cardápio");
@@ -28,15 +38,10 @@ function App() {
   };
 
   useEffect(() => {
-    // 1. Faz a busca imediatamente ao carregar
     fetchCardapio();
-
-    // 2. CONFIGURAÇÃO DA ATUALIZAÇÃO AUTOMÁTICA (a cada 10 segundos)
     const intervalId = setInterval(fetchCardapio, 10000);
-
-    // 3. FUNÇÃO DE LIMPEZA: Remove o intervalo quando a página for fechada
     return () => clearInterval(intervalId);
-  }, []); // O array vazio garante que o useEffect rode apenas no montagem do componente
+  }, []);
 
   const adicionarAoCarrinho = (item) => {
     const itemExistente = carrinho.find((c) => c.id === item.id);
@@ -49,6 +54,9 @@ function App() {
     } else {
       setCarrinho([...carrinho, { ...item, quantidade: 1 }]);
     }
+
+    // 🟢 CORREÇÃO: Removido o setMostraCarrinho(true)
+    // O carrinho lateral só abre quando o usuário clica no ícone.
   };
 
   const aumentarQuantidade = (itemId) => {
@@ -60,20 +68,28 @@ function App() {
   };
 
   const diminuirQuantidade = (itemId) => {
-    setCarrinho(
-      carrinho
-        .map((item) =>
-          item.id === itemId
-            ? { ...item, quantidade: item.quantidade - 1 }
-            : item
-        )
-        .filter((item) => item.quantidade > 0)
-    );
+    const novoCarrinho = carrinho
+      .map((item) =>
+        item.id === itemId ? { ...item, quantidade: item.quantidade - 1 } : item
+      )
+      .filter((item) => item.quantidade > 0);
+
+    setCarrinho(novoCarrinho);
+
+    // Fecha o carrinho se ele ficar vazio
+    if (novoCarrinho.length === 0) {
+      setMostraCarrinho(false);
+    }
   };
 
   const removerDoCarrinho = (itemId) => {
     const novoCarrinho = carrinho.filter((item) => item.id !== itemId);
     setCarrinho(novoCarrinho);
+
+    // Fecha o carrinho se ele ficar vazio
+    if (novoCarrinho.length === 0) {
+      setMostraCarrinho(false);
+    }
   };
 
   const calcularTotal = () => {
@@ -82,8 +98,17 @@ function App() {
       .toFixed(2);
   };
 
+  // FUNÇÃO: Alterna a visibilidade do carrinho lateral (acionada pelo ícone)
+  const handleToggleCarrinho = () => {
+    // Só alterna se o carrinho tiver itens
+    if (carrinho.length > 0) {
+      setMostraCarrinho(!mostraCarrinho);
+    }
+  };
+
   const handleFinalizarPedido = () => {
     setMostraCheckout(true);
+    setMostraCarrinho(false); // Fecha a barra lateral do carrinho
   };
 
   const handleCheckoutSubmit = async (event) => {
@@ -131,6 +156,7 @@ function App() {
 
   const handleNovoPedido = () => {
     setPedidoFinalizado(false);
+    setMostraCarrinho(false);
   };
 
   if (loading) {
@@ -141,13 +167,24 @@ function App() {
     return <div className="error">Erro ao carregar o cardápio: {error}</div>;
   }
 
+  const totalItensCarrinho = carrinho.reduce(
+    (total, item) => total + item.quantidade,
+    0
+  );
+
   return (
     <div className="App">
       <header>
         <h1>Manú Lanches</h1>
         <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
+
+        {/* ÍCONE DO CARRINHO */}
+        {carrinho.length > 0 && !mostraCheckout && !pedidoFinalizado && (
+          <CartIcon count={totalItensCarrinho} onClick={handleToggleCarrinho} />
+        )}
       </header>
 
+      {/* RENDERIZAÇÃO DO CARDÁPIO (PRINCIPAL) */}
       {!mostraCheckout && !pedidoFinalizado && (
         <>
           <main className="cardapio">
@@ -160,7 +197,9 @@ function App() {
             ))}
           </main>
 
-          {carrinho.length > 0 && (
+          {/* RENDERIZAÇÃO DO CARRINHO LATERAL (ASIDE) */}
+          {/* Aparece APENAS se houver itens E o estado mostraCarrinho for TRUE (clique no ícone) */}
+          {carrinho.length > 0 && mostraCarrinho && (
             <aside className="carrinho-container">
               <h2>Seu Carrinho</h2>
               <div className="carrinho-itens">
@@ -204,6 +243,7 @@ function App() {
         </>
       )}
 
+      {/* RENDERIZAÇÃO DO CHECKOUT */}
       {mostraCheckout && (
         <div className="checkout-container">
           <h2>Finalizar Pedido</h2>
@@ -232,6 +272,7 @@ function App() {
         </div>
       )}
 
+      {/* RENDERIZAÇÃO DA CONFIRMAÇÃO */}
       {pedidoFinalizado && ultimoPedido && (
         <div className="confirmacao-container">
           <h2>Pedido Confirmado!</h2>
