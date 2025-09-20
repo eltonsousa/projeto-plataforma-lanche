@@ -222,39 +222,35 @@ app.delete("/api/cardapio/:id", (req, res) => {
 });
 
 // ---------------------------------------------
-// SERVIR OS FRONTENDS EM PRODUÇÃO
+// SERVIR OS FRONTENDS EM PRODUÇÃO (USANDO REGEX)
 // ---------------------------------------------
 
-// 1. Serve o frontend Admin na rota /admin (Assets: JS, CSS, etc.)
-// DEVE vir antes do cliente para priorizar os ativos do Admin.
+// 1. Serve o frontend Admin na rota /admin (Assets: JS, CSS, Imagens)
+// DEVE ser o primeiro para priorizar o carregamento dos arquivos estáticos do Painel.
 app.use(
   "/admin",
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 2. ROTEAMENTO EXPLÍCITO DO ADMIN (Para o History API Fallback)
-// Esta rota força o carregamento do index.html para todas as variações de /admin.
-
-// A) Captura o caminho exato /admin
-app.get("/admin", (req, res) => {
+// 2. CATCH-ALL EXPLÍCITO DO ADMIN (Usando Regex para evitar o PathError)
+// O Regex /^\/admin(\/|$).*/ captura:
+// - /admin
+// - /admin/
+// - /admin/pedidos
+app.get(/^\/admin(\/|$).*/, (req, res) => {
+  // Carrega o index.html do Painel Admin para o History API Fallback
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// B) Captura todos os sub-caminhos, incluindo a barra final /admin/ e /admin/pedidos
-app.get("/admin/*", (req, res) => {
-  res.sendFile(
-    path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
-  );
-});
-
-// 3. Serve o frontend Cliente como a rota principal (/) (Assets)
+// 3. Serve o frontend Cliente como a rota principal (/) (Assets: JS, CSS, Imagens)
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE (History API e 404)
-// Qualquer URL que não foi tratada acima (e não é API) será direcionada para o cliente.
+// 4. CATCH-ALL FINAL PARA O CLIENTE (Usando Regex para evitar o PathError)
+// Captura qualquer outra rota restante que não foi /api ou /admin.
 app.get(/.*/, (req, res) => {
+  // Carrega o index.html do Cliente para o History API Fallback
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
   );
