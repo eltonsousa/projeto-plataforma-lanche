@@ -226,26 +226,36 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // ---------------------------------------------
 
 // 1. Serve o frontend Cliente como a rota principal (/)
+// DEVE ser o primeiro a ser servido, pois é a raiz.
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
-// 2. Serve o frontend Admin na rota /admin (Para carregar JS/CSS/Imagens)
+// 2. Serve o frontend Admin na rota /admin
+// Essencial para carregar os assets (JS/CSS) do Admin a partir do subcaminho /admin
 app.use(
-  "/admin", // A URL será /admin
+  "/admin",
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN (A CORREÇÃO FINAL)
-// A Regex /admin seguido por uma barra OU fim da string, e depois qualquer coisa.
-app.get(/\/admin(\/|$).*/, (req, res) => {
-  // Carrega o index.html do Painel Admin
+// 3. ROTEAMENTO EXPLÍCITO DO ADMIN (CATCH-ALL)
+
+// A) Rota exata para /admin: Garante que a rota base (sem sub-caminho) carregue o index.
+app.get("/admin", (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE (Para carregar o index.html do Cliente)
+// B) Rota para todas as sub-rotas: Usa a Regex mais segura para capturar /admin/qualquer-coisa
+// Isso lida com o History Fallback para URLs como /admin/pedidos
+app.get(/^\/admin\/.*/, (req, res) => {
+  res.sendFile(
+    path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
+  );
+});
+
+// 4. CATCH-ALL FINAL PARA O CLIENTE
+// Qualquer outra rota que não seja /api, /admin ou um arquivo estático existente, volta para o Cliente
 app.get(/.*/, (req, res) => {
-  // Carrega o index.html do Cliente
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
   );
