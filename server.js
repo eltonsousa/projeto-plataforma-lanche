@@ -224,17 +224,19 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // ---------------------------------------------
 // SERVIR OS FRONTENDS EM PRODUÇÃO
 // ---------------------------------------------
+// 1. Serve o frontend Admin na rota /admin
 app.use(
   "/admin", // A URL será /admin
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// Serve o frontend Cliente como a rota principal (/)
+// 2. Serve o frontend Cliente como a rota principal (/)
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
-// ATENÇÃO: Corrigido o erro do PathError. Usa '/*' para ser mais compatível.
-// Se a rota principal do CLIENTE não for encontrada, retorna o index.html (History API fallback)
-app.get("/*", (req, res) => {
+// 3. Rota Catch-All (CORREÇÃO DE ERRO)
+// Usa uma Expressão Regular para evitar o PathError e serve o index.html do cliente
+// para o History API do React.
+app.get(/.*/, (req, res) => {
   // O Render roda o servidor na raiz /opt/render/project/src/, por isso usamos path.resolve
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
