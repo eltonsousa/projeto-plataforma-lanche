@@ -324,3 +324,65 @@ header {
 .novo-pedido-btn:hover {
   background-color: #e5533d;
 }
+
+@media screen and (min-width: 350px) and (max-width: 450px) {
+  /* Coloque aqui os estilos CSS que serão aplicados */
+  
+.cardapio-item {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex
+;
+    align-items: center;
+    padding: 10px;
+    width: 95%;
+    max-width: 700px;
+}
+
+
+  .cardapio-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 20px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
+.cardapio-item h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0px 0px 10px 0px;
+}
+
+.cardapio-item p {
+    font-size: 0.8rem;
+    color: #666;
+    height: 60px;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 120px;
+    text-overflow: ellipsis;
+}
+
+.cardapio-item button.add-carrinho {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 7px 10px;
+}
+.add-carrinho {
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: .8rem;
+    transition: background-color 0.3s 
+ease;
+}
+
+}
