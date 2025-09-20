@@ -221,17 +221,21 @@ app.delete("/api/cardapio/:id", (req, res) => {
   }
 });
 
-// Serve o frontend Admin
+// ---------------------------------------------
+// SERVIR OS FRONTENDS EM PRODUÇÃO
+// ---------------------------------------------
 app.use(
   "/admin", // A URL será /admin
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// Serve o frontend Cliente como a rota principal
+// Serve o frontend Cliente como a rota principal (/)
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
-// Se a rota principal não for encontrada, retorna o index.html do cliente
-app.get("*", (req, res) => {
+// ATENÇÃO: Corrigido o erro do PathError. Usa '/*' para ser mais compatível.
+// Se a rota principal do CLIENTE não for encontrada, retorna o index.html (History API fallback)
+app.get("/*", (req, res) => {
+  // O Render roda o servidor na raiz /opt/render/project/src/, por isso usamos path.resolve
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
   );
