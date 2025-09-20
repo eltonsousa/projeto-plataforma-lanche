@@ -225,36 +225,35 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // SERVIR OS FRONTENDS EM PRODUÇÃO
 // ---------------------------------------------
 
-// 1. Serve o frontend Cliente como a rota principal (/)
-// DEVE ser o primeiro a ser servido, pois é a raiz.
-app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
-
-// 2. Serve o frontend Admin na rota /admin
-// Essencial para carregar os assets (JS/CSS) do Admin a partir do subcaminho /admin
+// 1. Serve o frontend Admin na rota /admin (Assets: JS, CSS, etc.)
+// DEVE vir antes do cliente para priorizar os ativos do Admin.
 app.use(
   "/admin",
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 3. ROTEAMENTO EXPLÍCITO DO ADMIN (CATCH-ALL)
+// 2. ROTEAMENTO EXPLÍCITO DO ADMIN (Para o History API Fallback)
+// Esta rota força o carregamento do index.html para todas as variações de /admin.
 
-// A) Rota exata para /admin: Garante que a rota base (sem sub-caminho) carregue o index.
+// A) Captura o caminho exato /admin
 app.get("/admin", (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// B) Rota para todas as sub-rotas: Usa a Regex mais segura para capturar /admin/qualquer-coisa
-// Isso lida com o History Fallback para URLs como /admin/pedidos
-app.get(/^\/admin\/.*/, (req, res) => {
+// B) Captura todos os sub-caminhos, incluindo a barra final /admin/ e /admin/pedidos
+app.get("/admin/*", (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE
-// Qualquer outra rota que não seja /api, /admin ou um arquivo estático existente, volta para o Cliente
+// 3. Serve o frontend Cliente como a rota principal (/) (Assets)
+app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
+
+// 4. CATCH-ALL FINAL PARA O CLIENTE (History API e 404)
+// Qualquer URL que não foi tratada acima (e não é API) será direcionada para o cliente.
 app.get(/.*/, (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
