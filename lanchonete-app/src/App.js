@@ -14,7 +14,9 @@ function App() {
   const fetchCardapio = async () => {
     try {
       // Agora o fetch é feito a partir do servidor
-      const response = await fetch("http://localhost:3001/api/cardapio");
+      const response = await fetch(
+        "https://lanchonete-api-hap5.onrender.com/api/cardapio"
+      );
       if (!response.ok) {
         throw new Error("Erro ao buscar o cardápio");
       }
@@ -103,13 +105,16 @@ function App() {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/api/pedidos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dadosDoPedido),
-      });
+      const response = await fetch(
+        "https://lanchonete-api-hap5.onrender.com/api/pedidos",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dadosDoPedido),
+        }
+      );
 
       if (response.ok) {
         alert("Pedido enviado com sucesso para a lanchonete!");

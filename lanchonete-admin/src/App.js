@@ -26,7 +26,9 @@ function App() {
   // FUNÇÕES DE PEDIDOS
   const fetchPedidos = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/pedidos");
+      const response = await fetch(
+        "https://lanchonete-api-hap5.onrender.com/api/pedidos"
+      );
       if (!response.ok) {
         throw new Error("Erro ao buscar pedidos");
       }
@@ -41,11 +43,14 @@ function App() {
 
   const atualizarStatus = async (pedidoId, novoStatus) => {
     try {
-      await fetch(`http://localhost:3001/api/pedidos/${pedidoId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: novoStatus }),
-      });
+      await fetch(
+        `https://lanchonete-api-hap5.onrender.com/api/pedidos/${pedidoId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: novoStatus }),
+        }
+      );
       fetchPedidos();
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
@@ -54,9 +59,12 @@ function App() {
 
   const concluirPedido = async (pedidoId) => {
     try {
-      await fetch(`http://localhost:3001/api/pedidos/${pedidoId}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `https://lanchonete-api-hap5.onrender.com/api/pedidos/${pedidoId}`,
+        {
+          method: "DELETE",
+        }
+      );
       fetchPedidos();
     } catch (error) {
       console.error("Erro ao concluir pedido:", error);
@@ -66,7 +74,9 @@ function App() {
   // FUNÇÕES DE CARDÁPIO
   const fetchCardapio = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/cardapio");
+      const response = await fetch(
+        "https://lanchonete-api-hap5.onrender.com/api/cardapio"
+      );
       const data = await response.json();
       setCardapio(data);
     } catch (error) {
@@ -86,8 +96,8 @@ function App() {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
-      ? `http://localhost:3001/api/cardapio/${itemForm.id}`
-      : "http://localhost:3001/api/cardapio";
+      ? `https://lanchonete-api-hap5.onrender.com/api/cardapio/${itemForm.id}`
+      : "https://lanchonete-api-hap5.onrender.com/api/cardapio";
 
     try {
       // Cria um objeto com os valores corretos (preço já é um número)
@@ -113,9 +123,12 @@ function App() {
 
   const handleDelete = async (itemId) => {
     try {
-      await fetch(`http://localhost:3001/api/cardapio/${itemId}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `https://lanchonete-api-hap5.onrender.com/api/cardapio/${itemId}`,
+        {
+          method: "DELETE",
+        }
+      );
       fetchCardapio();
     } catch (error) {
       console.error("Erro ao deletar item:", error);
@@ -130,11 +143,14 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3001/api/usuarios/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://lanchonete-api-hap5.onrender.com/api/usuarios/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
       if (response.ok) {
         setIsLoggedIn(true);
         sessionStorage.setItem("isLoggedIn", "true"); // PERSISTE O LOGIN
@@ -153,7 +169,7 @@ function App() {
     e.preventDefault();
     try {
       const response = await fetch(
-        "http://localhost:3001/api/usuarios/registrar",
+        "https://lanchonete-api-hap5.onrender.com/api/usuarios/registrar",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -375,7 +391,7 @@ function App() {
             {cardapio.map((item) => (
               <div key={item.id} className="item-cardapio-admin">
                 <img
-                  src={`http://localhost:3001/${item.imagem}`}
+                  src={`https://lanchonete-api-hap5.onrender.com/${item.imagem}`}
                   alt={item.nome}
                 />
                 <div className="item-info-admin">
