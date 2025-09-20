@@ -224,20 +224,29 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // ---------------------------------------------
 // SERVIR OS FRONTENDS EM PRODUÇÃO
 // ---------------------------------------------
-// 1. Serve o frontend Admin na rota /admin
+// 1. Serve o frontend Cliente como a rota principal (/)
+// DEVE vir antes do admin para que o root / funcione.
+app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
+
+// 2. Serve o frontend Admin na rota /admin
 app.use(
   "/admin", // A URL será /admin
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 2. Serve o frontend Cliente como a rota principal (/)
-app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
+// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN
+// O Admin precisa que TODAS as rotas comecem com /admin/ (ex: /admin/pedidos)
+// sejam redirecionadas para o seu próprio index.html (History API fallback).
+app.get("/admin/*", (req, res) => {
+  res.sendFile(
+    path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
+  );
+});
 
-// 3. Rota Catch-All (CORREÇÃO DE ERRO)
-// Usa uma Expressão Regular para evitar o PathError e serve o index.html do cliente
-// para o History API do React.
+// 4. CATCH-ALL FINAL PARA O CLIENTE
+// Qualquer outra rota que não seja /api, /admin, ou um arquivo estático existente,
+// deve ser redirecionada para o index.html do Cliente.
 app.get(/.*/, (req, res) => {
-  // O Render roda o servidor na raiz /opt/render/project/src/, por isso usamos path.resolve
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
   );
