@@ -226,31 +226,36 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // ---------------------------------------------
 
 // 1. Serve o frontend Admin na rota /admin (Assets: JS, CSS, Imagens)
-// DEVE ser o primeiro para priorizar o carregamento dos arquivos estáticos do Painel.
 app.use(
   "/admin",
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 2. CATCH-ALL EXPLÍCITO DO ADMIN (Usando Regex para evitar o PathError)
-// O Regex /^\/admin(\/|$).*/ captura:
-// - /admin
-// - /admin/
-// - /admin/pedidos
-app.get(/^\/admin(\/|$).*/, (req, res) => {
-  // Carrega o index.html do Painel Admin para o History API Fallback
+// 2. ROTEAMENTO EXPLÍCITO DO ADMIN (Fallback para index.html)
+
+// A) Captura o caminho EXATO /admin (sem barra final ou subcaminho)
+app.get("/admin", (req, res) => {
+  console.log("Servindo /admin -> index.html (rota base)");
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// 3. Serve o frontend Cliente como a rota principal (/) (Assets: JS, CSS, Imagens)
+// B) Captura todos os sub-caminhos, incluindo a barra final /admin/ e /admin/qualquer-coisa
+// Regex: Captura /admin/ e qualquer coisa que venha depois (.*)
+app.get(/\/admin\/.*/, (req, res) => {
+  console.log("Servindo /admin/* -> index.html (sub-rotas)");
+  res.sendFile(
+    path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
+  );
+});
+
+// 3. Serve o frontend Cliente como a rota principal (/) (Assets)
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE (Usando Regex para evitar o PathError)
-// Captura qualquer outra rota restante que não foi /api ou /admin.
+// 4. CATCH-ALL FINAL PARA O CLIENTE
+// Qualquer coisa que sobrou e não é /api, nem /admin/*, nem /admin, vai para o index do cliente.
 app.get(/.*/, (req, res) => {
-  // Carrega o index.html do Cliente para o History API Fallback
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
   );
