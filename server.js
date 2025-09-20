@@ -225,8 +225,6 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // SERVIR OS FRONTENDS EM PRODUÇÃO
 // ---------------------------------------------
 
-// Certifique-se de que const path = require("path"); está no topo do seu arquivo.
-
 // 1. Serve o frontend Cliente como a rota principal (/)
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
@@ -236,17 +234,18 @@ app.use(
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN (USANDO REGEX para History API Fallback)
-// O Regex /\/admin.*/ corresponde a /admin e a qualquer sub-rota dentro dele.
-app.get(/\/admin.*/, (req, res) => {
+// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN (A ROTA QUE PRECISA DE AJUSTE)
+// Esta regex:
+// - ^\/admin  -> Corresponde à URL exata /admin
+// - (\/.*)?$ -> Corresponde a /admin/ e qualquer coisa depois (opcional)
+app.get(/^\/admin(\/.*)?$/, (req, res) => {
   // Carrega o index.html do Painel Admin
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE (USANDO REGEX para History API Fallback)
-// O Regex /.*/ corresponde a todas as outras rotas restantes e carrega o index.html do Cliente
+// 4. CATCH-ALL FINAL PARA O CLIENTE
 app.get(/.*/, (req, res) => {
   // Carrega o index.html do Cliente
   res.sendFile(
