@@ -228,24 +228,22 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // 1. Serve o frontend Cliente como a rota principal (/)
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
-// 2. Serve o frontend Admin na rota /admin
+// 2. Serve o frontend Admin na rota /admin (Para carregar JS/CSS/Imagens)
 app.use(
   "/admin", // A URL será /admin
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN (A ROTA QUE PRECISA DE AJUSTE)
-// Esta regex:
-// - ^\/admin  -> Corresponde à URL exata /admin
-// - (\/.*)?$ -> Corresponde a /admin/ e qualquer coisa depois (opcional)
-app.get(/^\/admin(\/.*)?$/, (req, res) => {
+// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN (A CORREÇÃO FINAL)
+// A Regex /admin seguido por uma barra OU fim da string, e depois qualquer coisa.
+app.get(/\/admin(\/|$).*/, (req, res) => {
   // Carrega o index.html do Painel Admin
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE
+// 4. CATCH-ALL FINAL PARA O CLIENTE (Para carregar o index.html do Cliente)
 app.get(/.*/, (req, res) => {
   // Carrega o index.html do Cliente
   res.sendFile(
