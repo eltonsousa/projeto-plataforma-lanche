@@ -4,7 +4,10 @@
     "description": "Backend para a aplicação de lanchonete",
     "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+        "start": "node server.js",
+        "build:app": "cd lanchonete-app && npm install && npm run build",
+        "build:admin": "cd lanchonete-admin && npm install && npm run build",
+        "build:all": "npm run build:app && npm run build:admin"
     },
     "dependencies": {
         "express": "^5.1.0",
