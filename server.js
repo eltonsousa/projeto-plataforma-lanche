@@ -225,7 +225,6 @@ app.delete("/api/cardapio/:id", (req, res) => {
 // SERVIR OS FRONTENDS EM PRODUÇÃO
 // ---------------------------------------------
 // 1. Serve o frontend Cliente como a rota principal (/)
-// DEVE vir antes do admin para que o root / funcione.
 app.use(express.static(path.join(__dirname, "lanchonete-app", "build")));
 
 // 2. Serve o frontend Admin na rota /admin
@@ -234,18 +233,16 @@ app.use(
   express.static(path.join(__dirname, "lanchonete-admin", "build"))
 );
 
-// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN
-// O Admin precisa que TODAS as rotas comecem com /admin/ (ex: /admin/pedidos)
-// sejam redirecionadas para o seu próprio index.html (History API fallback).
-app.get("/admin/*", (req, res) => {
+// 3. CATCH-ALL ESPECÍFICO PARA O ADMIN (CORREÇÃO FINAL DO ERRO)
+// Usa a sintaxe de parâmetro nomeado (:path(*)) para o catch-all, garantindo a compatibilidade.
+app.get("/admin/:path(*)", (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-admin", "build", "index.html")
   );
 });
 
-// 4. CATCH-ALL FINAL PARA O CLIENTE
-// Qualquer outra rota que não seja /api, /admin, ou um arquivo estático existente,
-// deve ser redirecionada para o index.html do Cliente.
+// 4. CATCH-ALL FINAL PARA O CLIENTE (MANTÉM A REGEX)
+// Qualquer outra rota que não seja /api, /admin, ou um arquivo estático existente.
 app.get(/.*/, (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
