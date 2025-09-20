@@ -221,10 +221,6 @@ app.delete("/api/cardapio/:id", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-});
-
 // Serve o frontend Admin
 app.use(
   "/admin", // A URL será /admin
@@ -239,4 +235,8 @@ app.get("*", (req, res) => {
   res.sendFile(
     path.resolve(__dirname, "lanchonete-app", "build", "index.html")
   );
+});
+
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
