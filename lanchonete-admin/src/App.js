@@ -26,9 +26,7 @@ function App() {
   // FUNÇÕES DE PEDIDOS
   const fetchPedidos = async () => {
     try {
-      const response = await fetch(
-        "https://lanchonete-api-hap5.onrender.com/api/pedidos"
-      );
+      const response = await fetch("/api/pedidos");
       if (!response.ok) {
         throw new Error("Erro ao buscar pedidos");
       }
@@ -43,14 +41,11 @@ function App() {
 
   const atualizarStatus = async (pedidoId, novoStatus) => {
     try {
-      await fetch(
-        `https://lanchonete-api-hap5.onrender.com/api/pedidos/${pedidoId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: novoStatus }),
-        }
-      );
+      await fetch(`/api/pedidos/${pedidoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: novoStatus }),
+      });
       fetchPedidos();
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
@@ -59,12 +54,9 @@ function App() {
 
   const concluirPedido = async (pedidoId) => {
     try {
-      await fetch(
-        `https://lanchonete-api-hap5.onrender.com/api/pedidos/${pedidoId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await fetch(`/api/pedidos/${pedidoId}`, {
+        method: "DELETE",
+      });
       fetchPedidos();
     } catch (error) {
       console.error("Erro ao concluir pedido:", error);
@@ -74,9 +66,7 @@ function App() {
   // FUNÇÕES DE CARDÁPIO
   const fetchCardapio = async () => {
     try {
-      const response = await fetch(
-        "https://lanchonete-api-hap5.onrender.com/api/cardapio"
-      );
+      const response = await fetch("/api/cardapio");
       const data = await response.json();
       setCardapio(data);
     } catch (error) {
@@ -95,9 +85,7 @@ function App() {
   const handleItemSubmit = async (e) => {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
-    const url = isEditing
-      ? `https://lanchonete-api-hap5.onrender.com/api/cardapio/${itemForm.id}`
-      : "https://lanchonete-api-hap5.onrender.com/api/cardapio";
+    const url = isEditing ? `/api/cardapio/${itemForm.id}` : "/api/cardapio";
 
     try {
       // Cria um objeto com os valores corretos (preço já é um número)
@@ -123,12 +111,9 @@ function App() {
 
   const handleDelete = async (itemId) => {
     try {
-      await fetch(
-        `https://lanchonete-api-hap5.onrender.com/api/cardapio/${itemId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await fetch(`/api/cardapio/${itemId}`, {
+        method: "DELETE",
+      });
       fetchCardapio();
     } catch (error) {
       console.error("Erro ao deletar item:", error);
@@ -143,14 +128,11 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "https://lanchonete-api-hap5.onrender.com/api/usuarios/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("/api/usuarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
       if (response.ok) {
         setIsLoggedIn(true);
         sessionStorage.setItem("isLoggedIn", "true"); // PERSISTE O LOGIN
@@ -168,14 +150,11 @@ function App() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "https://lanchonete-api-hap5.onrender.com/api/usuarios/registrar",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("/api/usuarios/registrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
       const data = await response.json();
       if (response.status === 201) {
         alert("Usuário registrado com sucesso! Faça login.");
@@ -390,10 +369,7 @@ function App() {
             <h3>Itens Atuais</h3>
             {cardapio.map((item) => (
               <div key={item.id} className="item-cardapio-admin">
-                <img
-                  src={`https://lanchonete-api-hap5.onrender.com/${item.imagem}`}
-                  alt={item.nome}
-                />
+                <img src={`/${item.imagem}`} alt={item.nome} />
                 <div className="item-info-admin">
                   <h4>{item.nome}</h4>
                   <p>R$ {item.preco ? item.preco.toFixed(2) : "0.00"}</p>
