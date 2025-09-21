@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 
+// Importa icone
+import { MdOutlineShoppingCart } from "react-icons/md";
+
 // COMPONENTE: Ícone do carrinho no cabeçalho
 const CartIcon = ({ count, onClick }) => (
   <button className="carrinho-icon-btn" onClick={onClick}>
-    🛒
+    <MdOutlineShoppingCart />
     {count > 0 && <span className="carrinho-count">{count}</span>}
   </button>
 );
