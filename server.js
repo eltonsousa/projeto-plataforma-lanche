@@ -337,17 +337,23 @@ const calcularDataFiltro = (periodo) => {
 
 // ROTA: GET /api/pedidos/relatorio (Relatórios e Filtros)
 app.get("/api/pedidos/relatorio", async (req, res) => {
-  const { periodo } = req.query; // Captura o parâmetro de filtro (hoje, 15dias, mes, geral)
+  // 🟢 ATUALIZAÇÃO: Captura o novo parâmetro 'status'
+  const { periodo, status } = req.query;
   let query = supabase.from("pedidos_lanche").select("*");
 
   // 1. Aplica o filtro de data, se for necessário
   const { dataInicio, dataFim } = calcularDataFiltro(periodo);
 
   if (dataInicio && dataFim) {
-    // Filtra a coluna 'data' (assumindo que você a salva no Supabase)
     query = query
       .gte("data", dataInicio.toISOString())
       .lte("data", dataFim.toISOString());
+  }
+
+  // 🟢 NOVO FILTRO DE STATUS
+  if (status && status !== "todos") {
+    // Aplica o filtro exato na coluna 'status'
+    query = query.eq("status", status);
   }
 
   try {

@@ -7,9 +7,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    // 📢 Troca de localStorage para sessionStorage
     return sessionStorage.getItem("isLoggedIn") === "true";
   });
+  // ✅ Declaração única (Corrigido o erro de redeclaração)
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ nome: "", senha: "" });
   const [mostraSenha, setMostraSenha] = useState(false);
@@ -23,20 +23,27 @@ function App() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // 🟢 NOVOS ESTADOS PARA RELATÓRIO
+  // 🟢 ESTADOS DE RELATÓRIO E FILTRO DE STATUS
   const [filtroPeriodo, setFiltroPeriodo] = useState("geral");
   const [resumoRelatorio, setResumoRelatorio] = useState({
     totalPedidos: 0,
     faturamento: "0.00",
   });
+  const [filtroStatus, setFiltroStatus] = useState("todos"); // Novo filtro de status
 
-  // FUNÇÕES DE PEDIDOS
-  // 🟢 NOVA FUNÇÃO: Substitui fetchPedidos, buscando o relatório filtrado
-  const fetchRelatorio = async (periodo) => {
+  // FUNÇÕES DE PEDIDOS E RELATÓRIOS (Atualizadas)
+
+  // 🟢 NOVO: Função Única para buscar pedidos/relatório com filtros de data e status
+  const fetchRelatorio = async (periodo, status) => {
     setLoading(true);
     try {
-      // Chama a nova rota de relatório com o parâmetro de período
-      const response = await fetch(`/api/pedidos/relatorio?periodo=${periodo}`);
+      // Constrói a URL com os filtros de período e status
+      let url = `/api/pedidos/relatorio?periodo=${periodo}`;
+      if (status && status !== "todos") {
+        url += `&status=${status}`;
+      }
+
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Erro ao buscar pedidos ou relatório.");
       }
@@ -56,6 +63,7 @@ function App() {
     }
   };
 
+  // 🟢 ATUALIZAÇÃO: Chama fetchRelatorio com os filtros atuais
   const atualizarStatus = async (pedidoId, novoStatus) => {
     try {
       await fetch(`/api/pedidos/${pedidoId}`, {
@@ -63,20 +71,19 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: novoStatus }),
       });
-      // 🟢 ATUALIZA: Recarrega o relatório com o filtro atual
-      fetchRelatorio(filtroPeriodo);
+      fetchRelatorio(filtroPeriodo, filtroStatus);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
     }
   };
 
+  // 🟢 ATUALIZAÇÃO: Chama fetchRelatorio com os filtros atuais
   const concluirPedido = async (pedidoId) => {
     try {
       await fetch(`/api/pedidos/${pedidoId}`, {
         method: "DELETE",
       });
-      // 🟢 ATUALIZA: Recarrega o relatório com o filtro atual
-      fetchRelatorio(filtroPeriodo);
+      fetchRelatorio(filtroPeriodo, filtroStatus);
     } catch (error) {
       console.error("Erro ao concluir pedido:", error);
     }
@@ -93,6 +100,7 @@ function App() {
     }
   };
 
+  // ... (handleItemFormChange, handleItemSubmit, handleEdit, handleDelete continuam aqui) ...
   const handleItemFormChange = (e) => {
     const { name, value } = e.target;
     setItemForm({
@@ -189,27 +197,34 @@ function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
     sessionStorage.removeItem("isLoggedIn"); // 📢 Limpa a chave de persistência
-    setCurrentPage("pedidos"); // Volta para a página inicial (se necessário)
+    setCurrentPage("pedidos");
     alert("Logout realizado com sucesso!");
   };
 
   // EFEITOS
   useEffect(() => {
     if (isLoggedIn) {
+      // 🟢 ATUALIZAÇÃO: Chama o relatório para Pedidos E Relatórios
       if (currentPage === "pedidos" || currentPage === "relatorios") {
-        // 🟢 ATUALIZAÇÃO: Usa fetchRelatorio e depende de filtroPeriodo
-        fetchRelatorio(filtroPeriodo);
+        // Passa os dois filtros: período (data) e status
+        fetchRelatorio(filtroPeriodo, filtroStatus);
+        // Configuração da atualização automática (a cada 10 segundos)
+        const intervalId = setInterval(
+          () => fetchRelatorio(filtroPeriodo, filtroStatus),
+          10000
+        );
+        return () => clearInterval(intervalId); // Limpa o intervalo na saída
       } else if (currentPage === "cardapio") {
         fetchCardapio();
       }
     }
-  }, [isLoggedIn, currentPage, filtroPeriodo]); // 🟢 Adiciona filtroPeriodo como dependência
+    // 🟢 DEPENDÊNCIAS: Recarrega se o login, a página, o filtro de data OU o filtro de status mudarem
+  }, [isLoggedIn, currentPage, filtroPeriodo, filtroStatus]);
 
   if (!isLoggedIn) {
     return (
       <div className="auth-container">
         <h2>{isLogin ? "Painel do Administrador" : "Registrar"}</h2>
-        {/* CORREÇÃO AQUI: Chama handleLogin ou handleRegister */}
         <form onSubmit={isLogin ? handleLogin : handleRegister}>
           <input
             type="text"
@@ -254,6 +269,7 @@ function App() {
         <p>Olá, {formData.nome}!</p>
         <nav className="nav-menu">
           <button onClick={() => setCurrentPage("pedidos")}>Pedidos</button>
+          {/* 🟢 Botão de Relatórios adicionado */}
           <button onClick={() => setCurrentPage("relatorios")}>
             Relatórios
           </button>
@@ -263,12 +279,27 @@ function App() {
       </header>
 
       {/* Conteúdo da página de Pedidos */}
-      <h2 className="titulo-pedidos-recebidos">Pedidos Recebidos</h2>
       {currentPage === "pedidos" && (
         <main className="lista-pedidos">
-          {/* 🟢 NOVOS CONTROLES DE FILTRO E RELATÓRIO */}
+          <h2 className="titulo-pedidos-recebidos">Pedidos Recebidos</h2>
 
-          {/* 🟢 FIM DOS CONTROLES DE FILTRO E RELATÓRIO */}
+          {/* 🟢 CONTROLE DE FILTRO DE STATUS */}
+          <div className="controles-pedidos">
+            <label>
+              Filtrar por Status:
+              <select
+                value={filtroStatus}
+                onChange={(e) => setFiltroStatus(e.target.value)}
+              >
+                <option value="todos">Todos os Pedidos</option>
+                <option value="Em preparação">Em Preparação</option>
+                <option value="Pronto para entrega">Pronto para Entrega</option>
+                <option value="Entregue">Entregue</option>
+                <option value="Concluído">Concluído</option>
+              </select>
+            </label>
+          </div>
+          {/* 🟢 FIM DO CONTROLE DE STATUS */}
 
           {loading && <p className="loading">Carregando pedidos...</p>}
           {error && <p className="error">Erro: {error}</p>}
@@ -348,12 +379,11 @@ function App() {
         </main>
       )}
 
-      {/* Conteúdo da página de Relatórios */}
+      {/* 🟢 CONTEÚDO DA PÁGINA DE RELATÓRIOS (Movido daqui) */}
       {currentPage === "relatorios" && isLoggedIn && (
         <main className="painel-relatorios">
           <h2 className="titulo-relatorio">Resumo Financeiro</h2>
 
-          {/* 🟢 CONTROLES DE FILTRO E RELATÓRIO MANTIDOS */}
           <div className="controles-relatorio">
             <label>
               Filtrar por Período:
@@ -388,12 +418,14 @@ function App() {
             </div>
           </div>
 
-          {/* 🟢 LISTA DE PEDIDOS FILTRADOS ABAIXO (OPCIONAL) */}
-          <h3 className="subtitulo-relatorio">Detalhe dos Pedidos</h3>
+          <h3 className="subtitulo-relatorio">
+            Detalhe dos Pedidos (Status:{" "}
+            {filtroStatus === "todos" ? "Todos" : filtroStatus})
+          </h3>
           {loading && <p className="loading">Carregando pedidos...</p>}
           {pedidos.length === 0 && !loading && (
             <p className="sem-pedidos">
-              Nenhum pedido encontrado para o período selecionado.
+              Nenhum pedido encontrado para o período/status selecionado.
             </p>
           )}
 
@@ -415,7 +447,7 @@ function App() {
         </main>
       )}
 
-      {/* Conteúdo da página de Cardápio (Inalterado) */}
+      {/* Conteúdo da página de Cardápio */}
       {currentPage === "cardapio" && (
         <main className="painel-cardapio">
           <h2>Gerenciar Cardápio</h2>
