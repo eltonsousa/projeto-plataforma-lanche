@@ -1,141 +1,185 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
 header {
-    background-color: #ff6347; /* Cor de lanchonete */
-    color: white;
-    padding: 2rem 1rem;
-    text-align: center;
+  background-color: #ff6347; /* Cor de lanchonete */
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
 }
 
 .cardapio {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-    /* 🟢 Altera o fluxo principal para coluna, mantendo os cards abaixo um do outro */
-    flex-direction: column; 
-    align-items: center; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  /* 🟢 Altera o fluxo principal para coluna, mantendo os cards abaixo um do outro */
+  flex-direction: column;
+  align-items: center;
 }
 
 .cardapio-item {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    
-    /* 🟢 NOVOS ESTILOS PARA HORIZONTAL LIMPO */
-    display: flex; 
-    align-items: center; /* Alinha verticalmente os elementos (imagem, info, botão) */
-    padding: 15px; 
-    width: 95%; 
-    max-width: 700px; /* Limite máximo para o card */
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  /* 🟢 NOVOS ESTILOS PARA HORIZONTAL LIMPO */
+  display: flex;
+  align-items: center; /* Alinha verticalmente os elementos (imagem, info, botão) */
+  padding: 15px;
+  width: 95%;
+  max-width: 700px; /* Limite máximo para o card */
 }
 
 .cardapio-item:hover {
-    transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .cardapio-item img {
-    /* 🟢 NOVOS ESTILOS */
-    width: 120px; 
-    height: 120px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-right: 20px; /* Espaço entre a imagem e o texto */
-    flex-shrink: 0; /* Impede a imagem de encolher */
-    margin-bottom: 0; /* Remove a margem inferior original */
+  /* 🟢 NOVOS ESTILOS */
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px; /* Espaço entre a imagem e o texto */
+  flex-shrink: 0; /* Impede a imagem de encolher */
+  margin-bottom: 0; /* Remove a margem inferior original */
 }
 
 .cardapio-item h2 {
-    font-size: 1.5rem;
-    color: #333;
-    margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
 }
 
 .cardapio-item p {
-    font-size: 0.9rem;
-    color: #666;
-    height: 60px;
-    margin: 0;
-    
+  font-size: 0.9rem;
+  color: #666;
+  height: 60px;
+  margin: 0;
 }
 
 /* Ajuste fino no botão */
 .cardapio-item button.add-carrinho {
-    margin-left: auto; /* Empurra o botão para o canto direito */
-    flex-shrink: 0;
-    padding: 10px 15px;
-    
+  margin-left: auto; /* Empurra o botão para o canto direito */
+  flex-shrink: 0;
+  padding: 10px 15px;
 }
 
 .preco {
-    font-size: 1.4rem;
-    color: #ff6347;
-    font-weight: bold;
-    display: block;
-    margin-top: 5px;
+  font-size: 1.4rem;
+  color: #ff6347;
+  font-weight: bold;
+  display: block;
+  margin-top: 5px;
 }
 
 .add-carrinho {
-    background-color: #ff6347;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
 }
 
 .add-carrinho:hover {
-    background-color: #e5533d;
+  background-color: #e5533d;
 }
 
 /* Estilos da nova seção do carrinho */
 .carrinho-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 300px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  z-index: 50;
+}
+
+/* --------------------------------------------- */
+/* 🟢 NOVOS ESTILOS PARA O ÍCONE DO CARRINHO FIXO */
+/* --------------------------------------------- */
+
+.carrinho-icon-btn {
+  position: fixed; /* Fixa na tela */
+  top: 20px;
+  right: 20px;
+  background-color: white; /* Cor do cabeçalho */
+  color: #ff6347;
+  border: none;
+  border-radius: 50%; /* Faz o botão ser circular */
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 100; /* Garante que fique acima de tudo, inclusive do carrinho lateral */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.carrinho-icon-btn:hover {
+  background-color: #ff6347;
+  color: white;
+  transform: scale(1.05);
+}
+
+.carrinho-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #4caf50; /* Cor de destaque (verde) */
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 3px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 1.5;
 }
 
 .carrinho-container h2 {
-    color: #ff6347;
-    text-align: center;
-    border-bottom: 2px solid #ff6347;
-    padding-bottom: 10px;
-    margin-top: 0;
+  color: #ff6347;
+  text-align: center;
+  border-bottom: 2px solid #ff6347;
+  padding-bottom: 10px;
+  margin-top: 0;
 }
 
 .carrinho-itens {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .carrinho-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px dashed #ddd;
-    padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #ddd;
+  padding: 10px 0;
 }
 
 /* 🟢 NOVO: Classe que agrupa e organiza o Nome/Desc/Preço */
 .item-info {
-    flex-grow: 1; /* Faz o bloco de texto ocupar todo o espaço restante */
-    text-align: left; /* Garante que o texto comece à esquerda */
-    margin-right: 10px; /* Espaço antes do botão */
+  flex-grow: 1; /* Faz o bloco de texto ocupar todo o espaço restante */
+  text-align: left; /* Garante que o texto comece à esquerda */
+  margin-right: 10px; /* Espaço antes do botão */
 }
 
 .item-info p {
@@ -143,25 +187,25 @@ header {
 }
 
 .carrinho-botoes {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .quantidade-botoes {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .quantidade-botoes button {
-    background-color: #f4f4f4;
-    border: 1px solid #ccc;
-    color: #333;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
 .quantidade-botoes span {
@@ -169,114 +213,115 @@ header {
 }
 
 .quantidade-botoes button:hover {
-    background-color: #e2e2e2;
+  background-color: #e2e2e2;
 }
 
 .remover-item {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: background-color 0.3s ease;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease;
 }
 
 .remover-item:hover {
-    background-color: #d32f2f;
+  background-color: #d32f2f;
 }
 
 .carrinho-total {
-    margin-top: 1.5rem;
-    text-align: right;
+  margin-top: 1.5rem;
+  text-align: right;
 }
 
 .carrinho-total h3 {
-    color: #333;
+  color: #333;
 }
 
 .finalizar-pedido {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    width: 100%;
-    margin-top: 1rem;
-    transition: background-color 0.3s ease;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
 }
 
 .finalizar-pedido:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
 /* Estilos para o formulário de checkout */
 .checkout-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 2rem;
-    width: 90%;
-    max-width: 450px;
-    z-index: 100;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  width: 90%;
+  max-width: 450px;
+  z-index: 100;
 }
 
 .checkout-container h2 {
-    color: #ff6347;
-    text-align: center;
-    border-bottom: 2px solid #ff6347;
-    padding-bottom: 10px;
-    margin-top: 0;
+  color: #ff6347;
+  text-align: center;
+  border-bottom: 2px solid #ff6347;
+  padding-bottom: 10px;
+  margin-top: 0;
 }
 
 .checkout-container form {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .checkout-container label {
-    font-weight: bold;
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
+  font-weight: bold;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.checkout-container input, .checkout-container select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 5px;
+.checkout-container input,
+.checkout-container select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 5px;
 }
 
 .checkout-container button.finalizar-pedido {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 /* Estilos para a tela de confirmação */
 .confirmacao-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 2rem;
-    width: 90%;
-    max-width: 450px;
-    text-align: center;
-    z-index: 100;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  z-index: 100;
 }
 
 .confirmacao-container h2 {
-    color: #4CAF50;
+  color: #4caf50;
 }
 
 .resumo-pedido {
@@ -323,4 +368,62 @@ header {
 
 .novo-pedido-btn:hover {
   background-color: #e5533d;
+}
+
+@media screen and (min-width: 350px) and (max-width: 450px) {
+  /* Coloque aqui os estilos CSS que serão aplicados */
+
+  .cardapio-item {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    width: 95%;
+    max-width: 700px;
+  }
+
+  .cardapio-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 20px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+
+  .cardapio-item h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0px 0px 10px 0px;
+  }
+
+  .cardapio-item p {
+    font-size: 0.8rem;
+    color: #666;
+    height: 60px;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 120px;
+    text-overflow: ellipsis;
+  }
+
+  .cardapio-item button.add-carrinho {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 7px 10px;
+  }
+  .add-carrinho {
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.3s ease;
+  }
 }
