@@ -306,6 +306,70 @@ app.delete("/api/pedidos/:id", async (req, res) => {
   }
 });
 
+// ROTA: POST/PUT /api/carrinho (Salvar ou Atualizar Carrinho)
+app.post("/api/carrinho", async (req, res) => {
+  const { sessionId, itens } = req.body;
+
+  try {
+    // 1. Tenta encontrar um carrinho existente com esse sessionId
+    const { data: existingCart, error: fetchError } = await supabase
+      .from("carrinhos")
+      .select("id")
+      .eq("session_id", sessionId)
+      .limit(1);
+
+    if (fetchError) throw fetchError;
+
+    let data;
+    let error;
+
+    // 2. Se o carrinho existe, faz UPDATE
+    if (existingCart.length > 0) {
+      ({ data, error } = await supabase
+        .from("carrinhos")
+        .update({ itens: itens, atualizado_em: new Date() })
+        .eq("session_id", sessionId)
+        .select());
+    }
+    // 3. Se não existe, faz INSERT
+    else {
+      ({ data, error } = await supabase
+        .from("carrinhos")
+        .insert([{ session_id: sessionId, itens: itens }])
+        .select());
+    }
+
+    if (error) throw error;
+
+    res.status(200).json(data[0]);
+  } catch (err) {
+    console.error("Erro Supabase POST/PUT /api/carrinho:", err);
+    res.status(500).json({ message: "Erro ao salvar o carrinho." });
+  }
+});
+
+// ROTA: GET /api/carrinho/:sessionId (Carregar Carrinho)
+app.get("/api/carrinho/:sessionId", async (req, res) => {
+  const sessionId = req.params.sessionId;
+
+  try {
+    const { data: carrinho, error } = await supabase
+      .from("carrinhos")
+      .select("itens")
+      .eq("session_id", sessionId)
+      .limit(1);
+
+    if (error) throw error;
+
+    // Se encontrou, retorna os itens; senão, retorna um carrinho vazio.
+    const itens = carrinho.length > 0 ? carrinho[0].itens : [];
+    res.status(200).json(itens);
+  } catch (err) {
+    console.error("Erro Supabase GET /api/carrinho:", err);
+    res.status(500).json({ message: "Erro ao carregar o carrinho." });
+  }
+});
+
 // ---------------------------------------------
 // SERVIR OS FRONTENDS EM PRODUÇÃO
 // ---------------------------------------------

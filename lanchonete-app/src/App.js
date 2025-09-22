@@ -1,19 +1,35 @@
 import React, { useState, useEffect } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
+import { BsCart3 } from "react-icons/bs";
 
-// Importa icone
-import { MdOutlineShoppingCart } from "react-icons/md";
+// --- FUNÇÕES DE PERSISTÊNCIA (NOVO) ---
+// Função que garante um ID único para a sessão do carrinho no navegador
+const getSessionId = () => {
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    // Gera um ID único simples (UUID)
+    sessionId =
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
+    localStorage.setItem("sessionId", sessionId);
+  }
+  return sessionId;
+};
+
+// --- FUNÇÕES DE PERSISTÊNCIA (NOVO) FIM ---
 
 // COMPONENTE: Ícone do carrinho no cabeçalho
 const CartIcon = ({ count, onClick }) => (
   <button className="carrinho-icon-btn" onClick={onClick}>
-    <MdOutlineShoppingCart />
+    <BsCart3 size={24} />
     {count > 0 && <span className="carrinho-count">{count}</span>}
   </button>
 );
 
 function App() {
+  const sessionId = getSessionId(); // Obtém o ID da sessão na inicialização
+
   const [carrinho, setCarrinho] = useState([]);
   const [mostraCheckout, setMostraCheckout] = useState(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState(false);
@@ -21,11 +37,70 @@ function App() {
   const [itensCardapio, setItensCardapio] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // ESTADO: Controla se a visualização do carrinho (lateral) está aberta
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
 
+  // --- FUNÇÕES ASYNC DE CARRINHO (NOVO) ---
+
+  // FUNÇÃO: Carrega o carrinho do Supabase via Backend
+  const loadCarrinhoFromSupabase = async () => {
+    try {
+      // Busca os itens do carrinho usando a rota do Express/Backend
+      const response = await fetch(`/api/carrinho/${sessionId}`);
+
+      if (response.ok) {
+        const itens = await response.json();
+        if (itens && itens.length > 0) {
+          setCarrinho(itens);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar carrinho do Supabase:", error);
+    }
+  };
+
+  // FUNÇÃO: Salva o carrinho no Supabase via Backend
+  const saveCarrinhoToSupabase = async (currentCarrinho) => {
+    try {
+      await fetch("/api/carrinho", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sessionId, itens: currentCarrinho }),
+      });
+    } catch (error) {
+      console.error("Erro ao salvar carrinho no Supabase:", error);
+    }
+  };
+
+  // --- EFEITOS ---
+
+  // EFEITO 1: Carregar Cardápio e o Carrinho Persistido
+  useEffect(() => {
+    fetchCardapio();
+    loadCarrinhoFromSupabase(); // Carrega o carrinho na inicialização
+
+    const intervalId = setInterval(fetchCardapio, 10000);
+    return () => clearInterval(intervalId);
+  }, []); // Executa apenas uma vez no carregamento
+
+  // EFEITO 2: Persistência (Salva no Supabase sempre que o carrinho muda)
+  useEffect(() => {
+    // Evita salvar no primeiro carregamento, onde o carrinho é []
+    if (loading === false) {
+      saveCarrinhoToSupabase(carrinho);
+    }
+
+    // Lógica para controle da exibição do ícone do carrinho
+    if (carrinho.length === 0) {
+      setMostraCarrinho(false);
+    }
+  }, [carrinho, loading, sessionId]);
+
+  // --- RESTANTE DAS FUNÇÕES (ADICIONAR/REMOVER/CHECKOUT) ---
+
   const fetchCardapio = async () => {
+    // ... (função fetchCardapio, sem alterações)
     try {
       const response = await fetch("/api/cardapio");
       if (!response.ok) {
@@ -36,15 +111,10 @@ function App() {
     } catch (error) {
       setError(error.message);
     } finally {
+      // Definir loading como false AQUI é crucial para disparar o useEffect de salvar o carrinho
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchCardapio();
-    const intervalId = setInterval(fetchCardapio, 10000);
-    return () => clearInterval(intervalId);
-  }, []);
 
   const adicionarAoCarrinho = (item) => {
     const itemExistente = carrinho.find((c) => c.id === item.id);
@@ -57,9 +127,6 @@ function App() {
     } else {
       setCarrinho([...carrinho, { ...item, quantidade: 1 }]);
     }
-
-    // 🟢 CORREÇÃO: Removido o setMostraCarrinho(true)
-    // O carrinho lateral só abre quando o usuário clica no ícone.
   };
 
   const aumentarQuantidade = (itemId) => {
@@ -78,21 +145,11 @@ function App() {
       .filter((item) => item.quantidade > 0);
 
     setCarrinho(novoCarrinho);
-
-    // Fecha o carrinho se ele ficar vazio
-    if (novoCarrinho.length === 0) {
-      setMostraCarrinho(false);
-    }
   };
 
   const removerDoCarrinho = (itemId) => {
     const novoCarrinho = carrinho.filter((item) => item.id !== itemId);
     setCarrinho(novoCarrinho);
-
-    // Fecha o carrinho se ele ficar vazio
-    if (novoCarrinho.length === 0) {
-      setMostraCarrinho(false);
-    }
   };
 
   const calcularTotal = () => {
@@ -101,9 +158,7 @@ function App() {
       .toFixed(2);
   };
 
-  // FUNÇÃO: Alterna a visibilidade do carrinho lateral (acionada pelo ícone)
   const handleToggleCarrinho = () => {
-    // Só alterna se o carrinho tiver itens
     if (carrinho.length > 0) {
       setMostraCarrinho(!mostraCarrinho);
     }
@@ -111,11 +166,14 @@ function App() {
 
   const handleFinalizarPedido = () => {
     setMostraCheckout(true);
-    setMostraCarrinho(false); // Fecha a barra lateral do carrinho
+    setMostraCarrinho(false);
   };
 
   const handleCheckoutSubmit = async (event) => {
     event.preventDefault();
+    // ... (resto da lógica de checkout)
+
+    // ... (cria dadosDoPedido)
     const formData = new FormData(event.target);
     const cliente = {
       nome: formData.get("nome"),
@@ -148,6 +206,8 @@ function App() {
         setCarrinho([]);
         setMostraCheckout(false);
         setPedidoFinalizado(true);
+        // 🟢 IMPORTANTE: Deleta o carrinho persistido após finalizar o pedido
+        await saveCarrinhoToSupabase([]); // Salva um carrinho vazio no Supabase
       } else {
         alert("Erro ao enviar o pedido. Tente novamente.");
       }
@@ -163,7 +223,7 @@ function App() {
   };
 
   if (loading) {
-    return <div className="loading">Carregando cardápio...</div>;
+    return <div className="loading">Carregando...</div>;
   }
 
   if (error) {
@@ -187,6 +247,7 @@ function App() {
         )}
       </header>
 
+      {/* ... (Restante da renderização, sem alterações) ... */}
       {/* RENDERIZAÇÃO DO CARDÁPIO (PRINCIPAL) */}
       {!mostraCheckout && !pedidoFinalizado && (
         <>
@@ -201,7 +262,6 @@ function App() {
           </main>
 
           {/* RENDERIZAÇÃO DO CARRINHO LATERAL (ASIDE) */}
-          {/* Aparece APENAS se houver itens E o estado mostraCarrinho for TRUE (clique no ícone) */}
           {carrinho.length > 0 && mostraCarrinho && (
             <aside className="carrinho-container">
               <h2>Seu Carrinho</h2>
