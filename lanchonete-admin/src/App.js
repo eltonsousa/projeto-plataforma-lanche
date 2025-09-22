@@ -196,7 +196,7 @@ function App() {
   // EFEITOS
   useEffect(() => {
     if (isLoggedIn) {
-      if (currentPage === "pedidos") {
+      if (currentPage === "pedidos" || currentPage === "relatorios") {
         // 🟢 ATUALIZAÇÃO: Usa fetchRelatorio e depende de filtroPeriodo
         fetchRelatorio(filtroPeriodo);
       } else if (currentPage === "cardapio") {
@@ -254,6 +254,9 @@ function App() {
         <p>Olá, {formData.nome}!</p>
         <nav className="nav-menu">
           <button onClick={() => setCurrentPage("pedidos")}>Pedidos</button>
+          <button onClick={() => setCurrentPage("relatorios")}>
+            Relatórios
+          </button>
           <button onClick={() => setCurrentPage("cardapio")}>Cardápio</button>
           <button onClick={handleLogout}>Sair</button>
         </nav>
@@ -264,39 +267,7 @@ function App() {
       {currentPage === "pedidos" && (
         <main className="lista-pedidos">
           {/* 🟢 NOVOS CONTROLES DE FILTRO E RELATÓRIO */}
-          <div className="controles-relatorio">
-            <label>
-              Filtrar por Período:
-              <select
-                value={filtroPeriodo}
-                onChange={(e) => setFiltroPeriodo(e.target.value)}
-              >
-                <option value="geral">Total Geral</option>
-                <option value="hoje">Hoje</option>
-                <option value="15dias">Últimos 15 dias</option>
-                <option value="mes">Mês Atual</option>
-              </select>
-            </label>
 
-            <div className="resumo-financeiro">
-              <div className="metrica">
-                <h4>
-                  Total de Pedidos (
-                  {filtroPeriodo === "geral"
-                    ? "Geral"
-                    : filtroPeriodo.toUpperCase()}
-                  ):
-                </h4>
-                <p className="valor">{resumoRelatorio.totalPedidos}</p>
-              </div>
-              <div className="metrica">
-                <h4>Faturamento Total:</h4>
-                <p className="valor faturamento">
-                  R$ {resumoRelatorio.faturamento}
-                </p>
-              </div>
-            </div>
-          </div>
           {/* 🟢 FIM DOS CONTROLES DE FILTRO E RELATÓRIO */}
 
           {loading && <p className="loading">Carregando pedidos...</p>}
@@ -374,6 +345,73 @@ function App() {
                   <p>Nenhum pedido recebido ainda.</p>
                 </div>
               )}
+        </main>
+      )}
+
+      {/* Conteúdo da página de Relatórios */}
+      {currentPage === "relatorios" && isLoggedIn && (
+        <main className="painel-relatorios">
+          <h2 className="titulo-relatorio">Resumo Financeiro</h2>
+
+          {/* 🟢 CONTROLES DE FILTRO E RELATÓRIO MANTIDOS */}
+          <div className="controles-relatorio">
+            <label>
+              Filtrar por Período:
+              <select
+                value={filtroPeriodo}
+                onChange={(e) => setFiltroPeriodo(e.target.value)}
+              >
+                <option value="geral">Total Geral</option>
+                <option value="hoje">Hoje</option>
+                <option value="15dias">Últimos 15 dias</option>
+                <option value="mes">Mês Atual</option>
+              </select>
+            </label>
+
+            <div className="resumo-financeiro">
+              <div className="metrica">
+                <h4>
+                  Total de Pedidos (
+                  {filtroPeriodo === "geral"
+                    ? "Geral"
+                    : filtroPeriodo.toUpperCase()}
+                  ):
+                </h4>
+                <p className="valor">{resumoRelatorio.totalPedidos}</p>
+              </div>
+              <div className="metrica">
+                <h4>Faturamento Total:</h4>
+                <p className="valor faturamento">
+                  R$ {resumoRelatorio.faturamento}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 🟢 LISTA DE PEDIDOS FILTRADOS ABAIXO (OPCIONAL) */}
+          <h3 className="subtitulo-relatorio">Detalhe dos Pedidos</h3>
+          {loading && <p className="loading">Carregando pedidos...</p>}
+          {pedidos.length === 0 && !loading && (
+            <p className="sem-pedidos">
+              Nenhum pedido encontrado para o período selecionado.
+            </p>
+          )}
+
+          <div className="lista-pedidos-filtrada">
+            {pedidos.map((pedido) => (
+              <div key={pedido.id} className="pedido-card-relatorio">
+                <p>
+                  <strong>Pedido #{pedido.id}</strong>
+                </p>
+                <p>Cliente: {pedido.cliente.nome.replace(/\*\*/g, "")}</p>
+                <p>
+                  Data: {new Date(pedido.data).toLocaleDateString("pt-BR")} às{" "}
+                  {new Date(pedido.data).toLocaleTimeString("pt-BR")}
+                </p>
+                <p>Total: R$ {pedido.total}</p>
+              </div>
+            ))}
+          </div>
         </main>
       )}
 

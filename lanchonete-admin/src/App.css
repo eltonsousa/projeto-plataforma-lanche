@@ -334,14 +334,41 @@ body {
     text-decoration: underline;
 }
 
+/* ---------------------------------------------------- */
+/* 🟢 NOVOS ESTILOS PARA A PÁGINA "RELATÓRIOS" 🟢 */
+/* ---------------------------------------------------- */
+
+.painel-relatorios {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.titulo-relatorio {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #3f51b5;
+    font-size: 2rem;
+}
+
+.subtitulo-relatorio {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #555;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
 /* Estilos para o bloco de controle de filtro e métricas */
 .controles-relatorio {
-    margin: 20px auto; /* Centraliza */
-    max-width: 90%;
+    margin: 20px auto;
+    max-width: 1000px; /* Limita a largura do bloco */
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: white; /* Alterado para branco para contraste */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -352,7 +379,7 @@ body {
 }
 
 .controles-relatorio select {
-    padding: 8px;
+    padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 1rem;
@@ -365,28 +392,28 @@ body {
 .resumo-financeiro {
     display: flex;
     gap: 30px;
-    margin-top: 15px;
+    margin-top: 25px;
     justify-content: center;
 }
 
 .metrica {
-    background-color: white;
-    padding: 15px 20px;
+    background-color: #f0f2f5; /* Fundo leve para destaque */
+    padding: 20px;
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    flex-basis: 40%; /* Ajuste para ter um tamanho razoável */
+    flex-basis: 40%;
     text-align: center;
 }
 
 .metrica h4 {
-    margin: 0 0 5px 0;
-    color: #555;
-    font-weight: normal;
-    font-size: 0.9rem;
+    margin: 0 0 10px 0;
+    color: #3f51b5;
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 .metrica .valor {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: bold;
     color: #333;
 }
@@ -395,8 +422,25 @@ body {
     color: #4caf50; /* Cor verde para faturamento */
 }
 
-/* Garante que o painel principal possa acomodar a nova largura */
-.painel-pedidos {
-  max-width: 1000px; /* Aumenta a largura para acomodar o resumo */
-  margin: 0 auto;
+/* Estilo para a lista detalhada de pedidos na página de Relatórios */
+.lista-pedidos-filtrada {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pedido-card-relatorio {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #ff9800; /* Borda laranja para diferenciar do Pedidos normal */
+}
+
+.pedido-card-relatorio p {
+    margin: 5px 0;
+    font-size: 0.95rem;
 }
