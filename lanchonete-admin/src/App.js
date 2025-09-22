@@ -23,16 +23,33 @@ function App() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // 🟢 NOVOS ESTADOS PARA RELATÓRIO
+  const [filtroPeriodo, setFiltroPeriodo] = useState("geral");
+  const [resumoRelatorio, setResumoRelatorio] = useState({
+    totalPedidos: 0,
+    faturamento: "0.00",
+  });
+
   // FUNÇÕES DE PEDIDOS
-  const fetchPedidos = async () => {
+  // 🟢 NOVA FUNÇÃO: Substitui fetchPedidos, buscando o relatório filtrado
+  const fetchRelatorio = async (periodo) => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/pedidos");
+      // Chama a nova rota de relatório com o parâmetro de período
+      const response = await fetch(`/api/pedidos/relatorio?periodo=${periodo}`);
       if (!response.ok) {
-        throw new Error("Erro ao buscar pedidos");
+        throw new Error("Erro ao buscar pedidos ou relatório.");
       }
       const data = await response.json();
-      setPedidos(data);
+
+      setPedidos(data.pedidos);
+      setResumoRelatorio({
+        totalPedidos: data.totalPedidos,
+        faturamento: data.faturamento,
+      });
+      setError(null);
     } catch (error) {
+      console.error("Erro ao buscar relatório:", error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -46,7 +63,8 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: novoStatus }),
       });
-      fetchPedidos();
+      // 🟢 ATUALIZA: Recarrega o relatório com o filtro atual
+      fetchRelatorio(filtroPeriodo);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
     }
@@ -57,13 +75,14 @@ function App() {
       await fetch(`/api/pedidos/${pedidoId}`, {
         method: "DELETE",
       });
-      fetchPedidos();
+      // 🟢 ATUALIZA: Recarrega o relatório com o filtro atual
+      fetchRelatorio(filtroPeriodo);
     } catch (error) {
       console.error("Erro ao concluir pedido:", error);
     }
   };
 
-  // FUNÇÕES DE CARDÁPIO
+  // FUNÇÕES DE CARDÁPIO (Inalteradas)
   const fetchCardapio = async () => {
     try {
       const response = await fetch("/api/cardapio");
@@ -120,7 +139,7 @@ function App() {
     }
   };
 
-  // FUNÇÕES DE AUTENTICAÇÃO (CORRIGIDAS)
+  // FUNÇÕES DE AUTENTICAÇÃO (Inalteradas)
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -178,12 +197,13 @@ function App() {
   useEffect(() => {
     if (isLoggedIn) {
       if (currentPage === "pedidos") {
-        fetchPedidos();
+        // 🟢 ATUALIZAÇÃO: Usa fetchRelatorio e depende de filtroPeriodo
+        fetchRelatorio(filtroPeriodo);
       } else if (currentPage === "cardapio") {
         fetchCardapio();
       }
     }
-  }, [isLoggedIn, currentPage]);
+  }, [isLoggedIn, currentPage, filtroPeriodo]); // 🟢 Adiciona filtroPeriodo como dependência
 
   if (!isLoggedIn) {
     return (
@@ -243,6 +263,42 @@ function App() {
       <h2 className="titulo-pedidos-recebidos">Pedidos Recebidos</h2>
       {currentPage === "pedidos" && (
         <main className="lista-pedidos">
+          {/* 🟢 NOVOS CONTROLES DE FILTRO E RELATÓRIO */}
+          <div className="controles-relatorio">
+            <label>
+              Filtrar por Período:
+              <select
+                value={filtroPeriodo}
+                onChange={(e) => setFiltroPeriodo(e.target.value)}
+              >
+                <option value="geral">Total Geral</option>
+                <option value="hoje">Hoje</option>
+                <option value="15dias">Últimos 15 dias</option>
+                <option value="mes">Mês Atual</option>
+              </select>
+            </label>
+
+            <div className="resumo-financeiro">
+              <div className="metrica">
+                <h4>
+                  Total de Pedidos (
+                  {filtroPeriodo === "geral"
+                    ? "Geral"
+                    : filtroPeriodo.toUpperCase()}
+                  ):
+                </h4>
+                <p className="valor">{resumoRelatorio.totalPedidos}</p>
+              </div>
+              <div className="metrica">
+                <h4>Faturamento Total:</h4>
+                <p className="valor faturamento">
+                  R$ {resumoRelatorio.faturamento}
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* 🟢 FIM DOS CONTROLES DE FILTRO E RELATÓRIO */}
+
           {loading && <p className="loading">Carregando pedidos...</p>}
           {error && <p className="error">Erro: {error}</p>}
           {!loading && pedidos.length > 0
@@ -321,7 +377,7 @@ function App() {
         </main>
       )}
 
-      {/* Conteúdo da página de Cardápio */}
+      {/* Conteúdo da página de Cardápio (Inalterado) */}
       {currentPage === "cardapio" && (
         <main className="painel-cardapio">
           <h2>Gerenciar Cardápio</h2>

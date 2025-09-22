@@ -333,3 +333,70 @@ body {
     cursor: pointer;
     text-decoration: underline;
 }
+
+/* Estilos para o bloco de controle de filtro e métricas */
+.controles-relatorio {
+    margin: 20px auto; /* Centraliza */
+    max-width: 90%;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.controles-relatorio label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.controles-relatorio select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    margin-left: 10px;
+    width: 200px;
+    cursor: pointer;
+}
+
+/* Estilos para o resumo financeiro (caixas de métricas) */
+.resumo-financeiro {
+    display: flex;
+    gap: 30px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.metrica {
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    flex-basis: 40%; /* Ajuste para ter um tamanho razoável */
+    text-align: center;
+}
+
+.metrica h4 {
+    margin: 0 0 5px 0;
+    color: #555;
+    font-weight: normal;
+    font-size: 0.9rem;
+}
+
+.metrica .valor {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.metrica .faturamento {
+    color: #4caf50; /* Cor verde para faturamento */
+}
+
+/* Garante que o painel principal possa acomodar a nova largura */
+.painel-pedidos {
+  max-width: 1000px; /* Aumenta a largura para acomodar o resumo */
+  margin: 0 auto;
+}

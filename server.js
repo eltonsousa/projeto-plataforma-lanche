@@ -306,7 +306,82 @@ app.delete("/api/pedidos/:id", async (req, res) => {
   }
 });
 
+// ---------------------------------------------
+// server.js (Adicionar novas rotas de RELATÓRIOS/ADMIN)
+// ---------------------------------------------
+
+// Função auxiliar para calcular datas de filtro
+const calcularDataFiltro = (periodo) => {
+  const dataFim = new Date();
+  const dataInicio = new Date();
+
+  switch (periodo) {
+    case "hoje":
+      dataInicio.setHours(0, 0, 0, 0); // Começo do dia
+      break;
+    case "15dias":
+      dataInicio.setDate(dataFim.getDate() - 15);
+      dataInicio.setHours(0, 0, 0, 0);
+      break;
+    case "mes":
+      // Ajuste para o primeiro dia do mês atual
+      dataInicio.setDate(1);
+      dataInicio.setHours(0, 0, 0, 0);
+      break;
+    case "geral":
+    default:
+      return { dataInicio: null, dataFim: null }; // Não aplica filtro
+  }
+  return { dataInicio, dataFim };
+};
+
+// ROTA: GET /api/pedidos/relatorio (Relatórios e Filtros)
+app.get("/api/pedidos/relatorio", async (req, res) => {
+  const { periodo } = req.query; // Captura o parâmetro de filtro (hoje, 15dias, mes, geral)
+  let query = supabase.from("pedidos_lanche").select("*");
+
+  // 1. Aplica o filtro de data, se for necessário
+  const { dataInicio, dataFim } = calcularDataFiltro(periodo);
+
+  if (dataInicio && dataFim) {
+    // Filtra a coluna 'data' (assumindo que você a salva no Supabase)
+    query = query
+      .gte("data", dataInicio.toISOString())
+      .lte("data", dataFim.toISOString());
+  }
+
+  try {
+    const { data: pedidosFiltrados, error } = await query.order("id", {
+      ascending: false,
+    });
+
+    if (error) throw error;
+
+    // 2. Calcula as métricas (Total de Pedidos e Faturamento)
+    const totalPedidos = pedidosFiltrados.length;
+    // Importante: Converte 'total' (string) para número antes de somar
+    const faturamento = pedidosFiltrados.reduce(
+      (sum, pedido) => sum + parseFloat(pedido.total),
+      0
+    );
+
+    res.status(200).json({
+      pedidos: pedidosFiltrados,
+      totalPedidos,
+      faturamento: faturamento.toFixed(2),
+      periodo,
+    });
+  } catch (err) {
+    console.error("Erro ao buscar relatórios de pedidos:", err);
+    res
+      .status(500)
+      .json({ message: "Erro interno do servidor ao gerar relatório." });
+  }
+});
+
+// ---------------------------------------------
 // ROTA: POST/PUT /api/carrinho (Salvar ou Atualizar Carrinho)
+// ---------------------------------------------
 app.post("/api/carrinho", async (req, res) => {
   const { sessionId, itens } = req.body;
 
