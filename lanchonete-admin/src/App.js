@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 function App() {
@@ -24,6 +24,8 @@ function App() {
     imagem: "",
   });
   const [isEditing, setIsEditing] = useState(false);
+
+  const formRef = useRef(null); // 🟢 NOVO: Referência para o formulário
 
   // 🟢 ESTADOS DE RELATÓRIO E FILTRO DE STATUS
   const [filtroPeriodo, setFiltroPeriodo] = useState("geral");
@@ -124,6 +126,11 @@ function App() {
   const handleEdit = (item) => {
     setItemForm(item);
     setIsEditing(true);
+
+    // 🟢 NOVA LÓGICA DE ROLAGEM
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const handleDelete = async (itemId) => {
@@ -470,7 +477,7 @@ function App() {
         <main className="painel-cardapio">
           <h2>Gerenciar Cardápio</h2>
           <div className="cardapio-form">
-            <form onSubmit={handleItemSubmit}>
+            <form ref={formRef} onSubmit={handleItemSubmit}>
               <input
                 type="text"
                 name="nome"
