@@ -77,18 +77,6 @@ function App() {
     }
   };
 
-  // 🟢 ATUALIZAÇÃO: Chama fetchRelatorio com os filtros atuais
-  const concluirPedido = async (pedidoId) => {
-    try {
-      await fetch(`/api/pedidos/${pedidoId}`, {
-        method: "DELETE",
-      });
-      fetchRelatorio(filtroPeriodo, filtroStatus);
-    } catch (error) {
-      console.error("Erro ao concluir pedido:", error);
-    }
-  };
-
   // FUNÇÕES DE CARDÁPIO (Inalteradas)
   const fetchCardapio = async () => {
     try {
@@ -372,7 +360,8 @@ function App() {
                     </ul>
                     <button
                       className="concluir-btn"
-                      onClick={() => concluirPedido(pedido.id)}
+                      // 🟢 ATUALIZAÇÃO: Chama a função atualizarStatus com o status 'Concluído'
+                      onClick={() => atualizarStatus(pedido.id, "Concluído")}
                     >
                       Concluir Pedido
                     </button>

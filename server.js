@@ -283,26 +283,30 @@ app.put("/api/pedidos/:id", async (req, res) => {
   }
 });
 
-// ROTA: DELETE /api/pedidos/:id (Remover pedido)
-app.delete("/api/pedidos/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+// ROTA: PUT /api/pedidos/:id (Atualizar status do pedido)
+app.put("/api/pedidos/:id", async (req, res) => {
+  const pedidoId = req.params.id;
+  const { status } = req.body;
+
+  if (!status) {
+    return res
+      .status(400)
+      .json({ message: "Status é obrigatório para atualização." });
+  }
 
   try {
-    const { error } = await supabase
-      .from("pedidos_lanche") // Alterado para pedidos_lanche
-      .delete()
-      .eq("id", id);
+    const { data, error } = await supabase
+      .from("pedidos_lanche")
+      .update({ status: status })
+      .eq("id", pedidoId);
 
-    if (error) {
-      console.error("Erro Supabase DELETE /api/pedidos:", error);
-      return res.status(500).json({ message: "Erro ao remover pedido." });
-    }
-
-    console.log(`Pedido ${id} removido.`);
-    res.status(204).send();
+    if (error) throw error;
+    res
+      .status(200)
+      .json({ message: "Status do pedido atualizado com sucesso.", data });
   } catch (err) {
-    console.error("Erro inesperado na rota DELETE /api/pedidos:", err);
-    res.status(500).json({ message: "Erro inesperado do servidor." });
+    console.error("Erro Supabase PUT /api/pedidos/:id:", err);
+    res.status(500).json({ message: "Erro ao atualizar o status do pedido." });
   }
 });
 
