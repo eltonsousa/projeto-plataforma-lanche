@@ -504,7 +504,7 @@ function App() {
         </main>
       )}
       <footer>
-        <p>&copy; 2025 Manú. Todos os direitos reservados.</p>
+        <p>&copy; 2025 Manú Lanche. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
