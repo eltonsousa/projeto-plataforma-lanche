@@ -6,6 +6,24 @@ body {
     color: #333;
 }
 
+/* Painel principal ocupa toda a tela e organiza em coluna */
+.painel-admin {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Footer fixo no final (igual ao header) */
+.painel-admin footer {
+  margin-top: auto;
+  background-color: #3f51b5;
+  color: #ffffff;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Cabeçalho */
 .painel-admin header {
     background-color: #3f51b5;
     color: white;
@@ -23,6 +41,17 @@ body {
     font-size: 1.2rem;
 }
 
+/* Botão base reutilizável */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+/* Menu navegação */
 .nav-menu {
     display: flex;
     justify-content: center;
@@ -31,25 +60,23 @@ body {
 }
 
 .nav-menu button {
+    composes: btn;
     background-color: #5c6bc0;
     color: white;
-    border: none;
-    padding: 10px 20px;
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
+    border: none;
+    padding: 6px 10px 6px 10px;
 }
 
 .nav-menu button:hover {
     background-color: #7986cb;
 }
 
+/* Pedidos */
 .titulo-pedidos-recebidos {
-    /* 🟢 Simplificado para centralizar o texto */
     text-align: center;
-    margin: 20px 0; /* Adiciona um espaço acima e abaixo do título */
-    color: #3f51b5; /* Opcional: mantém a cor padrão dos títulos */
+    margin: 20px 0;
+    color: #3f51b5;
 }
 
 .pedido-card {
@@ -78,7 +105,6 @@ body {
     border-radius: 4px;
 }
 
-/* Estilos para os botões de status do pedido */
 .status-botoes {
   display: flex;
   gap: 10px;
@@ -96,9 +122,8 @@ body {
   transition: all 0.2s ease-in-out;
 }
 
-/* Estilo para o botão de status ativo */
 .active-status-btn {
-  background-color: #3f51b5; /* Cor principal */
+  background-color: #3f51b5;
   color: white;
   border-color: #3f51b5;
   font-weight: bold;
@@ -109,7 +134,7 @@ body {
   color: #3f51b5;
 }
 
-/* Estilos para as tags de status */
+/* Status tags */
 .status-em-preparação,
 .status-pronto-para-entrega,
 .status-entregue,
@@ -119,25 +144,13 @@ body {
     padding: 5px 10px;
     border-radius: 3px;
     font-size: 0.9rem;
-    white-space: nowrap; /* Impede quebras de linha */
+    white-space: nowrap;
 }
 
-/* Cores específicas para cada status */
-.status-em-preparação {
-    background-color: #ff9800; /* Laranja */
-}
-
-.status-pronto-para-entrega {
-    background-color: #2196f3; /* Azul */
-}
-
-.status-entregue {
-    background-color: #4caf50; /* Verde */
-}
-
-.status-concluído {
-    background-color: #555555; /* Cinza escuro */
-}
+.status-em-preparação { background-color: #ff9800; }
+.status-pronto-para-entrega { background-color: #2196f3; }
+.status-entregue { background-color: #4caf50; }
+.status-concluído { background-color: #555555; }
 
 .concluir-btn {
     width: 100%;
@@ -150,6 +163,7 @@ body {
     cursor: pointer;
 }
 
+/* Estados */
 .loading-state, .error-state, .sem-pedidos {
   text-align: center;
   padding: 20px;
@@ -161,11 +175,13 @@ body {
   color: #c0392b;
 }
 
-/* Novo estilo para o painel de cardápio */
+/* Cardápio */
 .painel-cardapio {
   padding: 20px;
-  max-width: 800px;
+  max-width: 1200px; /* mais largo no PC */
+  width: 100%;       /* ocupa toda a largura disponível */
   margin: auto;
+  box-sizing: border-box;
 }
 
 .painel-cardapio h2 {
@@ -195,12 +211,12 @@ body {
 }
 
 .cardapio-form button {
-  padding: 12px;
+  composes: btn;
   background-color: #4caf50;
   color: white;
-  border: none;
   border-radius: 5px;
-  cursor: pointer;
+  border: none;
+  padding: 6px 10px 6px 10px;
 }
 
 .cardapio-lista {
@@ -239,23 +255,26 @@ body {
 }
 
 .item-botoes-admin button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  composes: btn;
 }
 
 .item-botoes-admin button:first-child {
-  background-color: #ff9800; /* Laranja para Editar */
+  background-color: #ff9800;
   color: white;
+  border-radius: 5px;
+border: none;
+padding: 6px 10px 6px 10px;
 }
 
 .item-botoes-admin button:last-child {
-  background-color: #f44336; /* Vermelho para Remover */
+  background-color: #f44336;
   color: white;
+  border-radius: 5px;
+border: none;
+padding: 6px 10px 6px 10px;
 }
 
-/* Estilos para a tela de login/registro */
+/* Autenticação */
 .auth-container {
     display: flex;
     flex-direction: column;
@@ -278,7 +297,6 @@ body {
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
 }
 
 .password-input-container {
@@ -316,15 +334,14 @@ body {
 }
 
 .auth-container button[type="submit"] {
-    padding: 10px;
+    composes: btn;
     background-color: #3f51b5;
     color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
     font-weight: 500;
-    cursor: pointer;
     margin-top: 1rem;
+    border-radius: 5px;
+    border: none;
+    padding: 6px 10px 6px 10px;
 }
 
 .auth-container p.toggle-auth {
@@ -334,10 +351,7 @@ body {
     text-decoration: underline;
 }
 
-/* ---------------------------------------------------- */
-/* 🟢 NOVOS ESTILOS PARA A PÁGINA "RELATÓRIOS" 🟢 */
-/* ---------------------------------------------------- */
-
+/* Relatórios */
 .painel-relatorios {
     max-width: 1200px;
     margin: 20px auto;
@@ -361,12 +375,11 @@ body {
     font-size: 1.5rem;
 }
 
-/* Estilos para o bloco de controle de filtro e métricas */
 .controles-relatorio {
     margin: 20px auto;
-    max-width: 1000px; /* Limita a largura do bloco */
+    max-width: 1000px;
     padding: 20px;
-    background-color: white; /* Alterado para branco para contraste */
+    background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -388,7 +401,6 @@ body {
     cursor: pointer;
 }
 
-/* Estilos para o resumo financeiro (caixas de métricas) */
 .resumo-financeiro {
     display: flex;
     gap: 30px;
@@ -397,7 +409,7 @@ body {
 }
 
 .metrica {
-    background-color: #f0f2f5; /* Fundo leve para destaque */
+    background-color: #f0f2f5;
     padding: 20px;
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -419,10 +431,9 @@ body {
 }
 
 .metrica .faturamento {
-    color: #4caf50; /* Cor verde para faturamento */
+    color: #4caf50;
 }
 
-/* Estilo para a lista detalhada de pedidos na página de Relatórios */
 .lista-pedidos-filtrada {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -437,7 +448,7 @@ body {
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border-left: 5px solid #ff9800; /* Borda laranja para diferenciar do Pedidos normal */
+    border-left: 5px solid #ff9800;
 }
 
 .pedido-card-relatorio p {
@@ -445,13 +456,13 @@ body {
     font-size: 0.95rem;
 }
 
-/* Estilo para a nova seção de controles na página de pedidos */
+/* Controles pedidos */
 .controles-pedidos {
     text-align: center;
     margin-bottom: 20px;
     padding: 10px;
     width: 100%;
-    max-width: 900px; /* Adapte à largura desejada */
+    max-width: 900px;
     margin-left: auto;
     margin-right: auto;
     background-color: #f9f9f9;
@@ -472,21 +483,123 @@ body {
     margin-left: 5px;
 }
 
-/* 🟢 NOVO ESTILO PARA CENTRALIZAR O CONTEÚDO PRINCIPAL */
+/* Conteúdo principal */
 .painel-conteudo {
-    max-width: 1200px; /* Define uma largura máxima para o contêiner */
-    margin: 0 auto; /* Centraliza o contêiner horizontalmente na tela */
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
 }
 
-/* Garante que o painel de pedidos ocupe a largura total para centralizar os controles */
 .lista-pedidos {
-    /* 🟢 NOVAS PROPRIEDADES para alinhar os cards lado a lado */
-    display: flex; /* Habilita o Flexbox */
-    flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
-    justify-content: center; /* Centraliza os itens horizontalmente */
-    gap: 20px; /* Espaço entre os cards */
-    padding: 20px; /* Preenchimento ao redor da lista */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
 }
 
+/* ============================= */
+/* 📱 Ajustes responsivos Mobile */
+/* ============================= */
+@media (max-width: 768px) {
+  /* Blocos do resumo financeiro em coluna */
+  .resumo-financeiro {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch; /* força os filhos a ocupar largura toda */
+  }
+
+  .metrica {
+    flex: 1 1 100% !important; /* força largura total */
+    max-width: 100%;           /* garante que não quebre */
+    box-sizing: border-box;    /* respeita padding */
+  }
+
+  /* Controles centralizados em coluna */
+  .controles-relatorio {
+    padding: 15px;
+  }
+
+  .controles-relatorio select {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  /* Cards de pedidos em uma coluna */
+  .lista-pedidos-filtrada {
+    grid-template-columns: 1fr;
+    padding: 0 10px;
+  }
+
+  .painel-cardapio {
+    max-width: 100%; /* ocupa toda a largura no celular */
+    padding: 15px;
+  }
+}
+
+/* =================================== */
+/* 📱 Ajustes extras para telas pequenas (≤ 400px) */
+/* =================================== */
+@media (max-width: 400px) {
+  /* ---------- Página Pedidos ---------- */
+  .pedido-card {
+    width: 100%;           /* ocupa toda a largura */
+    padding: 1rem;         /* reduz padding */
+    box-sizing: border-box;
+  }
+
+  .status-botoes {
+    flex-direction: column; /* empilha botões de status */
+    gap: 8px;
+  }
+
+  .status-btn {
+    width: 100%;            /* botões mais fáceis de clicar */
+    font-size: 0.85rem;
+  }
+
+  .concluir-btn {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  /* ---------- Página Relatórios ---------- */
+  .resumo-financeiro {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .metrica {
+    flex: 1 1 100% !important;
+    max-width: 100%;
+    padding: 15px;
+    font-size: 0.9rem; /* texto menor */
+  }
+
+  .metrica .valor {
+    font-size: 1.6rem; /* reduz o tamanho do número */
+  }
+
+  .controles-relatorio {
+    padding: 15px;
+  }
+
+  .controles-relatorio select {
+    width: 100%;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    margin-left: 0;
+  }
+
+  .lista-pedidos-filtrada {
+    grid-template-columns: 1fr; /* apenas 1 coluna */
+    padding: 0 10px;
+  }
+
+  .pedido-card-relatorio {
+    padding: 10px;
+  }
+}
 

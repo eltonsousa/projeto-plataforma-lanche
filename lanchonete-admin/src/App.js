@@ -265,7 +265,6 @@ function App() {
           <button onClick={handleLogout}>Sair</button>
         </nav>
       </header>
-
       {/* Conteúdo da página de Pedidos */}
       {currentPage === "pedidos" && (
         <div className="painel-conteudo">
@@ -375,7 +374,6 @@ function App() {
           </main>
         </div>
       )}
-
       {/* 🟢 CONTEÚDO DA PÁGINA DE RELATÓRIOS (Movido daqui) */}
       {currentPage === "relatorios" && isLoggedIn && (
         <main className="painel-relatorios">
@@ -443,7 +441,6 @@ function App() {
           </div>
         </main>
       )}
-
       {/* Conteúdo da página de Cardápio */}
       {currentPage === "cardapio" && (
         <main className="painel-cardapio">
@@ -506,6 +503,9 @@ function App() {
           </div>
         </main>
       )}
+      <footer>
+        <p>&copy; 2025 Manú Lanches. Todos os direitos reservados.</p>
+      </footer>
     </div>
   );
 }
