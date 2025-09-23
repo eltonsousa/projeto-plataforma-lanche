@@ -64,6 +64,7 @@ body {
 
 .nav-menu button {
   /* composes: btn; */
+  cursor: pointer;
   background-color: #5c6bc0;
   color: white;
   border-radius: 5px;
@@ -348,6 +349,7 @@ body {
 
 .auth-container button[type="submit"] {
   /* composes: btn; */
+  cursor: pointer;
   background-color: #3f51b5;
   color: white;
   font-weight: 500;
@@ -504,6 +506,7 @@ body {
 
 /*estilo botao atualizar pedidos*/
 .botao-atualizar {
+  cursor: pointer;
   background-color: #f44336;
   color: white;
   border-radius: 5px;
