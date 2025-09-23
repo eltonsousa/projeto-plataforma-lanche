@@ -4,11 +4,6 @@ body {
   padding: 0;
   background-color: #f4f4f4;
   color: #333;
-
-  /* 🟢 GARANTE QUE O CONTEÚDO OCUPA A TELA INTEIRA */
-  display: flex; /* Habilita o Flexbox */
-  flex-direction: column; /* Organiza os filhos em coluna */
-  min-height: 100vh; /* Garante que a altura mínima seja a altura da tela */
 }
 
 header {
@@ -432,20 +427,4 @@ header {
     transition: background-color 0.3s ease;
   }
 }
-/* 🟢 ESTILOS PARA O FOOTER */
-footer {
-    background-color: #ff6347; /* Cor de fundo escura, alinhada com o cabeçalho */
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    position: relative; /* ou 'fixed' se preferir fixar no final da tela */
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    margin-top: 2rem; /* Adiciona um espaço acima do footer */
-}
 
-footer p {
-    margin: 0;
-    font-size: 0.9rem;
-}
