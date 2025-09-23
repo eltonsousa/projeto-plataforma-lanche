@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 import { BsCart3 } from "react-icons/bs";
@@ -39,10 +39,10 @@ function App() {
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
 
-  // --- FUNÇÕES ASYNC DE CARRINHO (NOVO) ---
+  // --- FUNÇÕES ASYNC DE CARRINHO (CORRIGIDO) ---
 
   // FUNÇÃO: Carrega o carrinho do Supabase via Backend
-  const loadCarrinhoFromSupabase = async () => {
+  const loadCarrinhoFromSupabase = useCallback(async () => {
     try {
       // Busca os itens do carrinho usando a rota do Express/Backend
       const response = await fetch(`/api/carrinho/${sessionId}`);
@@ -56,24 +56,27 @@ function App() {
     } catch (error) {
       console.error("Erro ao carregar carrinho do Supabase:", error);
     }
-  };
+  }, [sessionId]);
 
   // FUNÇÃO: Salva o carrinho no Supabase via Backend
-  const saveCarrinhoToSupabase = async (currentCarrinho) => {
-    try {
-      await fetch("/api/carrinho", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId, itens: currentCarrinho }),
-      });
-    } catch (error) {
-      console.error("Erro ao salvar carrinho no Supabase:", error);
-    }
-  };
+  const saveCarrinhoToSupabase = useCallback(
+    async (currentCarrinho) => {
+      try {
+        await fetch("/api/carrinho", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sessionId, itens: currentCarrinho }),
+        });
+      } catch (error) {
+        console.error("Erro ao salvar carrinho no Supabase:", error);
+      }
+    },
+    [sessionId]
+  );
 
-  // --- EFEITOS ---
+  // --- EFEITOS (CORRIGIDO) ---
 
   // EFEITO 1: Carregar Cardápio e o Carrinho Persistido
   useEffect(() => {
@@ -82,7 +85,7 @@ function App() {
 
     const intervalId = setInterval(fetchCardapio, 10000);
     return () => clearInterval(intervalId);
-  }, []); // Executa apenas uma vez no carregamento
+  }, [loadCarrinhoFromSupabase]); // Dependência adicionada
 
   // EFEITO 2: Persistência (Salva no Supabase sempre que o carrinho muda)
   useEffect(() => {
@@ -95,7 +98,7 @@ function App() {
     if (carrinho.length === 0) {
       setMostraCarrinho(false);
     }
-  }, [carrinho, loading, sessionId]);
+  }, [carrinho, loading, sessionId, saveCarrinhoToSupabase]); // Dependência adicionada
 
   // --- RESTANTE DAS FUNÇÕES (ADICIONAR/REMOVER/CHECKOUT) ---
 
