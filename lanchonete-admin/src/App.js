@@ -12,6 +12,7 @@ function App() {
   // ✅ Declaração única (Corrigido o erro de redeclaração)
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ nome: "", senha: "" });
+  const [isAuthLoading, setIsAuthLoading] = useState(false); // 🟢 NOVO ESTADO DE CARREGAMENTO
   const [usuarioLogado, setUsuarioLogado] = useState(null); // 🟢 NOVO ESTADO
   const [mostraSenha, setMostraSenha] = useState(false);
   const [currentPage, setCurrentPage] = useState("pedidos");
@@ -143,6 +144,7 @@ function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsAuthLoading(true); // 🟢 Inicia o carregamento
     try {
       const response = await fetch("/api/usuarios/login", {
         method: "POST",
@@ -163,11 +165,14 @@ function App() {
       }
     } catch (error) {
       alert("Erro ao fazer login. Verifique o servidor.");
+    } finally {
+      setIsAuthLoading(false); // 🟢 Finaliza o carregamento (sempre)
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setIsAuthLoading(true); // 🟢 Inicia o carregamento
     try {
       const response = await fetch("/api/usuarios/registrar", {
         method: "POST",
@@ -188,6 +193,8 @@ function App() {
       }
     } catch (error) {
       alert("Erro ao registrar. Verifique o servidor.");
+    } finally {
+      setIsAuthLoading(false); // 🟢 Finaliza o carregamento (sempre)
     }
   };
 
@@ -250,7 +257,9 @@ function App() {
               {mostraSenha ? "🙈" : "👁️"}
             </button>
           </div>
-          <button type="submit">{isLogin ? "Entrar" : "Registrar"}</button>
+          <button type="submit" disabled={isAuthLoading}>
+            {isAuthLoading ? "Carregando..." : isLogin ? "Entrar" : "Registrar"}
+          </button>
         </form>
         <p onClick={() => setIsLogin(!isLogin)} className="toggle-auth">
           {isLogin

@@ -365,6 +365,41 @@ body {
   color: white;
 }
 
+/* =================================== */
+/* 🟢 ESTILOS DE CARREGAMENTO (AJUSTADO) */
+/* =================================== */
+.auth-container button[disabled] {
+  cursor: not-allowed;
+  background-color: #8c9eff; /* Uma cor mais clara quando desabilitado */
+
+  /* 🟢 NOVAS PROPRIEDADES PARA ALINHAR O SPINNER E O TEXTO */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Adiciona um spinner dentro do botão quando estiver carregando */
+.auth-container button[disabled]::before {
+  content: "";
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 8px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
 .auth-container p.toggle-auth {
   margin-top: 1rem;
   color: #3f51b5;
