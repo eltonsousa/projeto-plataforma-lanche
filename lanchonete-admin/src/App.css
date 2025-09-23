@@ -45,21 +45,11 @@ body {
     background-color: #7986cb;
 }
 
-.lista-pedidos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-}
-
-.titulo-pedidos-recebidos{
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
+.titulo-pedidos-recebidos {
+    /* 🟢 Simplificado para centralizar o texto */
     text-align: center;
+    margin: 20px 0; /* Adiciona um espaço acima e abaixo do título */
+    color: #3f51b5; /* Opcional: mantém a cor padrão dos títulos */
 }
 
 .pedido-card {
@@ -466,17 +456,27 @@ body {
 .controles-pedidos select {
     padding: 8px;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    border: 2px solid #3f51b5;
     font-size: 1rem;
     cursor: pointer;
+    margin-left: 5px;
+}
+
+/* 🟢 NOVO ESTILO PARA CENTRALIZAR O CONTEÚDO PRINCIPAL */
+.painel-conteudo {
+    max-width: 1200px; /* Define uma largura máxima para o contêiner */
+    margin: 0 auto; /* Centraliza o contêiner horizontalmente na tela */
+    padding: 20px;
 }
 
 /* Garante que o painel de pedidos ocupe a largura total para centralizar os controles */
 .lista-pedidos {
-    /* Manter o display flex para a lista de cards, mas centralizar o conteúdo */
-    /* Remova `justify-content: center;` se for centralizar o bloco de pedidos */
-    flex-direction: column; 
-    align-items: center; /* Centraliza o conteúdo se for em coluna */
-    gap: 20px;
-    padding: 20px;
+    /* 🟢 NOVAS PROPRIEDADES para alinhar os cards lado a lado */
+    display: flex; /* Habilita o Flexbox */
+    flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
+    justify-content: center; /* Centraliza os itens horizontalmente */
+    gap: 20px; /* Espaço entre os cards */
+    padding: 20px; /* Preenchimento ao redor da lista */
 }
+
+

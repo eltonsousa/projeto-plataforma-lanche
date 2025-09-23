@@ -280,103 +280,111 @@ function App() {
 
       {/* Conteúdo da página de Pedidos */}
       {currentPage === "pedidos" && (
-        <main className="lista-pedidos">
-          <h2 className="titulo-pedidos-recebidos">Pedidos Recebidos</h2>
+        <div className="painel-conteudo">
+          <main className="lista-pedidos">
+            <h2 className="titulo-pedidos-recebidos">Pedidos Recebidos</h2>
 
-          {/* 🟢 CONTROLE DE FILTRO DE STATUS */}
-          <div className="controles-pedidos">
-            <label>
-              Filtrar por Status:
-              <select
-                value={filtroStatus}
-                onChange={(e) => setFiltroStatus(e.target.value)}
-              >
-                <option value="todos">Todos os Pedidos</option>
-                <option value="Em preparação">Em Preparação</option>
-                <option value="Pronto para entrega">Pronto para Entrega</option>
-                <option value="Entregue">Entregue</option>
-                <option value="Concluído">Concluído</option>
-              </select>
-            </label>
-          </div>
-          {/* 🟢 FIM DO CONTROLE DE STATUS */}
+            {/* 🟢 CONTROLE DE FILTRO DE STATUS */}
+            <div className="controles-pedidos">
+              <label>
+                Filtrar por Status:
+                <select
+                  value={filtroStatus}
+                  onChange={(e) => setFiltroStatus(e.target.value)}
+                >
+                  <option value="todos">Todos os Pedidos</option>
+                  <option value="Em preparação">Em Preparação</option>
+                  <option value="Pronto para entrega">
+                    Pronto para Entrega
+                  </option>
+                  <option value="Entregue">Entregue</option>
+                  <option value="Concluído">Concluído</option>
+                </select>
+              </label>
+            </div>
+            {/* 🟢 FIM DO CONTROLE DE STATUS */}
 
-          {loading && <p className="loading">Carregando pedidos...</p>}
-          {error && <p className="error">Erro: {error}</p>}
-          {!loading && pedidos.length > 0
-            ? pedidos.map((pedido) => (
-                <div key={pedido.id} className="pedido-card">
-                  <h3>Pedido #{pedido.id}</h3>
-                  <p>
-                    Cliente:{" "}
-                    <strong>{pedido.cliente.nome.replace(/\*\*/g, "")}</strong>
-                  </p>
-                  <p>
-                    Status:{" "}
-                    <span
-                      className={`status-${pedido.status
-                        .replace(/\s+/g, "-")
-                        .toLowerCase()}`}
-                    >
-                      {pedido.status}
-                    </span>
-                  </p>
-                  <div className="status-botoes">
+            {loading && <p className="loading">Carregando pedidos...</p>}
+            {error && <p className="error">Erro: {error}</p>}
+            {!loading && pedidos.length > 0
+              ? pedidos.map((pedido) => (
+                  <div key={pedido.id} className="pedido-card">
+                    <h3>Pedido #{pedido.id}</h3>
+                    <p>
+                      Cliente:{" "}
+                      <strong>
+                        {pedido.cliente.nome.replace(/\*\*/g, "")}
+                      </strong>
+                    </p>
+                    <p>
+                      Status:{" "}
+                      <span
+                        className={`status-${pedido.status
+                          .replace(/\s+/g, "-")
+                          .toLowerCase()}`}
+                      >
+                        {pedido.status}
+                      </span>
+                    </p>
+                    <div className="status-botoes">
+                      <button
+                        className={`status-btn ${
+                          pedido.status === "Em preparação"
+                            ? "active-status-btn"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          atualizarStatus(pedido.id, "Em preparação")
+                        }
+                      >
+                        Em Preparação
+                      </button>
+                      <button
+                        className={`status-btn ${
+                          pedido.status === "Pronto para entrega"
+                            ? "active-status-btn"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          atualizarStatus(pedido.id, "Pronto para entrega")
+                        }
+                      >
+                        Pronto para Entrega
+                      </button>
+                      <button
+                        className={`status-btn ${
+                          pedido.status === "Entregue"
+                            ? "active-status-btn"
+                            : ""
+                        }`}
+                        onClick={() => atualizarStatus(pedido.id, "Entregue")}
+                      >
+                        Entregue
+                      </button>
+                    </div>
+                    <h4>Itens:</h4>
+                    <ul>
+                      {pedido.itens.map((item) => (
+                        <li key={item.id}>
+                          {item.nome} (x{item.quantidade})
+                        </li>
+                      ))}
+                    </ul>
                     <button
-                      className={`status-btn ${
-                        pedido.status === "Em preparação"
-                          ? "active-status-btn"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        atualizarStatus(pedido.id, "Em preparação")
-                      }
+                      className="concluir-btn"
+                      onClick={() => concluirPedido(pedido.id)}
                     >
-                      Em Preparação
-                    </button>
-                    <button
-                      className={`status-btn ${
-                        pedido.status === "Pronto para entrega"
-                          ? "active-status-btn"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        atualizarStatus(pedido.id, "Pronto para entrega")
-                      }
-                    >
-                      Pronto para Entrega
-                    </button>
-                    <button
-                      className={`status-btn ${
-                        pedido.status === "Entregue" ? "active-status-btn" : ""
-                      }`}
-                      onClick={() => atualizarStatus(pedido.id, "Entregue")}
-                    >
-                      Entregue
+                      Concluir Pedido
                     </button>
                   </div>
-                  <h4>Itens:</h4>
-                  <ul>
-                    {pedido.itens.map((item) => (
-                      <li key={item.id}>
-                        {item.nome} (x{item.quantidade})
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    className="concluir-btn"
-                    onClick={() => concluirPedido(pedido.id)}
-                  >
-                    Concluir Pedido
-                  </button>
-                </div>
-              ))
-            : !loading && (
-                <div className="sem-pedidos">
-                  <p>Nenhum pedido recebido ainda.</p>
-                </div>
-              )}
-        </main>
+                ))
+              : !loading && (
+                  <div className="sem-pedidos">
+                    <p>Nenhum pedido recebido ainda.</p>
+                  </div>
+                )}
+          </main>
+        </div>
       )}
 
       {/* 🟢 CONTEÚDO DA PÁGINA DE RELATÓRIOS (Movido daqui) */}
