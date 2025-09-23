@@ -278,6 +278,7 @@ body {
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
 }
 
 .password-input-container {
@@ -291,17 +292,20 @@ body {
     flex-grow: 1;
     margin-bottom: 0;
     padding-right: 40px;
+    border: 1px solid #c0392b;
 }
 
 .auth-container input {
+    margin-bottom: 8px;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #3f51b5;
     border-radius: 5px;
     font-size: 1rem;
 }
 
 .mostrar-senha-btn {
     position: absolute;
+    margin-bottom: 9px;
     right: 10px;
     background: none;
     border: none;
@@ -318,6 +322,7 @@ body {
     border: none;
     border-radius: 5px;
     font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
     margin-top: 1rem;
 }
