@@ -60,7 +60,7 @@ body {
 }
 
 .nav-menu button {
-    composes: btn;
+    /* composes: btn; */
     background-color: #5c6bc0;
     color: white;
     border-radius: 5px;
@@ -211,7 +211,7 @@ body {
 }
 
 .cardapio-form button {
-  composes: btn;
+  /* composes: btn; */
   background-color: #4caf50;
   color: white;
   border-radius: 5px;
@@ -254,9 +254,9 @@ body {
   gap: 10px;
 }
 
-.item-botoes-admin button {
+/* .item-botoes-admin button {
   composes: btn;
-}
+} */
 
 .item-botoes-admin button:first-child {
   background-color: #ff9800;
@@ -334,7 +334,7 @@ padding: 6px 10px 6px 10px;
 }
 
 .auth-container button[type="submit"] {
-    composes: btn;
+    /* composes: btn; */
     background-color: #3f51b5;
     color: white;
     font-weight: 500;
