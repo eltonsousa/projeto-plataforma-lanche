@@ -198,30 +198,26 @@ function App() {
     alert("Logout realizado com sucesso!");
   };
 
+  // 🟢 NOVA FUNÇÃO PARA ATUALIZAÇÃO MANUAL
+  const handleRefresh = () => {
+    fetchRelatorio(filtroPeriodo, filtroStatus);
+  };
+
   // EFEITOS
   useEffect(() => {
-    // 🟢 LINHA ADICIONADA: Carrega o nome do usuário do sessionStorage
     const storedUser = sessionStorage.getItem("usuarioLogado");
     if (storedUser) {
       setUsuarioLogado(storedUser);
     }
 
     if (isLoggedIn) {
-      // 🟢 ATUALIZAÇÃO: Chama o relatório para Pedidos E Relatórios
       if (currentPage === "pedidos" || currentPage === "relatorios") {
-        // Passa os dois filtros: período (data) e status
+        // Chama a busca apenas quando a página ou os filtros mudam
         fetchRelatorio(filtroPeriodo, filtroStatus);
-        // Configuração da atualização automática (a cada 10 segundos)
-        const intervalId = setInterval(
-          () => fetchRelatorio(filtroPeriodo, filtroStatus),
-          10000
-        );
-        return () => clearInterval(intervalId); // Limpa o intervalo na saída
       } else if (currentPage === "cardapio") {
         fetchCardapio();
       }
     }
-    // 🟢 DEPENDÊNCIAS: Recarrega se o login, a página, o filtro de data OU o filtro de status mudarem
   }, [isLoggedIn, currentPage, filtroPeriodo, filtroStatus]);
 
   if (!isLoggedIn) {
@@ -303,6 +299,10 @@ function App() {
                   <option value="Concluído">Concluído</option>
                 </select>
               </label>
+              {/* 🟢 BOTÃO DE ATUALIZAR */}
+              <button onClick={handleRefresh} className="botao-atualizar">
+                Atualizar Pedidos
+              </button>
             </div>
             {/* 🟢 FIM DO CONTROLE DE STATUS */}
 
