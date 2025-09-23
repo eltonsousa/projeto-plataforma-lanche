@@ -445,7 +445,7 @@ body {
     font-size: 0.95rem;
 }
 
-* Estilo para a nova seção de controles na página de pedidos */
+/* Estilo para a nova seção de controles na página de pedidos */
 .controles-pedidos {
     text-align: center;
     margin-bottom: 20px;
