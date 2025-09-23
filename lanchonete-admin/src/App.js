@@ -12,6 +12,7 @@ function App() {
   // ✅ Declaração única (Corrigido o erro de redeclaração)
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ nome: "", senha: "" });
+  const [usuarioLogado, setUsuarioLogado] = useState(null); // 🟢 NOVO ESTADO
   const [mostraSenha, setMostraSenha] = useState(false);
   const [currentPage, setCurrentPage] = useState("pedidos");
   const [itemForm, setItemForm] = useState({
@@ -151,6 +152,9 @@ function App() {
       if (response.ok) {
         setIsLoggedIn(true);
         sessionStorage.setItem("isLoggedIn", "true"); // PERSISTE O LOGIN
+        // 🟢 SALVA O NOME DO USUÁRIO NO SESSION STORAGE E NO ESTADO
+        sessionStorage.setItem("usuarioLogado", formData.nome);
+        setUsuarioLogado(formData.nome);
         setFormData({ nome: "", senha: "" });
         setCurrentPage("pedidos");
       } else {
@@ -172,6 +176,11 @@ function App() {
       });
       const data = await response.json();
       if (response.status === 201) {
+        // 🟢 LINHAS ADICIONADAS
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("usuarioLogado", formData.nome);
+        setUsuarioLogado(formData.nome);
+
         alert("Usuário registrado com sucesso! Faça login.");
         setIsLogin(true);
       } else {
@@ -191,6 +200,12 @@ function App() {
 
   // EFEITOS
   useEffect(() => {
+    // 🟢 LINHA ADICIONADA: Carrega o nome do usuário do sessionStorage
+    const storedUser = sessionStorage.getItem("usuarioLogado");
+    if (storedUser) {
+      setUsuarioLogado(storedUser);
+    }
+
     if (isLoggedIn) {
       // 🟢 ATUALIZAÇÃO: Chama o relatório para Pedidos E Relatórios
       if (currentPage === "pedidos" || currentPage === "relatorios") {
@@ -254,7 +269,7 @@ function App() {
     <div className="painel-admin">
       <header>
         <h1>Painel do Administrador</h1>
-        <p>Olá, {formData.nome}!</p>
+        <p>Olá, {usuarioLogado}!</p>
         <nav className="nav-menu">
           <button onClick={() => setCurrentPage("pedidos")}>Pedidos</button>
           {/* 🟢 Botão de Relatórios adicionado */}
