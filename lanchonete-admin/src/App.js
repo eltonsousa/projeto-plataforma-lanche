@@ -24,8 +24,9 @@ function App() {
     imagem: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-
+  const [isFormEmphasized, setIsFormEmphasized] = useState(false); // 🟢 ADICIONE ESTA LINHA
   const formRef = useRef(null); // 🟢 NOVO: Referência para o formulário
+  const nomeInputRef = useRef(null); // 🟢 NOVO: Referência para o input
 
   // 🟢 ESTADOS DE RELATÓRIO E FILTRO DE STATUS
   const [filtroPeriodo, setFiltroPeriodo] = useState("geral");
@@ -131,6 +132,17 @@ function App() {
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: "smooth" });
     }
+
+    // 🟢 Adiciona a lógica para focar o input
+    if (nomeInputRef.current) {
+      nomeInputRef.current.focus();
+    }
+
+    // 🟢 Lógica de ênfase
+    setIsFormEmphasized(true);
+    setTimeout(() => {
+      setIsFormEmphasized(false);
+    }, 500); // Remove a ênfase após 0.5s
   };
 
   const handleDelete = async (itemId) => {
@@ -477,13 +489,20 @@ function App() {
         <main className="painel-cardapio">
           <h2>Gerenciar Cardápio</h2>
           <div className="cardapio-form">
-            <form ref={formRef} onSubmit={handleItemSubmit}>
+            <form
+              ref={formRef}
+              onSubmit={handleItemSubmit}
+              className={`formulario-item ${
+                isFormEmphasized ? "form-emphasis" : ""
+              }`}
+            >
               <input
                 type="text"
                 name="nome"
                 placeholder="Nome do Item"
                 value={itemForm.nome}
                 onChange={handleItemFormChange}
+                ref={nomeInputRef} // 🟢 Associe a referência aqui
                 required
               />
               <input
