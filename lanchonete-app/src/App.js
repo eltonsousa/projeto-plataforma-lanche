@@ -364,9 +364,9 @@ function App() {
           </button>
         </div>
       )}
-      {/* <footer>
+      <footer>
         <p>&copy; 2025 Manú Lanches. Todos os direitos reservados.</p>
-      </footer> */}
+      </footer>
     </div>
   );
 }
