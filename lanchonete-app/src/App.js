@@ -4,12 +4,10 @@ import "./App.css";
 import { BsCart3 } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 
-// --- FUNÇÕES DE PERSISTÊNCIA (NOVO) ---
-// Função que garante um ID único para a sessão do carrinho no navegador
+// --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
   let sessionId = localStorage.getItem("sessionId");
   if (!sessionId) {
-    // Gera um ID único simples (UUID)
     sessionId =
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
@@ -18,9 +16,7 @@ const getSessionId = () => {
   return sessionId;
 };
 
-// --- FUNÇÕES DE PERSISTÊNCIA (NOVO) FIM ---
-
-// COMPONENTE: Ícone do carrinho no cabeçalho
+// COMPONENTE: Ícone do carrinho
 const CartIcon = ({ count, onClick }) => (
   <button className="carrinho-icon-btn" onClick={onClick}>
     <BsCart3 size={24} />
@@ -29,7 +25,7 @@ const CartIcon = ({ count, onClick }) => (
 );
 
 function App() {
-  const sessionId = getSessionId(); // Obtém o ID da sessão na inicialização
+  const sessionId = getSessionId();
 
   const [carrinho, setCarrinho] = useState([]);
   const [mostraCheckout, setMostraCheckout] = useState(false);
@@ -39,17 +35,16 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
-  // 🟢 NOVO: estado do modal
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
-  // --- FUNÇÕES ASYNC DE CARRINHO (CORRIGIDO) ---
+  // 🟢 NOVOS ESTADOS PARA CHECKOUT
+  const [servico, setServico] = useState("");
+  const [pagamento, setPagamento] = useState("");
 
-  // FUNÇÃO: Carrega o carrinho do Supabase via Backend
+  // --- FUNÇÕES ASYNC ---
   const loadCarrinhoFromSupabase = useCallback(async () => {
     try {
-      // Busca os itens do carrinho usando a rota do Express/Backend
       const response = await fetch(`/api/carrinho/${sessionId}`);
-
       if (response.ok) {
         const itens = await response.json();
         if (itens && itens.length > 0) {
@@ -57,67 +52,52 @@ function App() {
         }
       }
     } catch (error) {
-      console.error("Erro ao carregar carrinho do Supabase:", error);
+      console.error("Erro ao carregar carrinho:", error);
     }
   }, [sessionId]);
 
-  // FUNÇÃO: Salva o carrinho no Supabase via Backend
   const saveCarrinhoToSupabase = useCallback(
     async (currentCarrinho) => {
       try {
         await fetch("/api/carrinho", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId, itens: currentCarrinho }),
         });
       } catch (error) {
-        console.error("Erro ao salvar carrinho no Supabase:", error);
+        console.error("Erro ao salvar carrinho:", error);
       }
     },
     [sessionId]
   );
 
-  // --- EFEITOS (CORRIGIDO) ---
-
-  // EFEITO 1: Carregar Cardápio e o Carrinho Persistido
+  // --- EFEITOS ---
   useEffect(() => {
     fetchCardapio();
-    loadCarrinhoFromSupabase(); // Carrega o carrinho na inicialização
-
+    loadCarrinhoFromSupabase();
     const intervalId = setInterval(fetchCardapio, 10000);
     return () => clearInterval(intervalId);
-  }, [loadCarrinhoFromSupabase]); // Dependência adicionada
+  }, [loadCarrinhoFromSupabase]);
 
-  // EFEITO 2: Persistência (Salva no Supabase sempre que o carrinho muda)
   useEffect(() => {
-    // Evita salvar no primeiro carregamento, onde o carrinho é []
     if (loading === false) {
       saveCarrinhoToSupabase(carrinho);
     }
-
-    // Lógica para controle da exibição do ícone do carrinho
     if (carrinho.length === 0) {
       setMostraCarrinho(false);
     }
-  }, [carrinho, loading, sessionId, saveCarrinhoToSupabase]); // Dependência adicionada
+  }, [carrinho, loading, sessionId, saveCarrinhoToSupabase]);
 
-  // --- RESTANTE DAS FUNÇÕES (ADICIONAR/REMOVER/CHECKOUT) ---
-
+  // --- FUNÇÕES DE CARRINHO ---
   const fetchCardapio = async () => {
-    // ... (função fetchCardapio, sem alterações)
     try {
       const response = await fetch("/api/cardapio");
-      if (!response.ok) {
-        throw new Error("Erro ao buscar o cardápio");
-      }
+      if (!response.ok) throw new Error("Erro ao buscar o cardápio");
       const data = await response.json();
       setItensCardapio(data);
     } catch (error) {
       setError(error.message);
     } finally {
-      // Definir loading como false AQUI é crucial para disparar o useEffect de salvar o carrinho
       setLoading(false);
     }
   };
@@ -149,25 +129,20 @@ function App() {
         item.id === itemId ? { ...item, quantidade: item.quantidade - 1 } : item
       )
       .filter((item) => item.quantidade > 0);
-
     setCarrinho(novoCarrinho);
   };
 
   const removerDoCarrinho = (itemId) => {
-    const novoCarrinho = carrinho.filter((item) => item.id !== itemId);
-    setCarrinho(novoCarrinho);
+    setCarrinho(carrinho.filter((item) => item.id !== itemId));
   };
 
-  const calcularTotal = () => {
-    return carrinho
+  const calcularTotal = () =>
+    carrinho
       .reduce((total, item) => total + item.preco * item.quantidade, 0)
       .toFixed(2);
-  };
 
   const handleToggleCarrinho = () => {
-    if (carrinho.length > 0) {
-      setMostraCarrinho(!mostraCarrinho);
-    }
+    if (carrinho.length > 0) setMostraCarrinho(!mostraCarrinho);
   };
 
   const handleFinalizarPedido = () => {
@@ -175,20 +150,16 @@ function App() {
     setMostraCarrinho(false);
   };
 
+  // --- CHECKOUT ---
   const handleCheckoutSubmit = async (event) => {
     event.preventDefault();
-    // ... (resto da lógica de checkout)
-
-    // ... (cria dadosDoPedido)
     const formData = new FormData(event.target);
     const cliente = {
       nome: formData.get("nome"),
-      // 🟢 NOVO: Adiciona a opção de entrega/retirada
-      servico: formData.get("servico"),
-      // 🟢 NOVO: O endereço agora é opcional
-      endereco: formData.get("endereco") || "",
-      pagamento: formData.get("pagamento"),
-      troco: formData.get("troco") || "",
+      servico,
+      endereco: servico === "entrega" ? formData.get("endereco") : "",
+      pagamento,
+      troco: pagamento === "dinheiro" ? formData.get("troco") : "",
     };
 
     const dadosDoPedido = {
@@ -198,62 +169,44 @@ function App() {
       data: new Date().toISOString(),
     };
 
-    // 🟢 NOVO: Lógica para montar a mensagem do WhatsApp
-    let mensagem = `Olá, *${cliente.nome}*!\n\n`; // Use \n para quebras de linha no código
-    mensagem += `*Novo Pedido Recebido!*\n\n`;
-    mensagem += `*Itens do Pedido:*\n`;
+    // Mensagem WhatsApp
+    let mensagem = `Olá, *${cliente.nome}*!\n\n*Novo Pedido Recebido!*\n\n*Itens:*\n`;
     carrinho.forEach((item) => {
       mensagem += `- ${item.nome} (x${item.quantidade}) - R$ ${(
         item.preco * item.quantidade
       ).toFixed(2)}\n`;
     });
-    mensagem += `\n`;
-    mensagem += `*Total:* R$ ${calcularTotal()}\n`;
-
-    // Adiciona a informação de serviço e endereço, se for o caso
+    mensagem += `\n*Total:* R$ ${calcularTotal()}\n`;
     mensagem += `*Serviço:* ${
       cliente.servico === "entrega" ? "Entrega" : "Retirada"
     }\n`;
-    if (cliente.servico === "entrega") {
+    if (cliente.servico === "entrega")
       mensagem += `*Endereço:* ${cliente.endereco}\n`;
-    }
     mensagem += `*Pagamento:* ${cliente.pagamento}\n\n`;
 
-    // Adiciona informações de pagamento baseadas na escolha do cliente
     if (cliente.pagamento === "pix") {
-      const chavePix = "73064335200";
-      mensagem += `*Informação para Pagamento com PIX:*\n`;
-      mensagem += `*Chave PIX:* ${chavePix}\n`;
-      mensagem += `*Nome: Manú Lanches*\n\n`;
-      mensagem += `_Aguardando a confirmação do seu pagamento!_`;
+      mensagem += `*PIX:* 73064335200 (Manú Lanches)\n_Aguardando pagamento._`;
     } else if (cliente.pagamento === "dinheiro") {
-      if (cliente.troco) {
-        mensagem += `*Observação:* Troco para R$ ${parseFloat(
-          cliente.troco
-        ).toFixed(2)}\n\n`;
-      }
-      if (cliente.servico === "entrega") {
-        mensagem += `Aguarde a entrega! Tenha o valor do pedido em mãos.`;
-      } else {
-        mensagem += `Aguarde a retirada! Tenha o valor do pedido em mãos.`;
-      }
+      if (cliente.troco)
+        mensagem += `*Troco para:* R$ ${parseFloat(cliente.troco).toFixed(
+          2
+        )}\n`;
+      mensagem +=
+        cliente.servico === "entrega"
+          ? "Aguarde a entrega! Tenha o valor em mãos."
+          : "Aguarde a retirada! Tenha o valor em mãos.";
     } else {
-      // Cartão
-      if (cliente.servico === "entrega") {
-        mensagem += `Aguarde a entrega! Tenha seu cartão em mãos.`;
-      } else {
-        mensagem += `Aguarde a retirada! Tenha seu cartão em mãos.`;
-      }
+      mensagem +=
+        cliente.servico === "entrega"
+          ? "Aguarde a entrega! Tenha seu cartão em mãos."
+          : "Aguarde a retirada! Tenha seu cartão em mãos.";
     }
 
-    // Se for retirada, adiciona o link para a localização
     if (cliente.servico === "retirada") {
-      const linkLocalizacao = "https://goo.gl/maps/sua-localizacao";
-      mensagem += `\n\n*Local para Retirada:* ${linkLocalizacao}`;
+      mensagem += `\n\n*Local:* https://goo.gl/maps/sua-localizacao`;
     }
 
     const numeroWhatsApp = "5592993312208";
-    // O encodeURIComponent é a função que fará a conversão para %0A, etc.
     const whatsappUrl = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
       mensagem
     )}`;
@@ -261,29 +214,17 @@ function App() {
     try {
       const response = await fetch("/api/pedidos", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dadosDoPedido),
       });
 
       if (response.ok) {
-        // 🟢 NOVO: Abre o WhatsApp
-
-        alert("Pedido enviado com sucesso para a lanchonete!");
-        setUltimoPedido({
-          itens: carrinho,
-          total: calcularTotal(),
-        });
-        setCarrinho([]);
+        setUltimoPedido({ itens: carrinho, total: calcularTotal() });
+        await saveCarrinhoToSupabase([]); // limpa no backend
+        setCarrinho([]); // limpa no front
         setMostraCheckout(false);
         setPedidoFinalizado(true);
-        // 🟢 IMPORTANTE: Deleta o carrinho persistido após finalizar o pedido
-        await saveCarrinhoToSupabase([]); // Salva um carrinho vazio no Supabase
-        setTimeout(() => {
-          // 3. Abre o WhatsApp com a mensagem
-          window.open(whatsappUrl, "_blank");
-        }, 6000); // Atraso em milissegundos
+        window.open(whatsappUrl, "_blank"); // abre direto
       } else {
         alert("Erro ao enviar o pedido. Tente novamente.");
       }
@@ -296,28 +237,22 @@ function App() {
   const handleNovoPedido = () => {
     setPedidoFinalizado(false);
     setMostraCarrinho(false);
+    setServico("");
+    setPagamento("");
   };
 
-  if (loading) {
-    return <div className="loading">Carregando...</div>;
-  }
+  // --- RENDERIZAÇÃO ---
+  if (loading) return <div className="loading">Carregando...</div>;
+  if (error)
+    return <div className="error">Erro ao carregar cardápio: {error}</div>;
 
-  if (error) {
-    return <div className="error">Erro ao carregar o cardápio: {error}</div>;
-  }
-
-  const totalItensCarrinho = carrinho.reduce(
-    (total, item) => total + item.quantidade,
-    0
-  );
+  const totalItensCarrinho = carrinho.reduce((t, i) => t + i.quantidade, 0);
 
   return (
     <div className="App">
       <header>
         <h1>Manú Lanches</h1>
         <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
-
-        {/* ÍCONE DO CARRINHO */}
         {carrinho.length > 0 && !mostraCheckout && !pedidoFinalizado && (
           <CartIcon count={totalItensCarrinho} onClick={handleToggleCarrinho} />
         )}
@@ -343,7 +278,7 @@ function App() {
             ))}
           </main>
 
-          {/* RENDERIZAÇÃO DO CARRINHO LATERAL (ASIDE) */}
+          {/* CARRINHO */}
           {carrinho.length > 0 && mostraCarrinho && (
             <aside className="carrinho-container">
               <h2>Seu Carrinho</h2>
@@ -388,7 +323,7 @@ function App() {
         </>
       )}
 
-      {/* 🟢 NOVO: MODAL DE DETALHES */}
+      {/* MODAL DETALHES */}
       {produtoSelecionado && (
         <div
           className="modal-overlay"
@@ -405,7 +340,6 @@ function App() {
               R$ {produtoSelecionado.preco.toFixed(2)}
             </span>
 
-            {/* Se o item já está no carrinho, mostra controles */}
             {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
               <>
                 <div className="quantidade-botoes">
@@ -432,8 +366,6 @@ function App() {
                     Remover
                   </button>
                 </div>
-
-                {/* 🟢 Novo: total parcial do item */}
                 <div className="total-item">
                   Total: R${" "}
                   {(
@@ -450,7 +382,6 @@ function App() {
                 Adicionar ao Carrinho
               </button>
             )}
-
             <AiOutlineClose
               className="modal-close-icon"
               onClick={() => setProdutoSelecionado(null)}
@@ -459,7 +390,7 @@ function App() {
         </div>
       )}
 
-      {/* RENDERIZAÇÃO DO CHECKOUT */}
+      {/* CHECKOUT */}
       {mostraCheckout && (
         <div className="checkout-container">
           <h2>Finalizar Pedido</h2>
@@ -469,26 +400,13 @@ function App() {
               <input type="text" name="nome" required />
             </label>
 
-            {/* 🟢 NOVO: Campo para escolher Entrega ou Retirada */}
             <label>
               Tipo de Serviço:
               <select
                 name="servico"
                 required
-                // 🟢 NOVO: Lógica para mostrar/esconder campos
-                onChange={(e) => {
-                  const servicoEscolhido = e.target.value;
-                  const enderecoField = document.querySelector(
-                    'input[name="endereco"]'
-                  );
-
-                  // Lógica para mostrar/esconder o campo de endereço
-                  if (enderecoField) {
-                    enderecoField.style.display =
-                      servicoEscolhido === "entrega" ? "block" : "none";
-                    enderecoField.required = servicoEscolhido === "entrega";
-                  }
-                }}
+                value={servico}
+                onChange={(e) => setServico(e.target.value)}
               >
                 <option value="">Selecione...</option>
                 <option value="entrega">Entrega</option>
@@ -496,28 +414,20 @@ function App() {
               </select>
             </label>
 
-            {/* 🟢 NOVO: Campo de endereço, inicialmente oculto */}
-            <label style={{ display: "none" }}>
-              Endereço de Entrega:
-              <input type="text" name="endereco" />
-            </label>
+            {servico === "entrega" && (
+              <label>
+                Endereço de Entrega:
+                <input type="text" name="endereco" required />
+              </label>
+            )}
 
             <label>
               Forma de Pagamento:
               <select
                 name="pagamento"
                 required
-                onChange={(e) => {
-                  const formaPagamento = e.target.value;
-                  const trocoField = document.querySelector(
-                    'input[name="troco"]'
-                  );
-                  if (trocoField) {
-                    trocoField.style.display =
-                      formaPagamento === "dinheiro" ? "block" : "none";
-                    trocoField.required = formaPagamento === "dinheiro";
-                  }
-                }}
+                value={pagamento}
+                onChange={(e) => setPagamento(e.target.value)}
               >
                 <option value="">Selecione...</option>
                 <option value="pix">PIX</option>
@@ -526,10 +436,12 @@ function App() {
               </select>
             </label>
 
-            <label style={{ display: "none" }}>
-              Troco para:
-              <input type="number" name="troco" step="0.01" />
-            </label>
+            {pagamento === "dinheiro" && (
+              <label>
+                Troco para:
+                <input type="number" name="troco" step="0.01" required />
+              </label>
+            )}
 
             <button type="submit" className="finalizar-pedido">
               Confirmar Pedido
@@ -538,12 +450,11 @@ function App() {
         </div>
       )}
 
-      {/* RENDERIZAÇÃO DA CONFIRMAÇÃO */}
+      {/* CONFIRMAÇÃO */}
       {pedidoFinalizado && ultimoPedido && (
         <div className="confirmacao-container">
           <h2>Pedido Confirmado!</h2>
           <p>Obrigado por sua compra! Seu pedido será preparado em breve.</p>
-
           <div className="resumo-pedido">
             <h3>Resumo do Pedido:</h3>
             <ul>
@@ -558,12 +469,12 @@ function App() {
               <strong>Total: R$ {ultimoPedido.total}</strong>
             </div>
           </div>
-
           <button onClick={handleNovoPedido} className="novo-pedido-btn">
             Fazer um novo pedido
           </button>
         </div>
       )}
+
       <footer>
         <p>&copy; 2025 Manú Lanches. Todos os direitos reservados.</p>
       </footer>
