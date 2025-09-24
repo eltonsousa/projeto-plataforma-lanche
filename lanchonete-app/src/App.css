@@ -526,21 +526,22 @@ header {
   align-items: center;
   justify-content: center;
   z-index: 200;
-  padding: 20px;
+  padding: 0; /* remove padding da overlay */
+  box-sizing: border-box;
 }
 
 .modal-content {
   background: white;
   border-radius: 10px;
-  max-width: 500px;
-  width: 100%;
+  width: 90%;        /* largura flexível */
+  max-width: 500px;  /* largura máxima no desktop */
   padding: 20px;
   text-align: center;
   position: relative;
   animation: fadeIn 0.3s ease;
-  /* 🟢 Novo: controle de altura e scroll interno */
-  max-height: 90vh;       /* não ultrapassa 90% da altura da tela */
-  overflow-y: auto;       /* permite scroll vertical se o conteúdo for grande */
+  max-height: 90vh;  /* não ultrapassa altura da tela */
+  overflow-y: auto;
+  box-sizing: border-box; /* importante */
 }
 
 .modal-content img {
@@ -598,59 +599,94 @@ header {
 /* Responsividade */
 @media (max-width: 480px) {
   .modal-content {
-    width: 90%;          /* ocupa 90% da tela */
-    max-width: 350px;    /* largura máxima menor */
-    padding: 15px;       /* menos padding */
-    max-height: 90vh;      /* garante altura máxima */
+    width: 95%;          /* ocupa quase toda a largura */
+    max-width: 320px;    /* força largura menor */
+    padding: 15px;       /* padding menor */
+    max-height: 85vh;    /* altura máxima da tela */
+    overflow-y: auto;    /* permite scroll interno se necessário */
+    box-sizing: border-box; /* garante que padding não aumente largura */
+  }
+
+  .modal-content img {
+    width: 100%;         /* imagem ocupa toda a largura disponível */
+    height: auto;
+    margin-bottom: 10px;
   }
 
   .modal-content h2 {
-    font-size: 1.3rem;   /* título menor */
+    font-size: 1.2rem;
+    margin: 10px 0;
   }
 
   .modal-content p {
-    font-size: 0.9rem;   /* descrição menor */
+    font-size: 0.9rem;
+    margin: 5px 0;
   }
 
   .modal-content .preco {
-    font-size: 1.2rem;   /* preço menor */
+    font-size: 1.1rem;
+    margin: 10px 0;
   }
 
   .modal-content .quantidade-botoes span {
-    font-size: 1.1rem;   /* quantidade menor */
+    font-size: 1rem;
   }
 
   .modal-close-icon {
-    top: 8px;
-    right: 8px;
-    font-size: 1.5rem;
-    padding: 4px;
+    top: 5px;
+    right: 5px;
+    font-size: 1.4rem;
+    padding: 3px;
   }
 }
 
-/* Ajuste extra para telas muito pequenas (≤ 350px) */
 @media (max-width: 350px) {
+
   .modal-content {
-    width: 95%;          /* quase toda a tela */
-    max-width: none;     /* remove limite de largura */
-    padding: 10px;       /* padding menor */
-    max-height: 90vh;      /* garante altura máxima */
+    animation: slideDownFade 0.3s ease forwards;
+    width: 95%;           /* quase toda a largura */
+    max-width: 300px;     /* largura reduzida */
+    padding: 12px;        /* padding menor */
+    max-height: 90vh;     /* altura máxima da tela */
+    overflow-y: auto;     /* scroll interno se necessário */
+    box-sizing: border-box;
+    margin: 0 auto;    /* garante centralização horizontal */
+  }
+
+    @keyframes slideDownFade {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .modal-content img {
+    width: 100%;          /* imagem ocupa toda a largura */
+    height: auto;
+    margin-bottom: 8px;
   }
 
   .modal-content h2 {
-    font-size: 1.1rem;   /* título menor */
+    font-size: 1.1rem;
+    margin: 8px 0;
   }
 
   .modal-content p {
-    font-size: 0.85rem;  /* descrição menor */
+    font-size: 0.85rem;
+    margin: 5px 0;
   }
 
   .modal-content .preco {
-    font-size: 1rem;     /* preço menor */
+    font-size: 1rem;
+    margin: 8px 0;
   }
 
   .modal-content .quantidade-botoes span {
-    font-size: 1rem;     /* quantidade menor */
+    font-size: 0.95rem;
   }
 
   .modal-close-icon {
@@ -659,7 +695,13 @@ header {
     font-size: 1.3rem;
     padding: 3px;
   }
+
+  .modal-botoes button {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
 }
+
 
 /*                                */
 .modal-content .quantidade-botoes {
