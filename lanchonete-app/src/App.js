@@ -183,8 +183,12 @@ function App() {
     const formData = new FormData(event.target);
     const cliente = {
       nome: formData.get("nome"),
-      endereco: formData.get("endereco"),
+      // 🟢 NOVO: Adiciona a opção de entrega/retirada
+      servico: formData.get("servico"),
+      // 🟢 NOVO: O endereço agora é opcional
+      endereco: formData.get("endereco") || "",
       pagamento: formData.get("pagamento"),
+      troco: formData.get("troco") || "",
     };
 
     const dadosDoPedido = {
@@ -193,6 +197,66 @@ function App() {
       total: calcularTotal(),
       data: new Date().toISOString(),
     };
+
+    // 🟢 NOVO: Lógica para montar a mensagem do WhatsApp
+    let mensagem = `Olá, *${cliente.nome}*!\n\n`; // Use \n para quebras de linha no código
+    mensagem += `*Novo Pedido Recebido!*\n\n`;
+    mensagem += `*Itens do Pedido:*\n`;
+    carrinho.forEach((item) => {
+      mensagem += `- ${item.nome} (x${item.quantidade}) - R$ ${(
+        item.preco * item.quantidade
+      ).toFixed(2)}\n`;
+    });
+    mensagem += `\n`;
+    mensagem += `*Total:* R$ ${calcularTotal()}\n`;
+
+    // Adiciona a informação de serviço e endereço, se for o caso
+    mensagem += `*Serviço:* ${
+      cliente.servico === "entrega" ? "Entrega" : "Retirada"
+    }\n`;
+    if (cliente.servico === "entrega") {
+      mensagem += `*Endereço:* ${cliente.endereco}\n`;
+    }
+    mensagem += `*Pagamento:* ${cliente.pagamento}\n\n`;
+
+    // Adiciona informações de pagamento baseadas na escolha do cliente
+    if (cliente.pagamento === "pix") {
+      const chavePix = "73064335200";
+      mensagem += `*Informação para Pagamento com PIX:*\n`;
+      mensagem += `*Chave PIX:* ${chavePix}\n`;
+      mensagem += `*Nome: Manú Lanches*\n\n`;
+      mensagem += `_Aguardando a confirmação do seu pagamento!_`;
+    } else if (cliente.pagamento === "dinheiro") {
+      if (cliente.troco) {
+        mensagem += `*Observação:* Troco para R$ ${parseFloat(
+          cliente.troco
+        ).toFixed(2)}\n\n`;
+      }
+      if (cliente.servico === "entrega") {
+        mensagem += `Aguarde a entrega! Tenha o valor do pedido em mãos.`;
+      } else {
+        mensagem += `Aguarde a retirada! Tenha o valor do pedido em mãos.`;
+      }
+    } else {
+      // Cartão
+      if (cliente.servico === "entrega") {
+        mensagem += `Aguarde a entrega! Tenha seu cartão em mãos.`;
+      } else {
+        mensagem += `Aguarde a retirada! Tenha seu cartão em mãos.`;
+      }
+    }
+
+    // Se for retirada, adiciona o link para a localização
+    if (cliente.servico === "retirada") {
+      const linkLocalizacao = "https://goo.gl/maps/sua-localizacao";
+      mensagem += `\n\n*Local para Retirada:* ${linkLocalizacao}`;
+    }
+
+    const numeroWhatsApp = "5592993312208";
+    // O encodeURIComponent é a função que fará a conversão para %0A, etc.
+    const whatsappUrl = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
+      mensagem
+    )}`;
 
     try {
       const response = await fetch("/api/pedidos", {
@@ -204,6 +268,9 @@ function App() {
       });
 
       if (response.ok) {
+        // 🟢 NOVO: Abre o WhatsApp
+        window.open(whatsappUrl, "_blank");
+
         alert("Pedido enviado com sucesso para a lanchonete!");
         setUltimoPedido({
           itens: carrinho,
@@ -398,19 +465,69 @@ function App() {
               Nome:
               <input type="text" name="nome" required />
             </label>
+
+            {/* 🟢 NOVO: Campo para escolher Entrega ou Retirada */}
             <label>
-              Endereço de Entrega:
-              <input type="text" name="endereco" required />
+              Tipo de Serviço:
+              <select
+                name="servico"
+                required
+                // 🟢 NOVO: Lógica para mostrar/esconder campos
+                onChange={(e) => {
+                  const servicoEscolhido = e.target.value;
+                  const enderecoField = document.querySelector(
+                    'input[name="endereco"]'
+                  );
+
+                  // Lógica para mostrar/esconder o campo de endereço
+                  if (enderecoField) {
+                    enderecoField.style.display =
+                      servicoEscolhido === "entrega" ? "block" : "none";
+                    enderecoField.required = servicoEscolhido === "entrega";
+                  }
+                }}
+              >
+                <option value="">Selecione...</option>
+                <option value="entrega">Entrega</option>
+                <option value="retirada">Retirada</option>
+              </select>
             </label>
+
+            {/* 🟢 NOVO: Campo de endereço, inicialmente oculto */}
+            <label style={{ display: "none" }}>
+              Endereço de Entrega:
+              <input type="text" name="endereco" />
+            </label>
+
             <label>
               Forma de Pagamento:
-              <select name="pagamento" required>
+              <select
+                name="pagamento"
+                required
+                onChange={(e) => {
+                  const formaPagamento = e.target.value;
+                  const trocoField = document.querySelector(
+                    'input[name="troco"]'
+                  );
+                  if (trocoField) {
+                    trocoField.style.display =
+                      formaPagamento === "dinheiro" ? "block" : "none";
+                    trocoField.required = formaPagamento === "dinheiro";
+                  }
+                }}
+              >
                 <option value="">Selecione...</option>
                 <option value="pix">PIX</option>
                 <option value="cartao">Cartão de Crédito/Débito</option>
                 <option value="dinheiro">Dinheiro</option>
               </select>
             </label>
+
+            <label style={{ display: "none" }}>
+              Troco para:
+              <input type="number" name="troco" step="0.01" />
+            </label>
+
             <button type="submit" className="finalizar-pedido">
               Confirmar Pedido
             </button>
