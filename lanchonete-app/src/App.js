@@ -38,6 +38,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
+  // 🟢 NOVO: estado do modal
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
   // --- FUNÇÕES ASYNC DE CARRINHO (CORRIGIDO) ---
 
@@ -250,17 +252,18 @@ function App() {
         )}
       </header>
 
-      {/* ... (Restante da renderização, sem alterações) ... */}
-      {/* RENDERIZAÇÃO DO CARDÁPIO (PRINCIPAL) */}
+      {/* LISTA DE PRODUTOS */}
       {!mostraCheckout && !pedidoFinalizado && (
         <>
           <main className="cardapio">
             {itensCardapio.map((item) => (
-              <CardapioItem
+              <div
                 key={item.id}
-                item={item}
-                onAdicionar={adicionarAoCarrinho}
-              />
+                onClick={() => setProdutoSelecionado(item)}
+                style={{ cursor: "pointer", width: "100%" }}
+              >
+                <CardapioItem item={item} onAdicionar={adicionarAoCarrinho} />
+              </div>
             ))}
           </main>
 
@@ -307,6 +310,79 @@ function App() {
             </aside>
           )}
         </>
+      )}
+
+      {/* 🟢 NOVO: MODAL DE DETALHES */}
+      {produtoSelecionado && (
+        <div
+          className="modal-overlay"
+          onClick={() => setProdutoSelecionado(null)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={produtoSelecionado.imagem}
+              alt={produtoSelecionado.nome}
+            />
+            <h2>{produtoSelecionado.nome}</h2>
+            <p>{produtoSelecionado.descricao}</p>
+            <span className="preco">
+              R$ {produtoSelecionado.preco.toFixed(2)}
+            </span>
+
+            {/* Se o item já está no carrinho, mostra controles */}
+            {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
+              <>
+                <div className="quantidade-botoes">
+                  <button
+                    onClick={() => diminuirQuantidade(produtoSelecionado.id)}
+                  >
+                    -
+                  </button>
+                  <span>
+                    {
+                      carrinho.find((c) => c.id === produtoSelecionado.id)
+                        ?.quantidade
+                    }
+                  </span>
+                  <button
+                    onClick={() => aumentarQuantidade(produtoSelecionado.id)}
+                  >
+                    +
+                  </button>
+                  <button
+                    className="remover-item"
+                    onClick={() => removerDoCarrinho(produtoSelecionado.id)}
+                  >
+                    Remover
+                  </button>
+                </div>
+
+                {/* 🟢 Novo: total parcial do item */}
+                <div className="total-item">
+                  Total: R${" "}
+                  {(
+                    carrinho.find((c) => c.id === produtoSelecionado.id)
+                      ?.quantidade * produtoSelecionado.preco
+                  ).toFixed(2)}
+                </div>
+              </>
+            ) : (
+              <button
+                className="add-carrinho"
+                onClick={() => adicionarAoCarrinho(produtoSelecionado)}
+              >
+                Adicionar ao Carrinho
+              </button>
+            )}
+
+            <button
+              className="btn-fechar"
+              onClick={() => setProdutoSelecionado(null)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
       )}
 
       {/* RENDERIZAÇÃO DO CHECKOUT */}
