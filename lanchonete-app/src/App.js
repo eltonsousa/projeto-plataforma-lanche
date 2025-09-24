@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 import { BsCart3 } from "react-icons/bs";
+import { AiOutlineClose } from "react-icons/ai";
 
 // --- FUNÇÕES DE PERSISTÊNCIA (NOVO) ---
 // Função que garante um ID único para a sessão do carrinho no navegador
@@ -260,7 +261,12 @@ function App() {
               <div
                 key={item.id}
                 onClick={() => setProdutoSelecionado(item)}
-                style={{ cursor: "pointer", width: "100%" }}
+                style={{
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
               >
                 <CardapioItem item={item} onAdicionar={adicionarAoCarrinho} />
               </div>
@@ -375,12 +381,10 @@ function App() {
               </button>
             )}
 
-            <button
-              className="btn-fechar"
+            <AiOutlineClose
+              className="modal-close-icon"
               onClick={() => setProdutoSelecionado(null)}
-            >
-              Fechar
-            </button>
+            />
           </div>
         </div>
       )}
