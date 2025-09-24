@@ -269,7 +269,6 @@ function App() {
 
       if (response.ok) {
         // 🟢 NOVO: Abre o WhatsApp
-        window.open(whatsappUrl, "_blank");
 
         alert("Pedido enviado com sucesso para a lanchonete!");
         setUltimoPedido({
@@ -281,6 +280,10 @@ function App() {
         setPedidoFinalizado(true);
         // 🟢 IMPORTANTE: Deleta o carrinho persistido após finalizar o pedido
         await saveCarrinhoToSupabase([]); // Salva um carrinho vazio no Supabase
+        setTimeout(() => {
+          // 3. Abre o WhatsApp com a mensagem
+          window.open(whatsappUrl, "_blank");
+        }, 6000); // Atraso em milissegundos
       } else {
         alert("Erro ao enviar o pedido. Tente novamente.");
       }
