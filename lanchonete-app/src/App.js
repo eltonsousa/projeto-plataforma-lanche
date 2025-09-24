@@ -37,7 +37,7 @@ function App() {
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
 
-  // 🟢 NOVOS ESTADOS PARA CHECKOUT
+  // 🟢 Estados do checkout
   const [servico, setServico] = useState("");
   const [pagamento, setPagamento] = useState("");
 
@@ -47,9 +47,7 @@ function App() {
       const response = await fetch(`/api/carrinho/${sessionId}`);
       if (response.ok) {
         const itens = await response.json();
-        if (itens && itens.length > 0) {
-          setCarrinho(itens);
-        }
+        if (itens && itens.length > 0) setCarrinho(itens);
       }
     } catch (error) {
       console.error("Erro ao carregar carrinho:", error);
@@ -80,15 +78,11 @@ function App() {
   }, [loadCarrinhoFromSupabase]);
 
   useEffect(() => {
-    if (loading === false) {
-      saveCarrinhoToSupabase(carrinho);
-    }
-    if (carrinho.length === 0) {
-      setMostraCarrinho(false);
-    }
-  }, [carrinho, loading, sessionId, saveCarrinhoToSupabase]);
+    if (!loading) saveCarrinhoToSupabase(carrinho);
+    if (carrinho.length === 0) setMostraCarrinho(false);
+  }, [carrinho, loading, saveCarrinhoToSupabase]);
 
-  // --- FUNÇÕES DE CARRINHO ---
+  // --- FUNÇÕES DE CARDÁPIO ---
   const fetchCardapio = async () => {
     try {
       const response = await fetch("/api/cardapio");
@@ -102,6 +96,7 @@ function App() {
     }
   };
 
+  // --- FUNÇÕES DE CARRINHO ---
   const adicionarAoCarrinho = (item) => {
     const itemExistente = carrinho.find((c) => c.id === item.id);
     if (itemExistente) {
