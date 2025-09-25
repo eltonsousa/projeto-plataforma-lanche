@@ -40,7 +40,7 @@ function App() {
   // 🟢 Estados do checkout
   const [servico, setServico] = useState("");
   const [pagamento, setPagamento] = useState("");
-
+  const [telefone, setTelefone] = useState(""); // <-- NOVO ESTADO
   // --- FUNÇÕES ASYNC ---
   const loadCarrinhoFromSupabase = useCallback(async () => {
     try {
@@ -151,9 +151,10 @@ function App() {
     const formData = new FormData(event.target);
     const cliente = {
       nome: formData.get("nome"),
-      servico,
+      telefone: telefone, // <-- ATUALIZAÇÃO
+      servico: servico,
       endereco: servico === "entrega" ? formData.get("endereco") : "",
-      pagamento,
+      pagamento: pagamento,
       troco: pagamento === "dinheiro" ? formData.get("troco") : "",
     };
 
@@ -162,49 +163,8 @@ function App() {
       itens: carrinho,
       total: calcularTotal(),
       data: new Date().toISOString(),
+      tipo_servico: servico, // <-- ATUALIZAÇÃO
     };
-
-    // Mensagem WhatsApp
-    let mensagem = `Olá, *${cliente.nome}*!\n\n*Novo Pedido Recebido!*\n\n*Itens:*\n`;
-    carrinho.forEach((item) => {
-      mensagem += `- ${item.nome} (x${item.quantidade}) - R$ ${(
-        item.preco * item.quantidade
-      ).toFixed(2)}\n`;
-    });
-    mensagem += `\n*Total:* R$ ${calcularTotal()}\n`;
-    mensagem += `*Serviço:* ${
-      cliente.servico === "entrega" ? "Entrega" : "Retirada"
-    }\n`;
-    if (cliente.servico === "entrega")
-      mensagem += `*Endereço:* ${cliente.endereco}\n`;
-    mensagem += `*Pagamento:* ${cliente.pagamento}\n\n`;
-
-    if (cliente.pagamento === "pix") {
-      mensagem += `*PIX:* 73064335200 (Manú Lanches)\n_Aguardando pagamento._`;
-    } else if (cliente.pagamento === "dinheiro") {
-      if (cliente.troco)
-        mensagem += `*Troco para:* R$ ${parseFloat(cliente.troco).toFixed(
-          2
-        )}\n`;
-      mensagem +=
-        cliente.servico === "entrega"
-          ? "Aguarde a entrega! Tenha o valor em mãos."
-          : "Aguarde a retirada! Tenha o valor em mãos.";
-    } else {
-      mensagem +=
-        cliente.servico === "entrega"
-          ? "Aguarde a entrega! Tenha seu cartão em mãos."
-          : "Aguarde a retirada! Tenha seu cartão em mãos.";
-    }
-
-    if (cliente.servico === "retirada") {
-      mensagem += `\n\n*Local:* https://goo.gl/maps/sua-localizacao`;
-    }
-
-    const numeroWhatsApp = "5592993312208";
-    const whatsappUrl = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
-      mensagem
-    )}`;
 
     try {
       const response = await fetch("/api/pedidos", {
@@ -219,7 +179,6 @@ function App() {
         setCarrinho([]); // limpa no front
         setMostraCheckout(false);
         setPedidoFinalizado(true);
-        window.open(whatsappUrl, "_blank"); // abre direto
       } else {
         alert("Erro ao enviar o pedido. Tente novamente.");
       }
@@ -393,6 +352,20 @@ function App() {
             <label>
               Nome:
               <input type="text" name="nome" required />
+            </label>
+
+            {/* --- NOVO CAMPO --- */}
+            <label>
+              Telefone (com DDD, somente números):
+              <input
+                type="tel"
+                name="telefone"
+                required
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                pattern="[0-9]{11}"
+                title="Formato: 11987654321"
+              />
             </label>
 
             <label>

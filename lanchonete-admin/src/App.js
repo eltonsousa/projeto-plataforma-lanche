@@ -71,11 +71,23 @@ function App() {
   // 🟢 ATUALIZAÇÃO: Chama fetchRelatorio com os filtros atuais
   const atualizarStatus = async (pedidoId, novoStatus) => {
     try {
+      // Primeira requisição: atualiza o status no banco de dados
       await fetch(`/api/pedidos/${pedidoId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: novoStatus }),
+        body: JSON.stringify({ status: novoStatus }), // Adicione esta linha
       });
+
+      // Segunda requisição: envia a mensagem do WhatsApp
+      if (novoStatus === "Pronto para entrega") {
+        await fetch(`/api/pedidos/${pedidoId}/enviar-whatsapp`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: novoStatus }), // Adicione esta linha
+        });
+      }
+
+      // Atualiza a lista de pedidos após a mudança
       fetchRelatorio(filtroPeriodo, filtroStatus);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
