@@ -237,7 +237,7 @@ app.post("/api/pedidos", async (req, res) => {
       }
       const numero = `55${telefoneLimpo}@c.us`;
 
-      let mensagemResumo = `Olá ${pedido.cliente.nome}! Estamos preparando seu pedido e avisaremos quando estiver pronto.\n\n`;
+      let mensagemResumo = `👋 Olá *${pedido.cliente.nome}*! Estamos preparando seu pedido e avisaremos quando estiver pronto.\n\n*🏷️ Resumo do seu Pedido:*\n`;
 
       // Lista de itens
       pedido.itens.forEach((item) => {
@@ -246,22 +246,27 @@ app.post("/api/pedidos", async (req, res) => {
       });
 
       const totalPedido = parseFloat(pedido.total || 0).toFixed(2);
-      mensagemResumo += `\nTotal: R$ ${totalPedido}`;
-      mensagemResumo += `\nServiço: ${pedido.tipo_servico}`;
+      mensagemResumo += `\n*💰 Total:* R$ ${totalPedido}`;
+      mensagemResumo += `\n*🚚 Serviço:* ${pedido.tipo_servico}`;
 
-      if (pedido.tipo_servico.toLowerCase() === "retirada") {
-        mensagemResumo += `\nRetirada: Av. Exemplo, 123, Sua Cidade`;
-      } else {
-        mensagemResumo += `\nEntrega: ${
-          pedido.cliente.endereco || "Endereço informado pelo cliente"
-        }`;
+      // Lógica tipo pagamento
+      if (pedido.forma_pagamento?.toLowerCase() === "pix") {
+        mensagemResumo += `\n*💰 Pagamento:* PIX\n*Chave PIX:* ${process.env.CHAVE_PIX}`;
+      } else if (pedido.forma_pagamento?.toLowerCase() === "dinheiro") {
+        mensagemResumo += `\n*💵 Pagamento:* Dinheiro`;
+        if (pedido.troco)
+          mensagemResumo += `\n*Troco para:* R$ ${pedido.troco}`;
+      } else if (pedido.forma_pagamento?.toLowerCase() === "cartao") {
+        mensagemResumo += `\n💳 *Pagamento:* Cartão`;
       }
 
-      if (pedido.forma_pagamento?.toLowerCase() === "pix") {
-        mensagemResumo += `\nPagamento: PIX\nChave PIX: ${process.env.CHAVE_PIX}`;
-      } else if (pedido.forma_pagamento?.toLowerCase() === "dinheiro") {
-        mensagemResumo += `\nPagamento: Dinheiro`;
-        if (pedido.troco) mensagemResumo += `\nTroco para: R$ ${pedido.troco}`;
+      // Lógica tipo de entrega
+      if (pedido.tipo_servico.toLowerCase() === "retirada") {
+        mensagemResumo += `\n*📍 Retirada:* Av. Exemplo, 123 - Novo Israel\n\n*📍 Nossa Localização:*\n${process.env.LOCALIZACAO_LOJA}`;
+      } else {
+        mensagemResumo += `\n*📍 Entrega:* ${
+          pedido.cliente.endereco || "Endereço informado pelo cliente"
+        }`;
       }
 
       client
@@ -322,9 +327,9 @@ app.put("/api/pedidos/:id", async (req, res) => {
     let mensagem = "";
     if (status.toLowerCase() === "pronto para entrega") {
       if (tipo_servico.toLowerCase() === "entrega") {
-        mensagem = "Seu pedido já está a caminho!";
+        mensagem = `Boa notícia *${pedido.cliente.nome}*\nseu pedido já está a caminho! 🚚`;
       } else if (tipo_servico.toLowerCase() === "retirada") {
-        mensagem = "Seu pedido já está pronto para retirada!";
+        mensagem = `Boa notícia *${pedido.cliente.nome}*\nseu pedido já está pronto para retirada! 🚚`;
       }
     }
 
