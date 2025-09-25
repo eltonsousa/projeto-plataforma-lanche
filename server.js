@@ -263,7 +263,15 @@ app.put("/api/pedidos/:id", async (req, res) => {
     }
 
     if (mensagem && telefone_cliente?.trim()) {
-      const numero = `55${telefone_cliente.replace(/\D/g, "")}@c.us`;
+      // Limpa o número
+      let telefoneLimpo = pedido.telefone_cliente.replace(/\D/g, "");
+
+      // Remove o "9" extra quando necessário
+      if (telefoneLimpo.length === 11 && telefoneLimpo[2] === "9") {
+        telefoneLimpo = telefoneLimpo.slice(0, 2) + telefoneLimpo.slice(3);
+      }
+
+      const numero = `55${telefoneLimpo}@c.us`;
 
       // 🔎 Debug antes de enviar
       console.log("Telefone bruto:", telefone_cliente);
