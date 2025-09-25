@@ -1,3 +1,2 @@
-2025/09/25-01:03:15.463 3a4c Reusing MANIFEST C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session\Default\Service Worker\Database/MANIFEST-000001
-2025/09/25-01:03:15.463 3a4c Recovering log #3
-2025/09/25-01:03:15.464 3a4c Reusing old log C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session\Default\Service Worker\Database/000003.log 
+2025/09/25-01:43:22.218 18c Creating DB C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session\Default\Service Worker\Database since it was missing.
+2025/09/25-01:43:22.224 18c Reusing MANIFEST C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session\Default\Service Worker\Database/MANIFEST-000001
