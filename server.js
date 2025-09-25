@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 // Whatsapp
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
+const QRCode = require("qrcode");
 
 // Carrega variáveis do .env
 require("dotenv").config();
@@ -24,6 +25,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Whatsapp Client
+let qrCodeAtual = null;
+
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: { headless: true, args: ["--no-sandbox"] },
@@ -32,13 +35,37 @@ const client = new Client({
 client.on("qr", (qr) => {
   console.log("QR RECEIVED", qr);
   qrcode.generate(qr, { small: true });
+  qrCodeAtual = qr;
 });
 
 client.on("ready", () => {
   console.log("WhatsApp Client está rodando!");
+  qrCodeAtual = null;
 });
 
 client.initialize();
+
+// Rota para exibir QR Code no navegador
+app.get("/api/whatsapp-qr", async (req, res) => {
+  if (!qrCodeAtual) {
+    return res
+      .status(200)
+      .send("<h2>✅ WhatsApp já conectado ou aguardando QR...</h2>");
+  }
+  try {
+    const qrImage = await QRCode.toDataURL(qrCodeAtual);
+    res.send(`
+      <html>
+        <body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;">
+          <h2>Escaneie o QR Code abaixo para conectar o WhatsApp 📱</h2>
+          <img src="${qrImage}" style="width:300px;height:300px;"/>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    res.status(500).send("Erro ao gerar QR Code.");
+  }
+});
 
 // ---------------------------------------------
 // AUTENTICAÇÃO (SUPABASE)
@@ -177,7 +204,7 @@ app.delete("/api/cardapio/:id", async (req, res) => {
 });
 
 // ---------------------------------------------
-// PEDIDOS (Atualização de status envia WhatsApp)
+// PEDIDOS (Resumo + Status envia WhatsApp)
 // ---------------------------------------------
 app.post("/api/pedidos", async (req, res) => {
   try {
@@ -189,17 +216,61 @@ app.post("/api/pedidos", async (req, res) => {
       status: "Em preparação",
       telefone_cliente: cliente.telefone,
       tipo_servico,
+      forma_pagamento: cliente.pagamento || null,
+      troco: cliente.troco || null,
     };
+
     const { data, error } = await supabase
       .from("pedidos_lanche")
       .insert([novoPedido])
       .select();
     if (error) throw error;
 
-    console.log("Novo pedido:", data[0]);
-    res
-      .status(201)
-      .json({ message: "Pedido recebido com sucesso!", pedido: data[0] });
+    const pedido = data[0];
+    console.log("Novo pedido:", pedido);
+
+    // 🔹 Envio do resumo para o cliente
+    if (pedido.telefone_cliente?.trim()) {
+      let telefoneLimpo = pedido.telefone_cliente.replace(/\D/g, "");
+      if (telefoneLimpo.length === 11 && telefoneLimpo[2] === "9") {
+        telefoneLimpo = telefoneLimpo.slice(0, 2) + telefoneLimpo.slice(3);
+      }
+      const numero = `55${telefoneLimpo}@c.us`;
+
+      let mensagemResumo = `Olá ${pedido.cliente.nome}! Estamos preparando seu pedido e avisaremos quando estiver pronto.\n\n`;
+
+      // Lista de itens
+      pedido.itens.forEach((item) => {
+        const precoItem = parseFloat(item.preco || 0).toFixed(2);
+        mensagemResumo += `${item.quantidade}x ${item.nome} - R$ ${precoItem}\n`;
+      });
+
+      const totalPedido = parseFloat(pedido.total || 0).toFixed(2);
+      mensagemResumo += `\nTotal: R$ ${totalPedido}`;
+      mensagemResumo += `\nServiço: ${pedido.tipo_servico}`;
+
+      if (pedido.tipo_servico.toLowerCase() === "retirada") {
+        mensagemResumo += `\nRetirada: Av. Exemplo, 123, Sua Cidade`;
+      } else {
+        mensagemResumo += `\nEntrega: ${
+          pedido.cliente.endereco || "Endereço informado pelo cliente"
+        }`;
+      }
+
+      if (pedido.forma_pagamento?.toLowerCase() === "pix") {
+        mensagemResumo += `\nPagamento: PIX\nChave PIX: ${process.env.CHAVE_PIX}`;
+      } else if (pedido.forma_pagamento?.toLowerCase() === "dinheiro") {
+        mensagemResumo += `\nPagamento: Dinheiro`;
+        if (pedido.troco) mensagemResumo += `\nTroco para: R$ ${pedido.troco}`;
+      }
+
+      client
+        .sendMessage(numero, mensagemResumo)
+        .then(() => console.log("Resumo do pedido enviado!"))
+        .catch((err) => console.error("Erro ao enviar resumo:", err));
+    }
+
+    res.status(201).json({ message: "Pedido recebido com sucesso!", pedido });
   } catch (err) {
     console.error("Erro POST /api/pedidos:", err);
     res.status(500).json({ message: "Erro inesperado do servidor." });
@@ -220,7 +291,6 @@ app.get("/api/pedidos", async (req, res) => {
   }
 });
 
-// 🔹 PUT único que atualiza status e envia WhatsApp automaticamente
 app.put("/api/pedidos/:id", async (req, res) => {
   const pedidoId = req.params.id;
   const { status } = req.body;
@@ -232,7 +302,6 @@ app.put("/api/pedidos/:id", async (req, res) => {
   }
 
   try {
-    // 1️⃣ Atualiza o status no banco
     const { data: pedidoAtualizado, error: updateError } = await supabase
       .from("pedidos_lanche")
       .update({ status })
@@ -246,13 +315,10 @@ app.put("/api/pedidos/:id", async (req, res) => {
     }
 
     const pedido = pedidoAtualizado[0];
-
     console.log("Pedido atualizado:", pedido);
 
-    // 2️⃣ Buscar dados do cliente (telefone e tipo de serviço)
     const { telefone_cliente, tipo_servico } = pedido;
 
-    // 3️⃣ Monta a mensagem se for "Pronto para entrega"
     let mensagem = "";
     if (status.toLowerCase() === "pronto para entrega") {
       if (tipo_servico.toLowerCase() === "entrega") {
@@ -263,32 +329,26 @@ app.put("/api/pedidos/:id", async (req, res) => {
     }
 
     if (mensagem && telefone_cliente?.trim()) {
-      // Limpa o número
       let telefoneLimpo = pedido.telefone_cliente.replace(/\D/g, "");
-
-      // Remove o "9" extra quando necessário
       if (telefoneLimpo.length === 11 && telefoneLimpo[2] === "9") {
         telefoneLimpo = telefoneLimpo.slice(0, 2) + telefoneLimpo.slice(3);
       }
 
       const numero = `55${telefoneLimpo}@c.us`;
 
-      // 🔎 Debug antes de enviar
       console.log("Telefone bruto:", telefone_cliente);
       console.log("Número final que será enviado:", numero);
       console.log("Mensagem:", mensagem);
 
       client
         .sendMessage(numero, mensagem)
-        .then(() => console.log("Mensagem enviada com sucesso!"))
+        .then(() => console.log("Mensagem de status enviada com sucesso!"))
         .catch((err) => console.error("Erro ao enviar mensagem:", err));
-    } else {
-      console.log("Não há mensagem a ser enviada ou telefone inválido.");
     }
 
     res.status(200).json({
       message: "Status do pedido atualizado com sucesso.",
-      pedido: pedido,
+      pedido,
     });
   } catch (err) {
     console.error("Erro na rota PUT /api/pedidos/:id:", err);
