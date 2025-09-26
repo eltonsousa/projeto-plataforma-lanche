@@ -105,7 +105,7 @@ footer {
 }
 
 .add-carrinho {
-  background-color: #ff6347;
+  background-color: #4caf50;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -206,14 +206,20 @@ footer {
   margin: 0;
 }
 
-.carrinho-botoes,
+.carrinho-botoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
 .quantidade-botoes {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   margin-bottom: 10px;
-
 }
 
 .quantidade-botoes button,
@@ -223,15 +229,12 @@ footer {
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.3s ease;
-
 }
 
 .quantidade-botoes button {
   background-color: #f44336;
   border: none;
   color: white;
-
-
 }
 
 .quantidade-botoes button:hover {
