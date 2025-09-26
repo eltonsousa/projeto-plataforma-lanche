@@ -1,0 +1,14 @@
+.projeto-plataforma-lanche
+├── lanchonete-admin/
+│   ├── src/
+│   │   ├── App.js
+│   │   └── App.css
+├── lanchonete-app/
+│   ├── src/
+│   │   ├── App.js
+│   │   └── App.css
+├── node_modules/
+├── cardapio.json
+├── package.json
+├── server.js
+└── usuarios.json

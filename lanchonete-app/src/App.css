@@ -206,15 +206,8 @@ footer {
   margin: 0;
 }
 
+.quantidade-botoes,
 .carrinho-botoes {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.quantidade-botoes {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -519,3 +512,31 @@ footer {
     font-size: 1rem;
   }
 }
+
+/* Carregamento Inicial */
+.loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #ff5722;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Carregamento Inicial */
+

@@ -82,6 +82,12 @@ function App() {
     if (carrinho.length === 0) setMostraCarrinho(false);
   }, [carrinho, loading, saveCarrinhoToSupabase]);
 
+  // Efeito Carregamento Pagina inicial
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500); // só libera depois de 0,5s
+    return () => clearTimeout(timer);
+  }, []);
+
   // --- FUNÇÕES DE CARDÁPIO ---
   const fetchCardapio = async () => {
     try {
@@ -196,7 +202,14 @@ function App() {
   };
 
   // --- RENDERIZAÇÃO ---
-  if (loading) return <div className="loading">Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <p>Carregando o cardápio...</p>
+      </div>
+    );
+  }
   if (error)
     return <div className="error">Erro ao carregar cardápio: {error}</div>;
 
