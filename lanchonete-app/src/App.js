@@ -349,7 +349,7 @@ function App() {
               <div className="carrinho-itens">
                 {carrinho.map((item) => (
                   <div key={item.id} className="carrinho-item">
-                    <div className="item-info">
+                    <div className="item-info-carrinho">
                       <p>{item.nome}</p>
                       <p>R$ {(item.preco * item.quantidade).toFixed(2)}</p>
                     </div>

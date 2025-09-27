@@ -48,6 +48,7 @@ footer {
   gap: 20px;
   padding: 20px;
   box-sizing: border-box;
+
 }
 
 .cardapio-item {
@@ -61,6 +62,7 @@ footer {
   max-width: 700px;
   margin: 0 auto;
   transition: transform 0.2s, box-shadow 0.2s;
+
 }
 
 .cardapio-item:hover {
@@ -163,109 +165,150 @@ footer {
   line-height: 1.5;
 }
 
+/* Estilos modal carrinho */
+/* =============================== */
+/* Carrinho Flutuante (Visual Melhorado) */
+/* =============================== */
 .carrinho-container {
   position: fixed;
-  top: 20px;
+  top: 80px;
   right: 20px;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 340px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  width: 300px;
-  z-index: 50;
+  z-index: 110;
+  animation: fadeIn 0.3s ease;
 }
 
 .carrinho-container h2 {
   text-align: center;
   color: #ff6347;
+  font-size: 1.4rem;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
   border-bottom: 2px solid #ff6347;
-  padding-bottom: 10px;
-  margin-top: 0;
 }
 
 .carrinho-itens {
-  margin-top: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding-right: 5px;
 }
 
 .carrinho-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px dashed #ddd;
-  padding: 10px 0;
+  flex-direction: column;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carrinho-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .item-info {
-  flex-grow: 1;
-  text-align: left;
-  margin-right: 10px;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.item-info p {
+.item-info-carrinho {
+  display: flex;
+  justify-content: space-between;
   margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
 }
 
-.quantidade-botoes,
 .carrinho-botoes {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
 }
 
-.quantidade-botoes button,
-.remover-item {
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
+.quantidade-botoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .quantidade-botoes button {
-  background-color: #f44336;
+  background: #ff6347;
   border: none;
-  color: white;
+  color: #fff;
+  font-size: 1rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .quantidade-botoes button:hover {
-  background-color: #d32f2f;
+  background: #e5533d;
+}
+
+.quantidade-botoes span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: bold;
+  color: #444;
 }
 
 .remover-item {
-  font-weight: 600;
-  background-color: #f44336;
+  background: #f44336;
   border: none;
   color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
 }
 
 .remover-item:hover {
-  background-color: #d32f2f;
+  background: #d32f2f;
 }
 
 .carrinho-total {
-  margin-top: 1.5rem;
+  border-top: 2px solid #eee;
+  padding-top: 1rem;
   text-align: right;
 }
 
-.finalizar-pedido {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%;
-  margin-top: 1rem;
-  transition: background-color 0.3s ease;
+.carrinho-total h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
 }
 
-.finalizar-pedido:hover {
-  background-color: #45a049;
+.carrinho-total .finalizar-pedido {
+    cursor: pointer;
+    margin-top: 1rem;
+    border: none;
+    background: #4caf50;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    color: white;
+    transition: background 0.3s ease;
 }
+
+.carrinho-total .finalizar-pedido:hover {
+  background: #43a047;
+}
+
 
 /* =============================== */
 /* Checkout & Confirmação (Visual Melhorado) */
