@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 import { BsCart3 } from "react-icons/bs";
@@ -16,6 +16,52 @@ const getSessionId = () => {
   return sessionId;
 };
 
+// 🟢 NOVO HOOK PARA ARRASTAR COM O MOUSE
+const useDraggableScroll = () => {
+  const ref = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const onMouseDown = (e) => {
+      setIsDragging(true);
+      setStartX(e.pageX - el.offsetLeft);
+      setScrollLeft(el.scrollLeft);
+      // Impede a seleção de texto ao arrastar
+      e.preventDefault();
+    };
+
+    const onMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      // Calcula o quanto o mouse se moveu
+      const x = e.pageX - el.offsetLeft;
+      // Calcula a distância para mover a rolagem
+      const walk = (x - startX) * 1.5; // Multiplicador para deslizar mais rápido
+      el.scrollLeft = scrollLeft - walk;
+    };
+
+    el.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("mousemove", onMouseMove);
+
+    return () => {
+      el.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("mousemove", onMouseMove);
+    };
+  }, [isDragging, startX, scrollLeft]);
+
+  return ref;
+};
+
 // COMPONENTE: Ícone do carrinho
 const CartIcon = ({ count, onClick }) => (
   <button className="carrinho-icon-btn" onClick={onClick}>
@@ -27,6 +73,8 @@ const CartIcon = ({ count, onClick }) => (
 function App() {
   const sessionId = getSessionId();
 
+  // 🟢 REFERÊNCIA para o elemento de categorias (para o hook)
+  const categoriaNavRef = useDraggableScroll();
   const [carrinho, setCarrinho] = useState([]);
   const [mostraCheckout, setMostraCheckout] = useState(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState(false);
@@ -251,7 +299,7 @@ function App() {
         <>
           <main className="cardapio">
             {/* 🟢 Menu de Categorias */}
-            <nav className="cardapio-categorias">
+            <nav className="cardapio-categorias" ref={categoriaNavRef}>
               {/* Define as categorias e mapeia para botões */}
               {["Sanduíches", "Bebidas", "Fritas", "Comidas"].map((cat) => (
                 <button

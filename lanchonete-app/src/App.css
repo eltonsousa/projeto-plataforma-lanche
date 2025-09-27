@@ -545,13 +545,31 @@ footer {
 /* =============================== */
 .cardapio-categorias {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Alinha para a esquerda */
   gap: 15px;
   margin: 30px 0 20px 0;
   width: 100%;
   max-width: 1200px;
   padding: 0 20px;
   box-sizing: border-box;
+  
+  /* --- ROLAGEM HORIZONTAL E ARRASTAR COM MOUSE/TOQUE --- */
+  overflow-x: auto; /* Habilita a rolagem horizontal */
+  white-space: nowrap; /* Impede a quebra de linha dos botões */
+  -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
+  cursor: grab; /* Indica que é arrastável (para desktop) */
+  /* Oculta a barra de rolagem */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 🟢 NOVO: Muda o cursor para "grabbing" quando o mouse está pressionado */
+.cardapio-categorias:active {
+  cursor: grabbing;
+}
+/* Oculta a barra de rolagem em Webkit (Chrome, Safari) */
+.cardapio-categorias::-webkit-scrollbar {
+  display: none;
 }
 
 .cardapio-categorias button {
