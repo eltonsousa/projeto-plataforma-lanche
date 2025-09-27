@@ -540,3 +540,54 @@ footer {
 }
 /* Carregamento Inicial */
 
+/* =============================== */
+/* Novo Menu de Categorias         */
+/* =============================== */
+.cardapio-categorias {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 30px 0 20px 0;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.cardapio-categorias button {
+  background-color: #f4f4f4;
+  color: #ff6347; /* Cor principal (tomate) */
+  border: 1px solid #ff6347;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  min-width: 120px;
+}
+
+/* Estilo para a categoria ativa */
+.cardapio-categorias button.categoria-ativa {
+  background-color: #ff6347;
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 99, 71, 0.4);
+}
+
+.cardapio-categorias button:hover:not(.categoria-ativa) {
+  background-color: #ffe0db; /* Cor mais clara no hover */
+}
+
+/* Adiciona um pouco de margem na lista de cardápio para não encostar na nav */
+.cardapio {
+  /* ... (manter estilos existentes) ... */
+  padding-top: 0; /* Remove o padding-top se houver */
+}
+
+/* Estilo para mensagem de Sem Itens */
+.sem-itens-cardapio {
+  text-align: center;
+  margin: 50px 0;
+  color: #777;
+  font-size: 1.2rem;
+}

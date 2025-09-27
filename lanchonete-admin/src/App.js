@@ -22,6 +22,7 @@ function App() {
     descricao: "",
     preco: "",
     imagem: "",
+    categoria: "Sanduíches",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isFormEmphasized, setIsFormEmphasized] = useState(false); // 🟢 ADICIONE ESTA LINHA
@@ -137,7 +138,11 @@ function App() {
   };
 
   const handleEdit = (item) => {
-    setItemForm(item);
+    setItemForm({
+      ...item,
+      // Garante que o itemForm receba a categoria do item (ou um padrão se estiver faltando)
+      categoria: item.categoria || "Sanduíches",
+    });
     setIsEditing(true);
 
     // 🟢 NOVA LÓGICA DE ROLAGEM
@@ -542,6 +547,21 @@ function App() {
                 onChange={handleItemFormChange}
                 required
               />
+
+              <select
+                name="categoria"
+                value={itemForm.categoria}
+                onChange={handleItemFormChange}
+                required
+              >
+                <option value="" disabled>
+                  Selecione a Categoria
+                </option>
+                <option value="Sanduíches">Sanduíches</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Fritas">Fritas</option>
+              </select>
+
               <button type="submit">
                 {isEditing ? "Salvar Alterações" : "Adicionar Item"}
               </button>

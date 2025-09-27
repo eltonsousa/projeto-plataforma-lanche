@@ -32,10 +32,18 @@ function App() {
   const [pedidoFinalizado, setPedidoFinalizado] = useState(false);
   const [ultimoPedido, setUltimoPedido] = useState(null);
   const [itensCardapio, setItensCardapio] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // ❌ REMOVIDO: [loading, setLoading] para usar apenas cardapioLoading
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [categoriaSelecionada, setCategoriaSelecionada] =
+    useState("Sanduíches");
+  // 🟢 ESTADO USADO PARA CONTROLE DE CARREGAMENTO
+  const [cardapioLoading, setCardapioLoading] = useState(true);
+
+  const cardapioFiltrado = itensCardapio.filter(
+    (item) => item.categoria === categoriaSelecionada
+  );
 
   // 🟢 Estados do checkout
   const [servico, setServico] = useState("");
@@ -69,38 +77,48 @@ function App() {
     [sessionId]
   );
 
-  // --- EFEITOS ---
-  useEffect(() => {
-    fetchCardapio();
-    loadCarrinhoFromSupabase();
-    const intervalId = setInterval(fetchCardapio, 10000);
-    return () => clearInterval(intervalId);
-  }, [loadCarrinhoFromSupabase]);
-
-  useEffect(() => {
-    if (!loading) saveCarrinhoToSupabase(carrinho);
-    if (carrinho.length === 0) setMostraCarrinho(false);
-  }, [carrinho, loading, saveCarrinhoToSupabase]);
-
-  // Efeito Carregamento Pagina inicial
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500); // só libera depois de 0,5s
-    return () => clearTimeout(timer);
-  }, []);
-
   // --- FUNÇÕES DE CARDÁPIO ---
-  const fetchCardapio = async () => {
+  // 🟢 ATUALIZADA: Agora usa setCardapioLoading corretamente
+  const fetchCardapio = useCallback(async () => {
+    setCardapioLoading(true); // Inicia o carregamento
     try {
       const response = await fetch("/api/cardapio");
       if (!response.ok) throw new Error("Erro ao buscar o cardápio");
       const data = await response.json();
       setItensCardapio(data);
+      setError(null);
     } catch (error) {
+      console.error("Erro ao buscar cardápio:", error);
       setError(error.message);
     } finally {
-      setLoading(false);
+      setCardapioLoading(false); // Finaliza o carregamento
     }
-  };
+  }, []); // Dependências vazias, já que não usa estados externos
+
+  // --- EFEITOS ---
+  useEffect(() => {
+    fetchCardapio();
+    loadCarrinhoFromSupabase();
+    // Use cardapioLoading como dependência se precisar esperar o carregamento, mas
+    // o useCallback() resolve o aviso de dependência.
+    const intervalId = setInterval(fetchCardapio, 10000);
+    return () => clearInterval(intervalId);
+  }, [fetchCardapio, loadCarrinhoFromSupabase]);
+
+  // Efeito para persistir carrinho no Supabase
+  // ✅ MODIFICADO: Condição agora verifica cardapioLoading
+  useEffect(() => {
+    if (!cardapioLoading) saveCarrinhoToSupabase(carrinho);
+    if (carrinho.length === 0) setMostraCarrinho(false);
+  }, [carrinho, cardapioLoading, saveCarrinhoToSupabase]);
+
+  // ❌ REMOVIDO: Efeito de carregamento inicial (agora controlado por cardapioLoading)
+  /*
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500); // só libera depois de 0,5s
+    return () => clearTimeout(timer);
+  }, []);
+  */
 
   // --- FUNÇÕES DE CARRINHO ---
   const adicionarAoCarrinho = (item) => {
@@ -202,7 +220,8 @@ function App() {
   };
 
   // --- RENDERIZAÇÃO ---
-  if (loading) {
+  // ✅ MODIFICADO: Usa cardapioLoading para o loading inicial
+  if (cardapioLoading) {
     return (
       <div className="loading">
         <div className="spinner"></div>
@@ -229,20 +248,48 @@ function App() {
       {!mostraCheckout && !pedidoFinalizado && (
         <>
           <main className="cardapio">
-            {itensCardapio.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setProdutoSelecionado(item)}
-                style={{
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                <CardapioItem item={item} onAdicionar={adicionarAoCarrinho} />
-              </div>
-            ))}
+            {/* 🟢 Menu de Categorias */}
+            <nav className="cardapio-categorias">
+              {/* Define as categorias e mapeia para botões */}
+              {["Sanduíches", "Bebidas", "Fritas"].map((cat) => (
+                <button
+                  key={cat}
+                  // Adiciona a classe 'categoria-ativa' se for a selecionada
+                  className={
+                    categoriaSelecionada === cat ? "categoria-ativa" : ""
+                  }
+                  // Ao clicar, atualiza o estado de filtro
+                  onClick={() => setCategoriaSelecionada(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </nav>
+            {/* 🟢 FIM: Menu de Categorias */}
+
+            {/* 🟢 LISTA DE ITENS FILTRADOS (Agora sem a verificação cardapioLoading redundante) */}
+            {cardapioFiltrado.length > 0 ? (
+              // Mapeia a lista FILTRADA
+              cardapioFiltrado.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setProdutoSelecionado(item)}
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  <CardapioItem item={item} onAdicionar={adicionarAoCarrinho} />
+                </div>
+              ))
+            ) : (
+              // Mensagem quando não há itens na categoria
+              <p className="sem-itens-cardapio">
+                Nenhum item encontrado na categoria {categoriaSelecionada}.
+              </p>
+            )}
           </main>
 
           {/* CARRINHO */}
