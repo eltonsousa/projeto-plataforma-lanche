@@ -560,6 +560,7 @@ function App() {
                 <option value="Sanduíches">Sanduíches</option>
                 <option value="Bebidas">Bebidas</option>
                 <option value="Fritas">Fritas</option>
+                <option value="Comidas">Comidas</option>
               </select>
 
               <button type="submit">

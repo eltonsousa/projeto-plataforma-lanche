@@ -251,7 +251,7 @@ function App() {
             {/* 🟢 Menu de Categorias */}
             <nav className="cardapio-categorias">
               {/* Define as categorias e mapeia para botões */}
-              {["Sanduíches", "Bebidas", "Fritas"].map((cat) => (
+              {["Sanduíches", "Bebidas", "Fritas", "Comidas"].map((cat) => (
                 <button
                   key={cat}
                   // Adiciona a classe 'categoria-ativa' se for a selecionada
