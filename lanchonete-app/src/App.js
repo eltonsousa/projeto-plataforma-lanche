@@ -78,9 +78,10 @@ function App() {
   );
 
   // --- FUNÇÕES DE CARDÁPIO ---
-  // 🟢 ATUALIZADA: Agora usa setCardapioLoading corretamente
-  const fetchCardapio = useCallback(async () => {
-    setCardapioLoading(true); // Inicia o carregamento
+  // 🟢 ATUALIZADA: Agora aceita um parâmetro (isInitial) para controlar se deve
+  // mostrar o loading. Assim atualizações periódicas não disparam o spinner.
+  const fetchCardapio = useCallback(async (isInitial = false) => {
+    if (isInitial) setCardapioLoading(true); // só ativa o loading na primeira vez
     try {
       const response = await fetch("/api/cardapio");
       if (!response.ok) throw new Error("Erro ao buscar o cardápio");
@@ -91,17 +92,18 @@ function App() {
       console.error("Erro ao buscar cardápio:", error);
       setError(error.message);
     } finally {
-      setCardapioLoading(false); // Finaliza o carregamento
+      if (isInitial) setCardapioLoading(false); // só desativa o loading inicial
     }
   }, []); // Dependências vazias, já que não usa estados externos
 
   // --- EFEITOS ---
   useEffect(() => {
-    fetchCardapio();
+    // primeira carga com spinner
+    fetchCardapio(true);
     loadCarrinhoFromSupabase();
-    // Use cardapioLoading como dependência se precisar esperar o carregamento, mas
-    // o useCallback() resolve o aviso de dependência.
-    const intervalId = setInterval(fetchCardapio, 10000);
+
+    // atualizações periódicas em segundo plano (sem spinner)
+    const intervalId = setInterval(() => fetchCardapio(false), 10000);
     return () => clearInterval(intervalId);
   }, [fetchCardapio, loadCarrinhoFromSupabase]);
 
