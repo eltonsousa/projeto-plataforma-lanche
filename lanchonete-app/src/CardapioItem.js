@@ -2,20 +2,27 @@ import React from "react";
 import "./App.css";
 
 function CardapioItem({ item, onAdicionar }) {
+  // Ajuste nos dados para garantir que sempre haja um preço formatado.
+  const precoFormatado = item.preco ? item.preco.toFixed(2) : "0.00";
+
   return (
     <div className="cardapio-item">
+      {/* 1. Imagem: Lado Esquerdo */}
       <img src={item.imagem} alt={item.nome} />
+
+      {/* 2. Informações: Centro, flexível */}
       <div className="item-info">
-        <h2>{item.nome}</h2>
+        <h4>{item.nome}</h4>
         <p>{item.descricao}</p>
-        <span className="preco">R$ {item.preco}</span>
+        <span className="preco">R$ {precoFormatado}</span>
       </div>
-      <button
-        className="add-carrinho"
-        onClick={() => onAdicionar(item)} // 1. Chama a função onAdicionar
-      >
-        Adicionar
-      </button>
+
+      {/* 3. Ações: Lado Direito, botão no final */}
+      <div className="item-acoes">
+        <button className="add-carrinho" onClick={() => onAdicionar(item)}>
+          Adicionar
+        </button>
+      </div>
     </div>
   );
 }

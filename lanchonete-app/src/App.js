@@ -4,6 +4,9 @@ import "./App.css";
 import { BsCart3 } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 
+// URL base da API
+const API_URL = "/api";
+
 // --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
   let sessionId = localStorage.getItem("sessionId");
@@ -32,474 +35,424 @@ function App() {
   const [pedidoFinalizado, setPedidoFinalizado] = useState(false);
   const [ultimoPedido, setUltimoPedido] = useState(null);
   const [itensCardapio, setItensCardapio] = useState([]);
-  // ❌ REMOVIDO: [loading, setLoading] para usar apenas cardapioLoading
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [mostraCarrinho, setMostraCarrinho] = useState(false);
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
-  const [categoriaSelecionada, setCategoriaSelecionada] =
-    useState("Sanduíches");
-  // 🟢 ESTADO USADO PARA CONTROLE DE CARREGAMENTO
-  const [cardapioLoading, setCardapioLoading] = useState(true);
+  const [pagamento, setPagamento] = useState("dinheiro"); // Estado para tipo de pagamento
 
-  const cardapioFiltrado = itensCardapio.filter(
-    (item) => item.categoria === categoriaSelecionada
-  );
+  // Categoria selecionada para filtro
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState("Todos");
 
-  // 🟢 Estados do checkout
-  const [servico, setServico] = useState("");
-  const [pagamento, setPagamento] = useState("");
-  const [telefone, setTelefone] = useState(""); // <-- NOVO ESTADO
-  // --- FUNÇÕES ASYNC ---
-  const loadCarrinhoFromSupabase = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/carrinho/${sessionId}`);
-      if (response.ok) {
-        const itens = await response.json();
-        if (itens && itens.length > 0) setCarrinho(itens);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar carrinho:", error);
-    }
-  }, [sessionId]);
+  // =============================================================
+  // FUNÇÕES MEMOIZADAS (useCallback)
+  // =============================================================
 
-  const saveCarrinhoToSupabase = useCallback(
-    async (currentCarrinho) => {
+  // 1. Atualizar o carrinho no servidor
+  const updateCartOnServer = useCallback(
+    async (itens) => {
       try {
-        await fetch("/api/carrinho", {
+        const response = await fetch(`${API_URL}/carrinho/${sessionId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId, itens: currentCarrinho }),
+          body: JSON.stringify({ itens }),
         });
-      } catch (error) {
-        console.error("Erro ao salvar carrinho:", error);
+        if (!response.ok) {
+          throw new Error("Falha ao salvar o carrinho no servidor.");
+        }
+      } catch (err) {
+        console.error("Erro ao salvar carrinho:", err);
       }
     },
     [sessionId]
   );
 
-  // --- FUNÇÕES DE CARDÁPIO ---
-  // 🟢 ATUALIZADA: Agora usa setCardapioLoading corretamente
-  const fetchCardapio = useCallback(async () => {
-    setCardapioLoading(true); // Inicia o carregamento
+  // 2. Buscar o cardápio
+  const fetchMenu = useCallback(async () => {
     try {
-      const response = await fetch("/api/cardapio");
-      if (!response.ok) throw new Error("Erro ao buscar o cardápio");
+      const response = await fetch(`${API_URL}/cardapio`);
+      if (!response.ok) {
+        throw new Error("Falha ao carregar o cardápio.");
+      }
       const data = await response.json();
       setItensCardapio(data);
-      setError(null);
-    } catch (error) {
-      console.error("Erro ao buscar cardápio:", error);
-      setError(error.message);
+    } catch (err) {
+      console.error("Erro ao carregar cardápio:", err);
+      setError("Não foi possível carregar o cardápio.");
     } finally {
-      setCardapioLoading(false); // Finaliza o carregamento
+      // O loading é encerrado no fetchCart para garantir que ambos tenham terminado
     }
-  }, []); // Dependências vazias, já que não usa estados externos
+  }, []); // Dependência vazia
 
-  // --- EFEITOS ---
-  useEffect(() => {
-    fetchCardapio();
-    loadCarrinhoFromSupabase();
-    // Use cardapioLoading como dependência se precisar esperar o carregamento, mas
-    // o useCallback() resolve o aviso de dependência.
-    const intervalId = setInterval(fetchCardapio, 10000);
-    return () => clearInterval(intervalId);
-  }, [fetchCardapio, loadCarrinhoFromSupabase]);
-
-  // Efeito para persistir carrinho no Supabase
-  // ✅ MODIFICADO: Condição agora verifica cardapioLoading
-  useEffect(() => {
-    if (!cardapioLoading) saveCarrinhoToSupabase(carrinho);
-    if (carrinho.length === 0) setMostraCarrinho(false);
-  }, [carrinho, cardapioLoading, saveCarrinhoToSupabase]);
-
-  // ❌ REMOVIDO: Efeito de carregamento inicial (agora controlado por cardapioLoading)
-  /*
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500); // só libera depois de 0,5s
-    return () => clearTimeout(timer);
-  }, []);
-  */
-
-  // --- FUNÇÕES DE CARRINHO ---
-  const adicionarAoCarrinho = (item) => {
-    const itemExistente = carrinho.find((c) => c.id === item.id);
-    if (itemExistente) {
-      setCarrinho(
-        carrinho.map((c) =>
-          c.id === item.id ? { ...c, quantidade: c.quantidade + 1 } : c
-        )
-      );
-    } else {
-      setCarrinho([...carrinho, { ...item, quantidade: 1 }]);
+  // 3. Buscar o carrinho
+  const fetchCart = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_URL}/carrinho/${sessionId}`);
+      if (!response.ok) {
+        throw new Error("Falha ao carregar o carrinho.");
+      }
+      const itens = await response.json();
+      setCarrinho(itens || []);
+    } catch (err) {
+      console.error("Erro ao carregar carrinho:", err);
+      setError("Não foi possível carregar seu carrinho.");
+    } finally {
+      setLoading(false); // Resetar loading após a carga inicial de dados
     }
+  }, [sessionId]); // Depende apenas de sessionId
+
+  // =============================================================
+  // useEffects para Carga de Dados
+  // =============================================================
+
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
+  // Adicionar item ao carrinho
+  const handleAdicionarAoCarrinho = useCallback(
+    (item) => {
+      setCarrinho((carrinhoAtual) => {
+        const itemExistente = carrinhoAtual.find((i) => i.id === item.id);
+        let novoCarrinho;
+
+        if (itemExistente) {
+          novoCarrinho = carrinhoAtual.map((i) =>
+            i.id === item.id ? { ...i, quantidade: i.quantidade + 1 } : i
+          );
+        } else {
+          // Adiciona o item com quantidade 1
+          novoCarrinho = [...carrinhoAtual, { ...item, quantidade: 1 }];
+        }
+
+        updateCartOnServer(novoCarrinho);
+        return novoCarrinho;
+      });
+    },
+    [updateCartOnServer]
+  );
+
+  // Remover item do carrinho ou diminuir quantidade
+  const handleRemoverDoCarrinho = useCallback(
+    (itemId) => {
+      setCarrinho((carrinhoAtual) => {
+        const itemExistente = carrinhoAtual.find((i) => i.id === itemId);
+        let novoCarrinho;
+
+        if (itemExistente && itemExistente.quantidade > 1) {
+          novoCarrinho = carrinhoAtual.map((i) =>
+            i.id === itemId ? { ...i, quantidade: i.quantidade - 1 } : i
+          );
+        } else {
+          // Remove completamente se a quantidade for 1 ou menos
+          novoCarrinho = carrinhoAtual.filter((i) => i.id !== itemId);
+        }
+
+        updateCartOnServer(novoCarrinho);
+        return novoCarrinho;
+      });
+    },
+    [updateCartOnServer]
+  );
+
+  // Abrir/Fechar Checkout
+  const toggleCheckout = () => {
+    setMostraCheckout((prev) => !prev);
   };
 
-  const aumentarQuantidade = (itemId) => {
-    setCarrinho(
-      carrinho.map((item) =>
-        item.id === itemId ? { ...item, quantidade: item.quantidade + 1 } : item
-      )
-    );
-  };
-
-  const diminuirQuantidade = (itemId) => {
-    const novoCarrinho = carrinho
-      .map((item) =>
-        item.id === itemId ? { ...item, quantidade: item.quantidade - 1 } : item
-      )
-      .filter((item) => item.quantidade > 0);
-    setCarrinho(novoCarrinho);
-  };
-
-  const removerDoCarrinho = (itemId) => {
-    setCarrinho(carrinho.filter((item) => item.id !== itemId));
-  };
-
-  const calcularTotal = () =>
-    carrinho
-      .reduce((total, item) => total + item.preco * item.quantidade, 0)
-      .toFixed(2);
-
-  const handleToggleCarrinho = () => {
-    if (carrinho.length > 0) setMostraCarrinho(!mostraCarrinho);
-  };
-
-  const handleFinalizarPedido = () => {
-    setMostraCheckout(true);
-    setMostraCarrinho(false);
-  };
-
-  // --- CHECKOUT ---
-  const handleCheckoutSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
+  // Processar o pedido
+  const handleFinalizarPedido = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
     const cliente = {
       nome: formData.get("nome"),
-      telefone: telefone, // <-- ATUALIZAÇÃO
-      servico: servico,
-      endereco: servico === "entrega" ? formData.get("endereco") : "",
-      pagamento: pagamento,
-      troco: pagamento === "dinheiro" ? formData.get("troco") : "",
+      endereco: formData.get("endereco"),
+      pagamento: formData.get("pagamento"),
+      troco: formData.get("troco"),
+      observacoes: formData.get("observacoes"),
     };
 
-    const dadosDoPedido = {
+    const total = carrinho
+      .reduce((acc, item) => acc + item.preco * item.quantidade, 0)
+      .toFixed(2);
+
+    const pedido = {
+      sessionId,
       cliente,
       itens: carrinho,
-      total: calcularTotal(),
+      total,
       data: new Date().toISOString(),
-      tipo_servico: servico, // <-- ATUALIZAÇÃO
     };
 
     try {
-      const response = await fetch("/api/pedidos", {
+      const response = await fetch(`${API_URL}/pedido`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dadosDoPedido),
+        body: JSON.stringify(pedido),
       });
 
-      if (response.ok) {
-        setUltimoPedido({ itens: carrinho, total: calcularTotal() });
-        await saveCarrinhoToSupabase([]); // limpa no backend
-        setCarrinho([]); // limpa no front
-        setMostraCheckout(false);
-        setPedidoFinalizado(true);
-      } else {
-        alert("Erro ao enviar o pedido. Tente novamente.");
+      if (!response.ok) {
+        throw new Error("Falha ao finalizar o pedido.");
       }
-    } catch (error) {
-      console.error("Erro na conexão:", error);
-      alert("Erro ao se conectar com o servidor.");
+
+      setUltimoPedido(pedido);
+      setPedidoFinalizado(true);
+      setMostraCheckout(false);
+
+      // Limpar o carrinho após a finalização
+      setCarrinho([]);
+      updateCartOnServer([]); // Limpa também no servidor
+    } catch (err) {
+      console.error("Erro ao finalizar pedido:", err);
+      // Aqui você pode mostrar uma mensagem de erro para o usuário
     }
   };
 
+  // Iniciar um novo pedido (retorna ao cardápio)
   const handleNovoPedido = () => {
     setPedidoFinalizado(false);
-    setMostraCarrinho(false);
-    setServico("");
-    setPagamento("");
+    setUltimoPedido(null);
+    setLoading(true);
+    fetchMenu(); // Garante que o cardápio seja recarregado se necessário
   };
 
-  // --- RENDERIZAÇÃO ---
-  // ✅ MODIFICADO: Usa cardapioLoading para o loading inicial
-  if (cardapioLoading) {
+  // Cálculos
+  const totalItens = carrinho.reduce((acc, item) => acc + item.quantidade, 0);
+  const valorTotal = carrinho
+    .reduce((acc, item) => acc + item.preco * item.quantidade, 0)
+    .toFixed(2);
+
+  // Lógica para obter categorias únicas
+  const categorias = [
+    "Todos",
+    ...new Set(itensCardapio.map((item) => item.categoria).filter(Boolean)),
+  ];
+
+  // Lógica para filtrar itens
+  const itensFiltrados =
+    categoriaSelecionada === "Todos"
+      ? itensCardapio
+      : itensCardapio.filter((item) => item.categoria === categoriaSelecionada);
+
+  if (loading) {
     return (
-      <div className="loading">
-        <div className="spinner"></div>
-        <p>Carregando o cardápio...</p>
+      <div className="App">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Carregando cardápio...</p>
+        </div>
       </div>
     );
   }
-  if (error)
-    return <div className="error">Erro ao carregar cardápio: {error}</div>;
 
-  const totalItensCarrinho = carrinho.reduce((t, i) => t + i.quantidade, 0);
+  if (error) {
+    return (
+      <div className="App">
+        <header>
+          <h1>Manú Lanches</h1>
+        </header>
+        <main className="container error-message">
+          <p>{error}</p>
+        </main>
+        <footer>
+          <p>&copy; 2025 Manú Lanches. Todos os direitos reservados.</p>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
       <header>
         <h1>Manú Lanches</h1>
-        <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
-        {carrinho.length > 0 && !mostraCheckout && !pedidoFinalizado && (
-          <CartIcon count={totalItensCarrinho} onClick={handleToggleCarrinho} />
+        <p>Seu lanche rápido e delicioso!</p>
+        {/* Ícone do carrinho: SÓ MOSTRA SE O CARDÁPIO CARREGOU E O PEDIDO NÃO FOI FINALIZADO */}
+        {itensCardapio.length > 0 && !pedidoFinalizado && (
+          <CartIcon count={totalItens} onClick={toggleCheckout} />
         )}
       </header>
 
-      {/* LISTA DE PRODUTOS */}
-      {!mostraCheckout && !pedidoFinalizado && (
-        <>
-          <main className="cardapio">
-            {/* 🟢 Menu de Categorias */}
-            <nav className="cardapio-categorias">
-              {/* Define as categorias e mapeia para botões */}
-              {["Sanduíches", "Bebidas", "Fritas", "Comidas"].map((cat) => (
+      <main className="container">
+        {/* CONFIRMAÇÃO (Apenas se o pedido foi finalizado) */}
+        {pedidoFinalizado && ultimoPedido && (
+          <div className="confirmacao-container">
+            <h2>Pedido Confirmado!</h2>
+            <p>Obrigado por sua compra! Seu pedido será preparado em breve.</p>
+            <div className="resumo-pedido">
+              <h3>Resumo do Pedido:</h3>
+              <ul>
+                {ultimoPedido.itens.map((item) => (
+                  <li key={item.id}>
+                    {item.nome} (x{item.quantidade}) - R${" "}
+                    {(item.preco * item.quantidade).toFixed(2)}
+                  </li>
+                ))}
+              </ul>
+              <div className="total-resumo">
+                <strong>Total: R$ {ultimoPedido.total}</strong>
+              </div>
+            </div>
+            <button onClick={handleNovoPedido} className="novo-pedido-btn">
+              Fazer um novo pedido
+            </button>
+          </div>
+        )}
+
+        {/* Cardápio (Apenas se o pedido NÃO foi finalizado) */}
+        {!pedidoFinalizado && (
+          <section className="cardapio">
+            <h2>Cardápio do Dia</h2>
+
+            {/* BOTÕES DE FILTRO DE CATEGORIA */}
+            <div className="categorias-botoes">
+              {categorias.map((categoria) => (
                 <button
-                  key={cat}
-                  // Adiciona a classe 'categoria-ativa' se for a selecionada
-                  className={
-                    categoriaSelecionada === cat ? "categoria-ativa" : ""
-                  }
-                  // Ao clicar, atualiza o estado de filtro
-                  onClick={() => setCategoriaSelecionada(cat)}
+                  key={categoria}
+                  className={`categoria-btn ${
+                    categoria === categoriaSelecionada ? "active" : ""
+                  }`}
+                  onClick={() => setCategoriaSelecionada(categoria)}
                 >
-                  {cat}
+                  {categoria}
                 </button>
               ))}
-            </nav>
-            {/* 🟢 FIM: Menu de Categorias */}
+            </div>
 
-            {/* 🟢 LISTA DE ITENS FILTRADOS (Agora sem a verificação cardapioLoading redundante) */}
-            {cardapioFiltrado.length > 0 ? (
-              // Mapeia a lista FILTRADA
-              cardapioFiltrado.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setProdutoSelecionado(item)}
-                  style={{
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "center",
-                    width: "100%",
-                  }}
-                >
-                  <CardapioItem item={item} onAdicionar={adicionarAoCarrinho} />
-                </div>
-              ))
+            {itensCardapio.length === 0 ? (
+              <p>Nenhum item disponível no momento.</p>
             ) : (
-              // Mensagem quando não há itens na categoria
-              <p className="sem-itens-cardapio">
-                Nenhum item encontrado na categoria {categoriaSelecionada}.
-              </p>
+              <div className="cardapio-grid">
+                {itensFiltrados.map(
+                  (
+                    item // USANDO ITENS FILTRADOS
+                  ) => (
+                    <CardapioItem
+                      key={item.id}
+                      item={item}
+                      onAdicionar={handleAdicionarAoCarrinho}
+                    />
+                  )
+                )}
+              </div>
             )}
-          </main>
+          </section>
+        )}
+      </main>
 
-          {/* CARRINHO */}
-          {carrinho.length > 0 && mostraCarrinho && (
-            <aside className="carrinho-container">
-              <h2>Seu Carrinho</h2>
-              <div className="carrinho-itens">
-                {carrinho.map((item) => (
-                  <div key={item.id} className="carrinho-item">
-                    <div className="item-info">
-                      <p>{item.nome}</p>
-                      <p>R$ {(item.preco * item.quantidade).toFixed(2)}</p>
-                    </div>
-                    <div className="carrinho-botoes">
-                      <div className="quantidade-botoes">
-                        <button onClick={() => diminuirQuantidade(item.id)}>
+      {/* MODAL DE CHECKOUT/CARRINHO */}
+      {mostraCheckout && !pedidoFinalizado && (
+        <div className="modal-overlay" onClick={toggleCheckout}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()} // Impede o fechamento ao clicar no conteúdo
+          >
+            <AiOutlineClose
+              className="fechar-modal"
+              onClick={toggleCheckout}
+              size={24}
+            />
+            <h2>Seu Carrinho</h2>
+            {carrinho.length === 0 ? (
+              <p>O carrinho está vazio.</p>
+            ) : (
+              <>
+                <ul className="carrinho-lista">
+                  {carrinho.map((item) => (
+                    <li key={item.id} className="carrinho-item">
+                      <div className="item-detalhes">
+                        <h4>{item.nome}</h4>
+                        <span className="preco">
+                          R$ {(item.preco * item.quantidade).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="item-quantidade">
+                        <button
+                          className="qnt-btn"
+                          onClick={() => handleRemoverDoCarrinho(item.id)}
+                        >
                           -
                         </button>
                         <span>{item.quantidade}</span>
-                        <button onClick={() => aumentarQuantidade(item.id)}>
+                        <button
+                          className="qnt-btn"
+                          onClick={() => handleAdicionarAoCarrinho(item)}
+                        >
                           +
                         </button>
                       </div>
-                      <button
-                        className="remover-item"
-                        onClick={() => removerDoCarrinho(item.id)}
-                      >
-                        Remover
-                      </button>
-                    </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="carrinho-rodape">
+                  <div className="total-valor">
+                    <strong>Total:</strong>
+                    <span className="preco-final">R$ {valorTotal}</span>
                   </div>
-                ))}
-              </div>
-              <div className="carrinho-total">
-                <h3>Total: R$ {calcularTotal()}</h3>
-                <button
-                  className="finalizar-pedido"
-                  onClick={handleFinalizarPedido}
-                >
-                  Finalizar Pedido
-                </button>
-              </div>
-            </aside>
-          )}
-        </>
-      )}
 
-      {/* MODAL DETALHES */}
-      {produtoSelecionado && (
-        <div
-          className="modal-overlay"
-          onClick={() => setProdutoSelecionado(null)}
-        >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={produtoSelecionado.imagem}
-              alt={produtoSelecionado.nome}
-            />
-            <h2>{produtoSelecionado.nome}</h2>
-            <p>{produtoSelecionado.descricao}</p>
-            <span className="preco">
-              R$ {produtoSelecionado.preco.toFixed(2)}
-            </span>
+                  {/* Formulário de Checkout */}
+                  <form
+                    onSubmit={handleFinalizarPedido}
+                    className="checkout-form"
+                  >
+                    <h3>Detalhes da Entrega</h3>
+                    <label>
+                      Nome:
+                      <input type="text" name="nome" required />
+                    </label>
+                    <label>
+                      Endereço (Rua, Número, Bairro, Cidade):
+                      <input type="text" name="endereco" required />
+                    </label>
+                    <label>
+                      Observações (Ex: Sem cebola, Ponto da carne):
+                      <textarea name="observacoes" rows="2"></textarea>
+                    </label>
 
-            {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
-              <>
-                <div className="quantidade-botoes">
-                  <button
-                    onClick={() => diminuirQuantidade(produtoSelecionado.id)}
-                  >
-                    -
-                  </button>
-                  <span>
-                    {
-                      carrinho.find((c) => c.id === produtoSelecionado.id)
-                        ?.quantidade
-                    }
-                  </span>
-                  <button
-                    onClick={() => aumentarQuantidade(produtoSelecionado.id)}
-                  >
-                    +
-                  </button>
-                  <button
-                    className="remover-item"
-                    onClick={() => removerDoCarrinho(produtoSelecionado.id)}
-                  >
-                    Remover
-                  </button>
-                </div>
-                <div className="total-item">
-                  Total: R${" "}
-                  {(
-                    carrinho.find((c) => c.id === produtoSelecionado.id)
-                      ?.quantidade * produtoSelecionado.preco
-                  ).toFixed(2)}
+                    <h3>Pagamento</h3>
+                    <label>
+                      Forma de Pagamento:
+                      <select
+                        name="pagamento"
+                        value={pagamento}
+                        onChange={(e) => setPagamento(e.target.value)}
+                        required
+                      >
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="pix">PIX</option>
+                        <option value="cartao">Cartão de Crédito/Débito</option>
+                      </select>
+                    </label>
+
+                    {pagamento === "dinheiro" && (
+                      <label>
+                        Troco para:
+                        <input
+                          type="number"
+                          name="troco"
+                          step="0.01"
+                          // 🟢 CORRIGIDO: Adicionado placeholder dinâmico e min para troco
+                          placeholder={
+                            parseFloat(valorTotal) > 0
+                              ? `Ex: ${parseFloat(valorTotal) + 5}`
+                              : "0.00"
+                          }
+                          min={valorTotal}
+                          required
+                        />
+                      </label>
+                    )}
+
+                    <button type="submit" className="finalizar-pedido">
+                      Confirmar Pedido (R$ {valorTotal})
+                    </button>
+                  </form>
                 </div>
               </>
-            ) : (
-              <button
-                className="add-carrinho"
-                onClick={() => adicionarAoCarrinho(produtoSelecionado)}
-              >
-                Adicionar ao Carrinho
-              </button>
             )}
-            <AiOutlineClose
-              className="modal-close-icon"
-              onClick={() => setProdutoSelecionado(null)}
-            />
           </div>
-        </div>
-      )}
-
-      {/* CHECKOUT */}
-      {mostraCheckout && (
-        <div className="checkout-container">
-          <h2>Finalizar Pedido</h2>
-          <form onSubmit={handleCheckoutSubmit}>
-            <label>
-              Nome:
-              <input type="text" name="nome" required />
-            </label>
-
-            {/* --- NOVO CAMPO --- */}
-            <label>
-              Telefone (com DDD, somente números):
-              <input
-                type="tel"
-                name="telefone"
-                required
-                value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
-                pattern="[0-9]{11}"
-                title="Formato: 11987654321"
-              />
-            </label>
-
-            <label>
-              Tipo de Serviço:
-              <select
-                name="servico"
-                required
-                value={servico}
-                onChange={(e) => setServico(e.target.value)}
-              >
-                <option value="">Selecione...</option>
-                <option value="entrega">Entrega</option>
-                <option value="retirada">Retirada</option>
-              </select>
-            </label>
-
-            {servico === "entrega" && (
-              <label>
-                Endereço de Entrega:
-                <input type="text" name="endereco" required />
-              </label>
-            )}
-
-            <label>
-              Forma de Pagamento:
-              <select
-                name="pagamento"
-                required
-                value={pagamento}
-                onChange={(e) => setPagamento(e.target.value)}
-              >
-                <option value="">Selecione...</option>
-                <option value="pix">PIX</option>
-                <option value="cartao">Cartão de Crédito/Débito</option>
-                <option value="dinheiro">Dinheiro</option>
-              </select>
-            </label>
-
-            {pagamento === "dinheiro" && (
-              <label>
-                Troco para:
-                <input type="number" name="troco" step="0.01" required />
-              </label>
-            )}
-
-            <button type="submit" className="finalizar-pedido">
-              Confirmar Pedido
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* CONFIRMAÇÃO */}
-      {pedidoFinalizado && ultimoPedido && (
-        <div className="confirmacao-container">
-          <h2>Pedido Confirmado!</h2>
-          <p>Obrigado por sua compra! Seu pedido será preparado em breve.</p>
-          <div className="resumo-pedido">
-            <h3>Resumo do Pedido:</h3>
-            <ul>
-              {ultimoPedido.itens.map((item) => (
-                <li key={item.id}>
-                  {item.nome} (x{item.quantidade}) - R${" "}
-                  {(item.preco * item.quantidade).toFixed(2)}
-                </li>
-              ))}
-            </ul>
-            <div className="total-resumo">
-              <strong>Total: R$ {ultimoPedido.total}</strong>
-            </div>
-          </div>
-          <button onClick={handleNovoPedido} className="novo-pedido-btn">
-            Fazer um novo pedido
-          </button>
         </div>
       )}
 
