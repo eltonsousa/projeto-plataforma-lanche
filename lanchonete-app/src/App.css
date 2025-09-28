@@ -243,8 +243,8 @@ footer {
   gap: 8px;
 }
 
-.quantidade-botoes button {
-    background: #ff6347;
+.quantidade-botoes button.btn-menos {
+    background: #646464;
     border: none;
     color: #fff;
     font-weight: bold;
@@ -255,8 +255,23 @@ footer {
     transition: background 0.2s ease;
 }
 
-.quantidade-botoes button:hover {
-  background: #e5533d;
+.quantidade-botoes button.btn-menos:hover {
+  background: #969696;
+}
+
+.quantidade-botoes button.btn-mais {
+    background: #4caf50;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 4px 10px 4px 10px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.quantidade-botoes button.btn-mais:hover {
+  background: #62ce65;
 }
 
 .quantidade-botoes span {
@@ -444,6 +459,9 @@ footer {
 /* =============================== */
 /* Modal de Detalhes               */
 /* =============================== */
+/* =============================== */
+/* Modal de Detalhes (Visual Melhorado) */
+/* =============================== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -455,77 +473,155 @@ footer {
   align-items: center;
   justify-content: center;
   z-index: 200;
-  padding: 0;
+  padding: 10px;
   box-sizing: border-box;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 16px;
   width: 90%;
   max-width: 500px;
-  padding: 20px;
+  padding: 25px;
   text-align: center;
   position: relative;
   animation: fadeIn 0.3s ease;
   max-height: 90vh;
   overflow-y: auto;
   box-sizing: border-box;
-
-
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
 .modal-content img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .modal-content h2 {
   margin: 10px 0;
-  font-size: 1.5rem;
-  
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #333;
 }
 
 .modal-content p {
   font-size: 1rem;
-  color: #555;
+  color: #666;
+  margin: 10px 0;
+  line-height: 1.4;
 }
 
 .modal-content .preco {
-  font-size: 1.1rem;
-  color: #464646;
+  font-size: 1.3rem;
+  color: #ff6347;
   font-weight: bold;
   display: block;
-  margin: 15px 0;
-
+  margin: 20px 0;
 }
 
 .modal-content .total-item {
-  margin-top: 15px;
-  font-size: 1.4rem;
+  margin-top: 20px;
+  font-size: 1.2rem;
   font-weight: bold;
-  color: #4caf50; /* verde */
+  color: #4caf50;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-.modal-botoes {
+.modal-botoes,
+.modal-content .quantidade-botoes {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
   margin-top: 20px;
+  flex-wrap: wrap;
+}
 
+.modal-content .quantidade-botoes button.btn-menos {
+  background: #7e7e7e;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 8px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-content .quantidade-botoes button.btn-mais {
+  background: #4caf50;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 8px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-content .quantidade-botoes button.btn-menos:hover {
+  background: #a5a5a5;
+}
+
+.modal-content .quantidade-botoes button.btn-mais:hover {
+  background: #61d165;
+}
+
+.modal-content .quantidade-botoes span {
+  min-width: 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+}
+
+.modal-content .remover-item {
+  background: #f44336;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.modal-content .remover-item:hover {
+  background: #d32f2f;
+}
+
+.modal-content .add-carrinho {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.modal-content .add-carrinho:hover {
+  background-color: #43a047;
 }
 
 .modal-close-icon {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 2.8rem;
+  top: 12px;
+  right: 12px;
+  font-size: 2rem;
   color: #ff6347;
   background-color: white;
   border-radius: 50%;
-  padding: 5px;
+  padding: 6px;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: background-color 0.3s, color 0.3s, transform 0.2s;
@@ -536,6 +632,7 @@ footer {
   color: white;
   transform: scale(1.1);
 }
+
 
 /* =============================== */
 /* Responsividade                   */

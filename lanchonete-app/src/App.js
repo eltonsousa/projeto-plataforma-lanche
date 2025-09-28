@@ -355,11 +355,17 @@ function App() {
                     </div>
                     <div className="carrinho-botoes">
                       <div className="quantidade-botoes">
-                        <button onClick={() => diminuirQuantidade(item.id)}>
+                        <button
+                          class="btn-menos"
+                          onClick={() => diminuirQuantidade(item.id)}
+                        >
                           -
                         </button>
                         <span>{item.quantidade}</span>
-                        <button onClick={() => aumentarQuantidade(item.id)}>
+                        <button
+                          class="btn-mais"
+                          onClick={() => aumentarQuantidade(item.id)}
+                        >
                           +
                         </button>
                       </div>
@@ -408,6 +414,7 @@ function App() {
               <>
                 <div className="quantidade-botoes">
                   <button
+                    class="btn-menos"
                     onClick={() => diminuirQuantidade(produtoSelecionado.id)}
                   >
                     -
@@ -419,6 +426,7 @@ function App() {
                     }
                   </span>
                   <button
+                    class="btn-mais"
                     onClick={() => aumentarQuantidade(produtoSelecionado.id)}
                   >
                     +
