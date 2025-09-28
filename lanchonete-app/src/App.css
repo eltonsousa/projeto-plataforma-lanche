@@ -871,3 +871,22 @@ footer {
   font-size: 1.2rem;
 }
 
+/* Botão "Adicionar" compacto em telas menores */
+@media (max-width: 450px) {
+  .cardapio-item button.add-carrinho {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .cardapio-item button.add-carrinho svg {
+    width: 20px; /* deixa o ícone maior */
+    height: 20px;
+  }
+}
+
