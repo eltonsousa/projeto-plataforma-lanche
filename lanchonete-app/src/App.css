@@ -244,13 +244,15 @@ footer {
 }
 
 .quantidade-botoes button.btn-menos {
+    width: 44px;
+    height: 44px;
     background: #646464;
     border: none;
     color: #fff;
     font-weight: bold;
     font-size: 1rem;
-    padding: 4px 10px 4px 10px;
-    border-radius: 50px;
+    padding: 0px;
+    border-radius: 50%;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -260,13 +262,15 @@ footer {
 }
 
 .quantidade-botoes button.btn-mais {
+    width: 44px;
+    height: 44px;
     background: #4caf50;
     border: none;
     color: #fff;
     font-weight: bold;
     font-size: 1rem;
-    padding: 4px 10px 4px 10px;
-    border-radius: 50px;
+    padding: 0px;
+    border-radius: 50%;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -282,11 +286,13 @@ footer {
 }
 
 .remover-item {
+  width: 44px;
+  height: 44px;
   background: #f44336;
   border: none;
   color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 0px;
+  border-radius: 50%;
   cursor: pointer;
   font-size: 0.85rem;
   transition: background 0.2s ease;
@@ -539,26 +545,30 @@ footer {
 }
 
 .modal-content .quantidade-botoes button.btn-menos {
+  width: 44px;
+  height: 44px;
   margin: 0px 10px 0px 0px;
   background: #7e7e7e;
   border: none;
   color: #fff;
   font-weight: bold;
   font-size: 1rem;
-  padding: 8px 14px;
+  padding: 0px;
   border-radius: 50px;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .modal-content .quantidade-botoes button.btn-mais {
+  width: 44px;
+  height: 44px;
   margin: 0px 50px 0px 10px;
   background: #4caf50;
   border: none;
   color: #fff;
   font-weight: bold;
   font-size: 1rem;
-  padding: 8px 14px;
+  padding: 0px;
   border-radius: 50px;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -581,11 +591,13 @@ footer {
 }
 
 .modal-content .remover-item {
+  width: 44px;
+  height: 44px;
   background: #f44336;
   border: none;
   color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 0px;
+  border-radius: 50%;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background 0.2s ease;
@@ -668,6 +680,24 @@ footer {
     font-weight: bold;
     color: #333;
   }
+
+  .modal-actions-bar button {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
+.modal-actions-bar .remover-item {
+  background: #f44336;
+  border-radius: 50%;
+  padding: 0;
+}
 }
 
 

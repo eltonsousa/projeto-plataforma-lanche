@@ -3,6 +3,7 @@ import CardapioItem from "./CardapioItem";
 import "./App.css";
 import { BsCart3 } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineMinus, AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
 
 // --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
@@ -359,21 +360,21 @@ function App() {
                           class="btn-menos"
                           onClick={() => diminuirQuantidade(item.id)}
                         >
-                          -
+                          <AiOutlineMinus size={22} />
                         </button>
                         <span>{item.quantidade}</span>
                         <button
                           class="btn-mais"
                           onClick={() => aumentarQuantidade(item.id)}
                         >
-                          +
+                          <AiOutlinePlus size={22} />
                         </button>
                       </div>
                       <button
                         className="remover-item"
                         onClick={() => removerDoCarrinho(item.id)}
                       >
-                        Remover
+                        <AiOutlineDelete size={22} />
                       </button>
                     </div>
                   </div>
@@ -418,7 +419,7 @@ function App() {
                       class="btn-menos"
                       onClick={() => diminuirQuantidade(produtoSelecionado.id)}
                     >
-                      -
+                      <AiOutlineMinus size={22} />
                     </button>
                     <span>
                       {
@@ -430,13 +431,13 @@ function App() {
                       class="btn-mais"
                       onClick={() => aumentarQuantidade(produtoSelecionado.id)}
                     >
-                      +
+                      <AiOutlinePlus size={22} />
                     </button>
                     <button
                       className="remover-item"
                       onClick={() => removerDoCarrinho(produtoSelecionado.id)}
                     >
-                      Remover
+                      <AiOutlineDelete size={22} />
                     </button>
                   </div>
                 </div>
