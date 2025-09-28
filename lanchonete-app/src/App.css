@@ -890,3 +890,72 @@ footer {
   }
 }
 
+@media (max-width: 450px) {
+    .cardapio-item p {
+        font-size: 0.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        margin: 8px 10px 0px 0px;
+    }
+}
+
+@media (max-width: 430px) {
+    .cardapio-item p {
+        font-size: 0.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 190px;
+        margin: 8px 10px 0px 0px;
+    }
+}
+
+@media (max-width: 400px) {
+    .cardapio-item p {
+        font-size: 0.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 165px;
+        margin: 8px 10px 0px 0px;
+    }
+}
+
+@media (max-width: 380px) {
+    .cardapio-item p {
+        font-size: 0.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 140px;
+        margin: 8px 10px 0px 0px;
+    }
+}
+
+@media (max-width: 350px) {
+    .cardapio-item p {
+        font-size: 0.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 110px;
+        margin: 8px 10px 0px 0px;
+    }
+}
+
+@media (max-width: 330px) {
+    .cardapio-item button.add-carrinho {
+        display: none;
+    }
+    .cardapio-item p {
+        font-size: 0.8rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 140px;
+        margin: 8px 10px 0px 0px;
+    }
+}
+
