@@ -12,7 +12,7 @@ function CardapioItem({ item, onAdicionar }) {
         <span className="preco">R$ {item.preco}</span>
       </div>
       <button
-        className="add-carrinho"
+        className="btn btn-verde"
         onClick={() => onAdicionar(item)} // 1. Chama a função onAdicionar
       >
         <BsCart3 size={14} /> Adicionar

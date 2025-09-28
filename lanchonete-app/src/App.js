@@ -361,24 +361,24 @@ function App() {
                     <div className="carrinho-botoes">
                       <div className="quantidade-botoes">
                         <button
-                          class="btn-menos"
+                          class="btn btn-vermelho btn-circle"
                           onClick={() => diminuirQuantidade(item.id)}
                         >
-                          <AiOutlineMinus size={22} />
+                          <AiOutlineMinus size={20} />
                         </button>
                         <span>{item.quantidade}</span>
                         <button
-                          class="btn-mais"
+                          class="btn btn-verde btn-circle"
                           onClick={() => aumentarQuantidade(item.id)}
                         >
-                          <AiOutlinePlus size={22} />
+                          <AiOutlinePlus size={20} />
                         </button>
                       </div>
                       <button
-                        className="remover-item"
+                        className="btn btn-vermelho btn-circle"
                         onClick={() => removerDoCarrinho(item.id)}
                       >
-                        <AiOutlineDelete size={22} />
+                        <AiOutlineDelete size={20} />
                       </button>
                     </div>
                   </div>
@@ -387,7 +387,7 @@ function App() {
               <div className="carrinho-total">
                 <h3>Total: R$ {calcularTotal()}</h3>
                 <button
-                  className="finalizar-pedido"
+                  className="btn btn-laranja"
                   onClick={handleFinalizarPedido}
                 >
                   Finalizar Pedido
@@ -420,10 +420,10 @@ function App() {
                 <div className="quantidade-botoes">
                   <div class="modal-actions-bar">
                     <button
-                      class="btn-menos"
+                      class="btn btn-vermelho btn-circle"
                       onClick={() => diminuirQuantidade(produtoSelecionado.id)}
                     >
-                      <AiOutlineMinus size={22} />
+                      <AiOutlineMinus size={20} />
                     </button>
                     <span>
                       {
@@ -432,16 +432,16 @@ function App() {
                       }
                     </span>
                     <button
-                      class="btn-mais"
+                      class="btn btn-verde btn-circle"
                       onClick={() => aumentarQuantidade(produtoSelecionado.id)}
                     >
-                      <AiOutlinePlus size={22} />
+                      <AiOutlinePlus size={20} />
                     </button>
                     <button
-                      className="remover-item"
+                      className="btn btn-vermelho btn-circle"
                       onClick={() => removerDoCarrinho(produtoSelecionado.id)}
                     >
-                      <AiOutlineDelete size={22} />
+                      <AiOutlineDelete size={20} />
                     </button>
                   </div>
                 </div>
@@ -455,10 +455,10 @@ function App() {
               </>
             ) : (
               <button
-                className="add-carrinho"
+                className="btn btn-verde"
                 onClick={() => adicionarAoCarrinho(produtoSelecionado)}
               >
-                <BsCart3 size={24} /> Adicionar ao Carrinho
+                <BsCart3 size={20} /> Adicionar ao Carrinho
               </button>
             )}
             <AiOutlineClose
@@ -536,7 +536,7 @@ function App() {
               </label>
             )}
 
-            <button type="submit" className="finalizar-pedido">
+            <button type="submit" className="btn btn-laranja">
               <AiOutlineCheck />
               Confirmar Pedido
             </button>
@@ -563,7 +563,7 @@ function App() {
               <strong>Total: R$ {ultimoPedido.total}</strong>
             </div>
           </div>
-          <button onClick={handleNovoPedido} className="novo-pedido-btn">
+          <button onClick={handleNovoPedido} className="btn btn-laranja">
             Fazer um novo pedido
           </button>
         </div>
