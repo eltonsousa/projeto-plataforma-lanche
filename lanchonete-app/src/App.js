@@ -413,30 +413,32 @@ function App() {
             {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
               <>
                 <div className="quantidade-botoes">
-                  <button
-                    class="btn-menos"
-                    onClick={() => diminuirQuantidade(produtoSelecionado.id)}
-                  >
-                    -
-                  </button>
-                  <span>
-                    {
-                      carrinho.find((c) => c.id === produtoSelecionado.id)
-                        ?.quantidade
-                    }
-                  </span>
-                  <button
-                    class="btn-mais"
-                    onClick={() => aumentarQuantidade(produtoSelecionado.id)}
-                  >
-                    +
-                  </button>
-                  <button
-                    className="remover-item"
-                    onClick={() => removerDoCarrinho(produtoSelecionado.id)}
-                  >
-                    Remover
-                  </button>
+                  <div class="modal-actions-bar">
+                    <button
+                      class="btn-menos"
+                      onClick={() => diminuirQuantidade(produtoSelecionado.id)}
+                    >
+                      -
+                    </button>
+                    <span>
+                      {
+                        carrinho.find((c) => c.id === produtoSelecionado.id)
+                          ?.quantidade
+                      }
+                    </span>
+                    <button
+                      class="btn-mais"
+                      onClick={() => aumentarQuantidade(produtoSelecionado.id)}
+                    >
+                      +
+                    </button>
+                    <button
+                      className="remover-item"
+                      onClick={() => removerDoCarrinho(produtoSelecionado.id)}
+                    >
+                      Remover
+                    </button>
+                  </div>
                 </div>
                 <div className="total-item">
                   Total: R${" "}
