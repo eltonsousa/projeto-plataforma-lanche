@@ -54,7 +54,7 @@ footer {
 .cardapio-item {
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
   padding: 15px;
@@ -67,7 +67,7 @@ footer {
 
 .cardapio-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
 .cardapio-item img {
@@ -138,7 +138,7 @@ footer {
   height: 50px;
   font-size: 1.5rem;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,19 +172,19 @@ footer {
 /* Carrinho Flutuante (Visual Melhorado) */
 /* =============================== */
 .carrinho-container {
-  position: fixed;
-  top: 100px;
-  right: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  width: 30vh;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem;
-  z-index: 110;
-  animation: fadeIn 0.3s ease;
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    width: 30vh;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    z-index: 110;
+    animation: fadeIn 0.3s ease;
 }
 
 .carrinho-container h2 {
@@ -210,13 +210,13 @@ footer {
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .carrinho-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .item-info {
@@ -246,17 +246,17 @@ footer {
 }
 
 .quantidade-botoes button.btn-menos {
-  width: 34px;
-  height: 34px;
-  background: #646464;
-  border: none;
-  color: #fff;
-  font-weight: bold;
-  font-size: 1rem;
-  padding: 0px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s ease;
+    width: 34px;
+    height: 34px;
+    background: #646464;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .quantidade-botoes button.btn-menos:hover {
@@ -264,19 +264,18 @@ footer {
 }
 
 .quantidade-botoes button.btn-mais {
-  width: 34px;
-  height: 34px;
-  background: #4caf50;
-  border: none;
-  color: #fff;
-  font-weight: bold;
-  font-size: 1rem;
-  padding: 0px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s ease;
+    width: 34px;
+    height: 34px;
+    background: #4caf50;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
-
 .quantidade-botoes button.btn-mais:hover {
   background: #62ce65;
 }
@@ -318,16 +317,16 @@ footer {
 }
 
 .carrinho-total .finalizar-pedido {
-  cursor: pointer;
-  margin-top: 1rem;
-  border: none;
-  background: #4caf50;
-  border-radius: 8px;
-  padding: 12px;
-  font-weight: bold;
-  font-size: 1rem;
-  color: white;
-  transition: background 0.3s ease;
+    cursor: pointer;
+    margin-top: 1rem;
+    border: none;
+    background: #4caf50;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    color: white;
+    transition: background 0.3s ease;
 }
 
 .carrinho-total .finalizar-pedido:hover {
@@ -346,9 +345,9 @@ footer {
   transform: translate(-50%, -50%);
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   padding: 2rem;
-  width: 85%;
+  width: 90%;
   max-width: 500px;
   z-index: 100;
   animation: fadeIn 0.3s ease;
@@ -478,7 +477,7 @@ footer {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0,0,0,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -499,7 +498,7 @@ footer {
   max-height: 90vh;
   overflow-y: auto;
   box-sizing: border-box;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
 .modal-content img {
@@ -507,7 +506,7 @@ footer {
   height: auto;
   border-radius: 12px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .modal-content h2 {
@@ -646,7 +645,7 @@ footer {
   border-radius: 50%;
   padding: 6px;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
@@ -661,8 +660,7 @@ footer {
 /* =============================== */
 @media (max-width: 480px) {
   .modal-content {
-    padding-bottom: 80px;
-    /* espaço para a barra fixa */
+    padding-bottom: 80px; /* espaço para a barra fixa */
   }
 
   .modal-actions-bar {
@@ -679,7 +677,7 @@ footer {
     justify-content: space-around;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
     z-index: 250;
   }
 
@@ -715,7 +713,66 @@ footer {
 
 
 
+/* =============================== */
+/* Responsividade                   */
+/* =============================== */
+@media (max-width: 768px) {
+  .cardapio-item {
+    padding: 10px;
+  }
+  .cardapio-item img {
+    width: 100px;
+    height: 100px;
+  }
+  .cardapio-item h2 {
+    font-size: 1.2rem;
+  }
+  .cardapio-item p {
+    font-size: 0.8rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+  .add-carrinho {
+    font-size: 0.8rem;
+    padding: 7px 10px;
+  }
+}
 
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    max-width: 320px;
+    padding: 15px;
+    max-height: 85vh;
+  }
+  .modal-content h2 {
+    font-size: 1.2rem;
+  }
+  .modal-content p {
+    font-size: 0.9rem;
+  }
+  .modal-content .preco {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 350px) {
+  .modal-content {
+    max-width: 300px;
+    padding: 12px;
+  }
+  .modal-content h2 {
+    font-size: 1.1rem;
+  }
+  .modal-content p {
+    font-size: 0.85rem;
+  }
+  .modal-content .preco {
+    font-size: 1rem;
+  }
+}
 
 /* Carregamento Inicial */
 .loading {
@@ -739,15 +796,9 @@ footer {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-
 /* Carregamento Inicial */
 
 /* =============================== */
@@ -755,36 +806,28 @@ footer {
 /* =============================== */
 .cardapio-categorias {
   display: flex;
-  justify-content: flex-start;
-  /* Alinha para a esquerda */
+  justify-content: flex-start; /* Alinha para a esquerda */
   gap: 15px;
   margin: 30px 0 20px 0;
   width: 100%;
   max-width: 1200px;
   padding: 0 20px;
   box-sizing: border-box;
-
+  
   /* --- ROLAGEM HORIZONTAL E ARRASTAR COM MOUSE/TOQUE --- */
-  overflow-x: auto;
-  /* Habilita a rolagem horizontal */
-  white-space: nowrap;
-  /* Impede a quebra de linha dos botões */
-  -webkit-overflow-scrolling: touch;
-  /* Melhora a rolagem em iOS */
-  cursor: grab;
-  /* Indica que é arrastável (para desktop) */
+  overflow-x: auto; /* Habilita a rolagem horizontal */
+  white-space: nowrap; /* Impede a quebra de linha dos botões */
+  -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
+  cursor: grab; /* Indica que é arrastável (para desktop) */
   /* Oculta a barra de rolagem */
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 /* 🟢 NOVO: Muda o cursor para "grabbing" quando o mouse está pressionado */
 .cardapio-categorias:active {
   cursor: grabbing;
 }
-
 /* Oculta a barra de rolagem em Webkit (Chrome, Safari) */
 .cardapio-categorias::-webkit-scrollbar {
   display: none;
@@ -792,8 +835,7 @@ footer {
 
 .cardapio-categorias button {
   background-color: #f4f4f4;
-  color: #ff6347;
-  /* Cor principal (tomate) */
+  color: #ff6347; /* Cor principal (tomate) */
   border: 1px solid #ff6347;
   padding: 10px 20px;
   border-radius: 20px;
@@ -812,15 +854,13 @@ footer {
 }
 
 .cardapio-categorias button:hover:not(.categoria-ativa) {
-  background-color: #ffe0db;
-  /* Cor mais clara no hover */
+  background-color: #ffe0db; /* Cor mais clara no hover */
 }
 
 /* Adiciona um pouco de margem na lista de cardápio para não encostar na nav */
 .cardapio {
   /* ... (manter estilos existentes) ... */
-  padding-top: 0;
-  /* Remove o padding-top se houver */
+  padding-top: 0; /* Remove o padding-top se houver */
 }
 
 /* Estilo para mensagem de Sem Itens */
@@ -845,15 +885,12 @@ footer {
   }
 
   .cardapio-item button.add-carrinho svg {
-    width: 20px;
-    /* deixa o ícone maior */
+    width: 20px; /* deixa o ícone maior */
     height: 20px;
   }
 }
 
-
-/* ---- ------- */
-/* @media (max-width: 450px) {
+@media (max-width: 450px) {
     .cardapio-item p {
         font-size: 0.8rem;
         overflow: hidden;
@@ -986,92 +1023,5 @@ footer {
         max-width: 140px;
         margin: 8px 10px 0px 0px;
     }
-} */
-/* ---- ------- */
-/* =============================== */
-/* Responsividade                   */
-/* =============================== */
-@media (max-width: 768px) {
-  .cardapio-item {
-    padding: 10px;
-  }
-
-  .cardapio-item img {
-    width: 100px;
-    height: 100px;
-  }
-
-  .cardapio-item h2 {
-    font-size: 1.2rem;
-  }
-
-  .cardapio-item p {
-    font-size: 0.8rem;
-    overflow: hidden;
-    max-width: 400px;
-  }
-
-  .add-carrinho {
-    font-size: 0.8rem;
-    padding: 7px 10px;
-  }
 }
 
-@media (max-width: 480px) {
-  .modal-content {
-    width: 95%;
-    max-width: 320px;
-    padding: 15px;
-    max-height: 85vh;
-  }
-
-  .modal-content h2 {
-    font-size: 1.2rem;
-  }
-
-  .modal-content p {
-    font-size: 0.9rem;
-  }
-
-  .modal-content .preco {
-    font-size: 1.1rem;
-  }
-
-  .cardapio-item p {
-    max-width: 200px;
-  }
-}
-
-@media (max-width: 400px) {
-  .cardapio-item p {
-    max-width: 150px;
-  }
-}
-
-@media (max-width: 350px) {
-  .modal-content {
-    max-width: 300px;
-    padding: 12px;
-  }
-
-  .modal-content h2 {
-    font-size: 1.1rem;
-  }
-
-  .modal-content p {
-    font-size: 0.85rem;
-  }
-
-  .modal-content .preco {
-    font-size: 1rem;
-  }
-
-  .cardapio-item p {
-    max-width: 120px;
-  }
-
-  .cardapio-item button.add-carrinho {
-    display: none;
-    /* esconde botão em telas muito pequenas */
-  }
-}
