@@ -608,6 +608,7 @@ footer {
 }
 
 .modal-content .add-carrinho {
+  display: flex;
   background-color: #4caf50;
   color: white;
   border: none;
@@ -618,6 +619,10 @@ footer {
   transition: background 0.3s ease;
   margin-top: 20px;
   width: 100%;
+  text-align: center !important;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .modal-content .add-carrinho:hover {

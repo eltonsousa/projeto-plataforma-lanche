@@ -454,7 +454,7 @@ function App() {
                 className="add-carrinho"
                 onClick={() => adicionarAoCarrinho(produtoSelecionado)}
               >
-                Adicionar ao Carrinho
+                <BsCart3 size={24} /> Adicionar ao Carrinho
               </button>
             )}
             <AiOutlineClose
