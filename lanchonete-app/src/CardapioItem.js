@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import { BsCart3 } from "react-icons/bs";
 
 function CardapioItem({ item, onAdicionar }) {
   return (
@@ -14,7 +15,7 @@ function CardapioItem({ item, onAdicionar }) {
         className="add-carrinho"
         onClick={() => onAdicionar(item)} // 1. Chama a função onAdicionar
       >
-        Adicionar
+        <BsCart3 size={14} /> Adicionar
       </button>
     </div>
   );
