@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
+
+// --- Import de ìcones
 import { BsCart3 } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 import { AiOutlineMinus, AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
+import { AiOutlineCheck } from "react-icons/ai";
+// --- Import de ìcones
 
 // --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
@@ -533,6 +537,7 @@ function App() {
             )}
 
             <button type="submit" className="finalizar-pedido">
+              <AiOutlineCheck />
               Confirmar Pedido
             </button>
           </form>

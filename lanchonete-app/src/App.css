@@ -390,6 +390,10 @@ footer {
 }
 
 .checkout-container .finalizar-pedido {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
   background: #4caf50;
   border: none;
   border-radius: 8px;
