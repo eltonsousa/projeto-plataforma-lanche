@@ -345,7 +345,7 @@ function App() {
                 </select>
               </label>
               {/* 🟢 BOTÃO DE ATUALIZAR */}
-              <button onClick={handleRefresh} className="botao-atualizar">
+              <button onClick={handleRefresh} className="botao-atualizar btn btn-laranja">
                 Atualizar Pedidos
               </button>
             </div>
@@ -418,7 +418,7 @@ function App() {
                       ))}
                     </ul>
                     <button
-                      className="concluir-btn"
+                      className="concluir-btn btn btn-verde"
                       // 🟢 ATUALIZAÇÃO: Chama a função atualizarStatus com o status 'Concluído'
                       onClick={() => atualizarStatus(pedido.id, "Concluído")}
                     >

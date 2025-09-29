@@ -1,3 +1,92 @@
+:root {
+  /* 🎨 Paleta de Cores */
+  --cor-azul: #3f51b5;
+  --cor-azul-hover: #3f51b5;
+  
+  --cor-laranja: #ff6347;
+  --cor-laranja-hover: #e5533d;
+  --cor-verde: #4caf50;
+  --cor-verde-hover: #43a047;
+  --cor-vermelho: #f44336;
+  --cor-vermelho-hover: #d32f2f;
+  --cor-cinza-medio: #666;
+  --cor-cinza-medio-hover: #333;
+  --cor-branco: #fff;
+
+  /* 🌑 Sombras */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================== */
+/* Botões Base                     */
+/* =============================== */
+.btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  padding: 10px 16px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* Variantes */
+
+.btn-azul {
+  background-color: var(--cor-azul);
+  color: var(--cor-branco);
+}
+
+.btn-azul:hover {
+  background-color: var(--cor-azul-hover);
+}
+
+.btn-laranja {
+  background-color: var(--cor-laranja);
+  color: var(--cor-branco);
+}
+
+.btn-laranja:hover {
+  background-color: var(--cor-laranja-hover);
+}
+
+.btn-verde {
+  background-color: var(--cor-verde);
+  color: var(--cor-branco);
+}
+
+.btn-verde:hover {
+  background-color: var(--cor-verde-hover);
+}
+
+.btn-vermelho {
+  background-color: var(--cor-vermelho);
+  color: var(--cor-branco);
+}
+
+.btn-vermelho:hover {
+  background-color: var(--cor-vermelho-hover);
+}
+
+/* Botões circulares */
+.btn-circle {
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f2f5;
@@ -16,8 +105,8 @@ body {
 /* Footer fixo no final (igual ao header) */
 .painel-admin footer {
   margin-top: auto;
-  background-color: #3f51b5;
-  color: #ffffff;
+  background-color: var(--cor-azul);
+  color: var(--cor-branco);
   text-align: center;
   padding: 1rem;
 }
@@ -28,8 +117,8 @@ body {
 
 /* Cabeçalho */
 .painel-admin header {
-  background-color: #3f51b5;
-  color: white;
+  background-color: var(--cor-azul);
+  color: var(--cor-branco);
   padding: 1.5rem 1rem;
   text-align: center;
 }
@@ -45,14 +134,14 @@ body {
 }
 
 /* Botão base reutilizável */
-.btn {
+/*.btn {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.3s;
-}
+}*/
 
 /* Menu navegação */
 .nav-menu {
@@ -167,12 +256,6 @@ body {
 .concluir-btn {
   width: 100%;
   margin-top: 15px;
-  padding: 10px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 /* Estados */
@@ -285,7 +368,7 @@ body {
   color: white;
   border-radius: 5px;
   border: none;
-  padding: 6px 10px 6px 10px;
+  padding: 6px 10px 6px 10p+x;
 }
 
 /* Autenticação */
@@ -542,13 +625,8 @@ body {
 }
 
 /*estilo botao atualizar pedidos*/
-.botao-atualizar {
-  cursor: pointer;
-  background-color: #f44336;
-  color: white;
-  border-radius: 5px;
-  border: none;
-  padding: 6px 10px 6px 10px;
+botao-atualizar{
+  
   margin-top: 8px;
 }
 
