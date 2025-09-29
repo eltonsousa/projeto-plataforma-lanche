@@ -359,7 +359,7 @@ function App() {
                       <p>R$ {(item.preco * item.quantidade).toFixed(2)}</p>
                     </div>
                     <div className="carrinho-botoes">
-                      <div className="quantidade-botoes">
+                      <div className="quantidade-botoes-carrinho">
                         <button
                           class="btn btn-vermelho btn-circle"
                           onClick={() => diminuirQuantidade(item.id)}
