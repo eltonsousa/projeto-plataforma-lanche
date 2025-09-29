@@ -536,7 +536,7 @@ function App() {
               </label>
             )}
 
-            <button type="submit" className="btn btn-laranja">
+            <button type="submit" className="btn btn-verde">
               <AiOutlineCheck />
               Confirmar Pedido
             </button>
