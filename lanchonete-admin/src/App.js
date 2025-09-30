@@ -1,6 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
+// --- Import de ìcones
+import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from "react-icons/ai";
+// import {
+//   AiOutlineMinus,
+//   AiOutlinePlus,
+//   AiOutlineDelete,
+//   AiOutlineClose,
+//   AiOutlineCheck,
+// } from "react-icons/ai";
+// <AiOutlineMinus size={20} />
+// <AiOutlinePlus size={20} />
+// <AiOutlineDelete size={20} />
+// <AiOutlineCheck />
+// <AiOutlineClose/>
+// --- Import de ìcones
+
 function App() {
   const [pedidos, setPedidos] = useState([]);
   const [cardapio, setCardapio] = useState([]);
@@ -345,7 +361,10 @@ function App() {
                 </select>
               </label>
               {/* 🟢 BOTÃO DE ATUALIZAR */}
-              <button onClick={handleRefresh} className="botao-atualizar btn btn-laranja">
+              <button
+                onClick={handleRefresh}
+                className="botao-atualizar btn btn-laranja"
+              >
                 Atualizar Pedidos
               </button>
             </div>
@@ -563,7 +582,8 @@ function App() {
                 <option value="Comidas">Comidas</option>
               </select>
 
-              <button class="btn-add-item btn btn-verde" type="submit" >
+              <button class="btn-add-item btn btn-verde" type="submit">
+                <AiOutlineCheck size={20} />{" "}
                 {isEditing ? "Salvar Alterações" : "Adicionar Item"}
               </button>
             </form>
@@ -578,8 +598,18 @@ function App() {
                   <p>R$ {item.preco ? item.preco.toFixed(2) : "0.00"}</p>
                 </div>
                 <div className="item-botoes-admin">
-                  <button class="btn btn-laranja" onClick={() => handleEdit(item)}>Editar</button>
-                  <button class="btn btn-verde" onClick={() => handleDelete(item.id)}>Remover</button>
+                  <button
+                    class="btn btn-verde"
+                    onClick={() => handleEdit(item)}
+                  >
+                    <AiOutlineEdit size={20} /> Editar
+                  </button>
+                  <button
+                    class="btn btn-laranja"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    <AiOutlineDelete size={20} /> Deletar
+                  </button>
                 </div>
               </div>
             ))}

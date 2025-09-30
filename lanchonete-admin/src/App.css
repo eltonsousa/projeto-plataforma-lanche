@@ -2,7 +2,7 @@
   /* 🎨 Paleta de Cores */
   --cor-azul: #3f51b5;
   --cor-azul-hover: #3f51b5;
-  
+
   --cor-laranja: #ff6347;
   --cor-laranja-hover: #e5533d;
   --cor-verde: #4caf50;
@@ -243,12 +243,15 @@ body {
 .status-em-preparação {
   background-color: #ff9800;
 }
+
 .status-pronto-para-entrega {
   background-color: #2196f3;
 }
+
 .status-entregue {
   background-color: #4caf50;
 }
+
 .status-concluído {
   background-color: #555555;
 }
@@ -275,8 +278,10 @@ body {
 /* Cardápio */
 .painel-cardapio {
   padding: 20px;
-  max-width: 1200px; /* mais largo no PC */
-  width: 100%; /* ocupa toda a largura disponível */
+  max-width: 1200px;
+  /* mais largo no PC */
+  width: 100%;
+  /* ocupa toda a largura disponível */
   margin: auto;
   box-sizing: border-box;
 }
@@ -314,7 +319,15 @@ body {
 }
 
 .cardapio-form .btn-add-item {
+  display: flex;
   margin-top: 15px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.cardapio-form .btn-add-item svg {
+  margin-right: 10px;
 }
 
 .cardapio-lista {
@@ -354,11 +367,21 @@ body {
 }
 
 .item-botoes-admin .btn:first-child {
+  display: flex;
   margin-bottom: 8px;
+  text-align: center;
+  align-items: center;
 }
 
 .item-botoes-admin .btn:last-child {
-  
+  text-align: center;
+  display: flex;
+  align-items: center;
+
+}
+
+.item-botoes-admin .btn svg {
+  margin-right: 10px;
 }
 
 /* Autenticação */
@@ -445,7 +468,8 @@ body {
 /* =================================== */
 .auth-container button[disabled] {
   cursor: not-allowed;
-  background-color: #8c9eff; /* Uma cor mais clara quando desabilitado */
+  background-color: #8c9eff;
+  /* Uma cor mais clara quando desabilitado */
 
   /* 🟢 NOVAS PROPRIEDADES PARA ALINHAR O SPINNER E O TEXTO */
   display: flex;
@@ -457,6 +481,7 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -615,8 +640,8 @@ body {
 }
 
 /*estilo botao atualizar pedidos*/
-botao-atualizar{
-  
+botao-atualizar {
+
   margin-top: 8px;
 }
 
@@ -644,17 +669,22 @@ botao-atualizar{
 /* 📱 Ajustes responsivos Mobile */
 /* ============================= */
 @media (max-width: 768px) {
+
   /* Blocos do resumo financeiro em coluna */
   .resumo-financeiro {
     flex-direction: column;
     gap: 15px;
-    align-items: stretch; /* força os filhos a ocupar largura toda */
+    align-items: stretch;
+    /* força os filhos a ocupar largura toda */
   }
 
   .metrica {
-    flex: 1 1 100% !important; /* força largura total */
-    max-width: 100%; /* garante que não quebre */
-    box-sizing: border-box; /* respeita padding */
+    flex: 1 1 100% !important;
+    /* força largura total */
+    max-width: 100%;
+    /* garante que não quebre */
+    box-sizing: border-box;
+    /* respeita padding */
   }
 
   /* Controles centralizados em coluna */
@@ -675,7 +705,8 @@ botao-atualizar{
   }
 
   .painel-cardapio {
-    max-width: 100%; /* ocupa toda a largura no celular */
+    max-width: 100%;
+    /* ocupa toda a largura no celular */
     padding: 15px;
   }
 }
@@ -684,20 +715,25 @@ botao-atualizar{
 /* 📱 Ajustes extras para telas pequenas (≤ 400px) */
 /* =================================== */
 @media (max-width: 400px) {
+
   /* ---------- Página Pedidos ---------- */
   .pedido-card {
-    width: 100%; /* ocupa toda a largura */
-    padding: 1rem; /* reduz padding */
+    width: 100%;
+    /* ocupa toda a largura */
+    padding: 1rem;
+    /* reduz padding */
     box-sizing: border-box;
   }
 
   .status-botoes {
-    flex-direction: column; /* empilha botões de status */
+    flex-direction: column;
+    /* empilha botões de status */
     gap: 8px;
   }
 
   .status-btn {
-    width: 100%; /* botões mais fáceis de clicar */
+    width: 100%;
+    /* botões mais fáceis de clicar */
     font-size: 0.85rem;
   }
 
@@ -717,11 +753,13 @@ botao-atualizar{
     flex: 1 1 100% !important;
     max-width: 100%;
     padding: 15px;
-    font-size: 0.9rem; /* texto menor */
+    font-size: 0.9rem;
+    /* texto menor */
   }
 
   .metrica .valor {
-    font-size: 1.6rem; /* reduz o tamanho do número */
+    font-size: 1.6rem;
+    /* reduz o tamanho do número */
   }
 
   .controles-relatorio {
@@ -736,7 +774,8 @@ botao-atualizar{
   }
 
   .lista-pedidos-filtrada {
-    grid-template-columns: 1fr; /* apenas 1 coluna */
+    grid-template-columns: 1fr;
+    /* apenas 1 coluna */
     padding: 0 10px;
   }
 
@@ -756,6 +795,7 @@ botao-atualizar{
   0% {
     box-shadow: 0 0 0 0 rgba(63, 81, 181, 0.4);
   }
+
   100% {
     box-shadow: 0 0 0 10px rgba(63, 81, 181, 0);
   }

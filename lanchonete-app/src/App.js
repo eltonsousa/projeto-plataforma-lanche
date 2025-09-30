@@ -4,9 +4,13 @@ import "./App.css";
 
 // --- Import de ìcones
 import { BsCart3 } from "react-icons/bs";
-import { AiOutlineClose } from "react-icons/ai";
-import { AiOutlineMinus, AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
-import { AiOutlineCheck } from "react-icons/ai";
+import {
+  AiOutlineMinus,
+  AiOutlinePlus,
+  AiOutlineDelete,
+  AiOutlineClose,
+  AiOutlineCheck,
+} from "react-icons/ai";
 // --- Import de ìcones
 
 // --- FUNÇÕES DE PERSISTÊNCIA ---
