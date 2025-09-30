@@ -203,7 +203,8 @@ body {
 .status-botoes {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
+  padding: 25px 0px 25px 0px;
+  border-bottom: solid 1px #ccc;
 }
 
 .status-btn {
@@ -630,7 +631,7 @@ body {
 
 .controles-pedidos label {
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 2rem;
 }
 
 .controles-pedidos select {
@@ -643,7 +644,7 @@ body {
 }
 
 /*estilo botao atualizar pedidos*/
-botao-atualizar {
+.botao-atualizar {
 
   margin-top: 8px;
 }
@@ -666,6 +667,26 @@ botao-atualizar {
   justify-content: center;
   gap: 20px;
   padding: 20px;
+}
+
+
+
+
+/* =================================== */
+/* 🟢 ESTILOS DE ÊNFASE DO FORMULÁRIO */
+/* =================================== */
+.form-emphasis {
+  animation: form-pulse 0.5s ease-out forwards;
+}
+
+@keyframes form-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(63, 81, 181, 0.4);
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px rgba(63, 81, 181, 0);
+  }
 }
 
 /* ============================= */
@@ -714,10 +735,100 @@ botao-atualizar {
   }
 }
 
-/* =================================== */
-/* 📱 Ajustes extras para telas pequenas (≤ 400px) */
-/* =================================== */
+@media (max-width: 480px) {
+  .controles-pedidos {
+    padding: 12px;
+  }
+
+  .controles-pedidos label {
+    margin-right: 0px;
+  }
+
+  /*estilo botao atualizar pedidos*/
+  .botao-atualizar {
+
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 450px) {
+
+  .painel-admin h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  /** Título Cardápio **/
+  .painel-cardapio h2 {
+    text-align: center;
+    color: #3f51b5;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+  }
+
+  /** Botões Editar e Remover Itens **/
+  .item-botoes-admin .btn:first-child {
+    margin-bottom: 8px;
+    text-align: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .item-botoes-admin .btn:last-child {
+    margin-bottom: 8px;
+    text-align: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .item-botoes-admin .btn svg {
+    margin: 0px;
+  }
+
+  /** Fim Botões Editar e Remover Itens **/
+
+  /** Título Item Painel Gerenciar Item **/
+  .item-cardapio-admin h4 {
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #505050;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+
+  .item-cardapio-admin h4 {
+    max-width: 170px;
+
+  }
+
+
+}
+
 @media (max-width: 400px) {
+
+  .controles-pedidos select {
+    margin: 10px 0px 0px 0px;
+    width: 100%;
+  }
+
+  .botao-atualizar {
+    width: 100%;
+  }
 
   /* ---------- Página Pedidos ---------- */
   .pedido-card {
@@ -785,92 +896,6 @@ botao-atualizar {
   .pedido-card-relatorio {
     padding: 10px;
   }
-}
-
-/* =================================== */
-/* 🟢 ESTILOS DE ÊNFASE DO FORMULÁRIO */
-/* =================================== */
-.form-emphasis {
-  animation: form-pulse 0.5s ease-out forwards;
-}
-
-@keyframes form-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(63, 81, 181, 0.4);
-  }
-
-  100% {
-    box-shadow: 0 0 0 10px rgba(63, 81, 181, 0);
-  }
-}
-
-/** Resposividade **/
-@media (max-width: 450px) {
-
-  .painel-admin h1 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-
-  /** Título Cardápio **/
-  .painel-cardapio h2 {
-    text-align: center;
-    color: #3f51b5;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-  }
-
-  /** Botões Editar e Remover Itens **/
-  .item-botoes-admin .btn:first-child {
-    margin-bottom: 8px;
-    text-align: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0;
-  }
-
-  .item-botoes-admin .btn:last-child {
-    margin-bottom: 8px;
-    text-align: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0;
-  }
-
-  .item-botoes-admin .btn svg {
-    margin: 0px;
-  }
-
-  /** Fim Botões Editar e Remover Itens **/
-
-  /** Título Item Painel Gerenciar Item **/
-  .item-cardapio-admin h4 {
-    max-width: 200px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: #505050;
-    margin: 0;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-
-  .item-cardapio-admin h4 {
-    max-width: 170px;
-    
-  }
-
-
 }
 
 @media (max-width: 350px) {
