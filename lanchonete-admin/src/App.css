@@ -800,3 +800,39 @@ botao-atualizar {
     box-shadow: 0 0 0 10px rgba(63, 81, 181, 0);
   }
 }
+
+/** Resposividade **/
+@media (max-width: 450px) {
+  /** Botões Editar e Remover Itens **/
+  .item-botoes-admin .btn:first-child {
+    margin-bottom: 8px;
+    text-align: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .item-botoes-admin .btn:last-child {
+    margin-bottom: 8px;
+    text-align: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .item-botoes-admin .btn svg {
+    margin: 0px;
+  }
+  /** Fim Botões Editar e Remover Itens **/
+
+}
