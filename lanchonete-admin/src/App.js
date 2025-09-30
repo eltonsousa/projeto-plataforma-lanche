@@ -563,7 +563,7 @@ function App() {
                 <option value="Comidas">Comidas</option>
               </select>
 
-              <button type="submit">
+              <button class="btn-add-item btn btn-verde" type="submit" >
                 {isEditing ? "Salvar Alterações" : "Adicionar Item"}
               </button>
             </form>
@@ -578,8 +578,8 @@ function App() {
                   <p>R$ {item.preco ? item.preco.toFixed(2) : "0.00"}</p>
                 </div>
                 <div className="item-botoes-admin">
-                  <button onClick={() => handleEdit(item)}>Editar</button>
-                  <button onClick={() => handleDelete(item.id)}>Remover</button>
+                  <button class="btn btn-laranja" onClick={() => handleEdit(item)}>Editar</button>
+                  <button class="btn btn-verde" onClick={() => handleDelete(item.id)}>Remover</button>
                 </div>
               </div>
             ))}

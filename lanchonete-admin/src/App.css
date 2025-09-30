@@ -307,13 +307,14 @@ body {
   border-radius: 5px;
 }
 
-.cardapio-form button {
-  /* composes: btn; */
-  background-color: #4caf50;
-  color: white;
+.cardapio-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  border: none;
-  padding: 6px 10px 6px 10px;
+}
+
+.cardapio-form .btn-add-item {
+  margin-top: 15px;
 }
 
 .cardapio-lista {
@@ -348,27 +349,16 @@ body {
 
 .item-botoes-admin {
   display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-/* .item-botoes-admin button {
-  composes: btn;
-} */
-
-.item-botoes-admin button:first-child {
-  background-color: #ff9800;
-  color: white;
-  border-radius: 5px;
-  border: none;
-  padding: 6px 10px 6px 10px;
+.item-botoes-admin .btn:first-child {
+  margin-bottom: 8px;
 }
 
-.item-botoes-admin button:last-child {
-  background-color: #f44336;
-  color: white;
-  border-radius: 5px;
-  border: none;
-  padding: 6px 10px 6px 10p+x;
+.item-botoes-admin .btn:last-child {
+  
 }
 
 /* Autenticação */
