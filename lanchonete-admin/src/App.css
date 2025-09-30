@@ -128,20 +128,22 @@ body {
   font-size: 2.5rem;
 }
 
-.painel-admin p {
-  margin: 0.5rem 0 0;
-  font-size: 1.2rem;
+.item-cardapio-admin h4 {
+  color: #505050;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
-/* Botão base reutilizável */
-/*.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.painel-admin p {
+  margin: 0.5rem 0 0;
   font-size: 1rem;
-  transition: background-color 0.3s;
-}*/
+  font-weight: bold;
+}
+
+.valor-item-info-admin {
+  color: #7d7d7d;
+}
 
 /* Menu navegação */
 .nav-menu {
@@ -287,6 +289,7 @@ body {
 }
 
 .painel-cardapio h2 {
+  text-align: center;
   color: #3f51b5;
   border-bottom: 2px solid #eee;
   padding-bottom: 10px;
@@ -803,6 +806,20 @@ botao-atualizar {
 
 /** Resposividade **/
 @media (max-width: 450px) {
+
+  .painel-admin h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  /** Título Cardápio **/
+  .painel-cardapio h2 {
+    text-align: center;
+    color: #3f51b5;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+  }
+
   /** Botões Editar e Remover Itens **/
   .item-botoes-admin .btn:first-child {
     margin-bottom: 8px;
@@ -833,6 +850,34 @@ botao-atualizar {
   .item-botoes-admin .btn svg {
     margin: 0px;
   }
+
   /** Fim Botões Editar e Remover Itens **/
 
+  /** Título Item Painel Gerenciar Item **/
+  .item-cardapio-admin h4 {
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #505050;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+
+  .item-cardapio-admin h4 {
+    max-width: 170px;
+    
+  }
+
+
+}
+
+@media (max-width: 350px) {
+
+  /** Título Item Painel Gerenciar Item **/
+  .item-cardapio-admin h4 {
+    max-width: 120px;
+
+  }
 }

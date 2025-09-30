@@ -595,7 +595,9 @@ function App() {
                 <img src={`/${item.imagem}`} alt={item.nome} />
                 <div className="item-info-admin">
                   <h4>{item.nome}</h4>
-                  <p>R$ {item.preco ? item.preco.toFixed(2) : "0.00"}</p>
+                  <p class="valor-item-info-admin">
+                    R$ {item.preco ? item.preco.toFixed(2) : "0.00"}
+                  </p>
                 </div>
                 <div className="item-botoes-admin">
                   <button
