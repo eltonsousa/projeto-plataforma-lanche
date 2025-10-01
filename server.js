@@ -22,7 +22,29 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Carregar imagens do Buckets Supabase
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() }); // mantém em memória
+
+const storage = multer.memoryStorage();
+
+const fileFilter = (req, file, cb) => {
+  // Tipos permitidos
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true); // Aceita
+  } else {
+    cb(
+      new Error(
+        "Tipo de arquivo inválido. Apenas JPG, PNG ou WEBP são permitidos."
+      )
+    );
+  }
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+  fileFilter,
+});
 // Carregar imagens do Buckets Supabase
 
 app.post("/api/upload", upload.single("imagem"), async (req, res) => {
@@ -57,7 +79,7 @@ app.post("/api/upload", upload.single("imagem"), async (req, res) => {
     res.status(500).json({ error: "Erro ao enviar imagem" });
   }
 });
-//
+// Fim carregar imagens do Buckets Supabase
 
 app.use(cors());
 app.use(express.json());
