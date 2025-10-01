@@ -20,6 +20,45 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+// Carregar imagens do Buckets Supabase
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() }); // mantém em memória
+// Carregar imagens do Buckets Supabase
+
+app.post("/api/upload", upload.single("imagem"), async (req, res) => {
+  try {
+    if (!req.file)
+      return res.status(400).json({ error: "Nenhum arquivo enviado" });
+
+    const file = req.file;
+    const fileExt = file.originalname.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}.${fileExt}`;
+    const filePath = `cardapio/${fileName}`;
+
+    // Faz upload para o Supabase Storage
+    const { data, error } = await supabase.storage
+      .from("imagens")
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+      });
+
+    if (error) throw error;
+
+    // Gera URL pública
+    const { data: publicUrl } = supabase.storage
+      .from("imagens")
+      .getPublicUrl(filePath);
+
+    res.json({ url: publicUrl.publicUrl });
+  } catch (err) {
+    console.error("Erro ao enviar imagem:", err);
+    res.status(500).json({ error: "Erro ao enviar imagem" });
+  }
+});
+//
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));

@@ -559,13 +559,41 @@ function App() {
                 required
               />
               <input
-                type="text"
-                name="imagem"
-                placeholder="URL da Imagem"
-                value={itemForm.imagem}
-                onChange={handleItemFormChange}
-                required
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+
+                  // Preview local
+                  const previewUrl = URL.createObjectURL(file);
+                  setItemForm({ ...itemForm, imagem: previewUrl });
+
+                  // Upload para backend (que manda ao Supabase)
+                  const formData = new FormData();
+                  formData.append("imagem", file);
+
+                  try {
+                    const res = await fetch("/api/upload", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                      setItemForm((prev) => ({ ...prev, imagem: data.url }));
+                    }
+                  } catch (err) {
+                    console.error("Erro ao enviar imagem:", err);
+                  }
+                }}
               />
+              {itemForm.imagem && (
+                <img
+                  src={itemForm.imagem}
+                  alt="Prévia"
+                  style={{ maxWidth: "200px", marginTop: "10px" }}
+                />
+              )}
 
               <select
                 name="categoria"
@@ -592,7 +620,7 @@ function App() {
             <h3>Itens Atuais</h3>
             {cardapio.map((item) => (
               <div key={item.id} className="item-cardapio-admin">
-                <img src={`/${item.imagem}`} alt={item.nome} />
+                <img src={item.imagem} alt={item.nome} />
                 <div className="item-info-admin">
                   <h4>{item.nome}</h4>
                   <p class="valor-item-info-admin">
