@@ -47,38 +47,48 @@ const upload = multer({
 });
 // Carregar imagens do Buckets Supabase
 
-app.post("/api/upload", upload.single("imagem"), async (req, res) => {
-  try {
-    if (!req.file)
+app.post("/api/upload", (req, res) => {
+  upload.single("imagem")(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ error: "file too large" });
+      }
+      return res.status(400).json({ error: err.message });
+    }
+
+    if (!req.file) {
       return res.status(400).json({ error: "Nenhum arquivo enviado" });
+    }
 
-    const file = req.file;
-    const fileExt = file.originalname.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(2)}.${fileExt}`;
-    const filePath = `cardapio/${fileName}`;
+    try {
+      const file = req.file;
+      const fileExt = file.originalname.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}.${fileExt}`;
+      const filePath = `cardapio/${fileName}`;
 
-    // Faz upload para o Supabase Storage
-    const { data, error } = await supabase.storage
-      .from("imagens")
-      .upload(filePath, file.buffer, {
-        contentType: file.mimetype,
-      });
+      // Upload no Supabase
+      const { data, error } = await supabase.storage
+        .from("imagens")
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+        });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    // Gera URL pública
-    const { data: publicUrl } = supabase.storage
-      .from("imagens")
-      .getPublicUrl(filePath);
+      const { data: publicUrl } = supabase.storage
+        .from("imagens")
+        .getPublicUrl(filePath);
 
-    res.json({ url: publicUrl.publicUrl });
-  } catch (err) {
-    console.error("Erro ao enviar imagem:", err);
-    res.status(500).json({ error: "Erro ao enviar imagem" });
-  }
+      return res.json({ url: publicUrl.publicUrl });
+    } catch (uploadErr) {
+      console.error("Erro ao enviar imagem:", uploadErr);
+      return res.status(500).json({ error: "Erro ao enviar imagem" });
+    }
+  });
 });
+
 // Fim carregar imagens do Buckets Supabase
 
 app.use(cors());

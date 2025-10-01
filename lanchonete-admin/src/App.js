@@ -579,10 +579,35 @@ function App() {
                       body: formData,
                     });
                     const data = await res.json();
+
+                    if (!res.ok) {
+                      // Trata mensagens vindas do backend
+                      if (data.error?.includes("file too large")) {
+                        alert(
+                          "⚠️ A imagem é muito grande. O limite é de 2 MB."
+                        );
+                      } else if (
+                        data.error?.includes("Tipo de arquivo inválido")
+                      ) {
+                        alert(
+                          "⚠️ Formato inválido. Use apenas JPG, PNG ou WEBP."
+                        );
+                      } else {
+                        alert(
+                          "⚠️ Erro ao enviar imagem: " +
+                            (data.error || "desconhecido")
+                        );
+                      }
+                      return;
+                    }
+
                     if (data.url) {
                       setItemForm((prev) => ({ ...prev, imagem: data.url }));
                     }
                   } catch (err) {
+                    alert(
+                      "❌ Falha na conexão com o servidor. Tente novamente."
+                    );
                     console.error("Erro ao enviar imagem:", err);
                   }
                 }}
