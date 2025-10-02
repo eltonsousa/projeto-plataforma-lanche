@@ -548,65 +548,78 @@ function App() {
                 step="0.01"
                 required
               />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  const file = e.target.files[0];
-                  if (!file) return;
+              <div className="custom-file-upload">
+                <input
+                  type="file"
+                  id="file-upload"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
 
-                  // Preview local
-                  const previewUrl = URL.createObjectURL(file);
-                  setItemForm({ ...itemForm, imagem: previewUrl });
+                    // Preview local
+                    const previewUrl = URL.createObjectURL(file);
+                    setItemForm({ ...itemForm, imagem: previewUrl });
 
-                  // Upload para backend (que manda ao Supabase)
-                  const formData = new FormData();
-                  formData.append("imagem", file);
+                    // Upload para backend (que manda ao Supabase)
+                    const formData = new FormData();
+                    formData.append("imagem", file);
 
-                  setIsImageUploading(true);
+                    setIsImageUploading(true);
 
-                  try {
-                    const res = await fetch("/api/upload", {
-                      method: "POST",
-                      body: formData,
-                    });
-                    const data = await res.json();
+                    try {
+                      const res = await fetch("/api/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const data = await res.json();
 
-                    if (!res.ok) {
-                      // Trata mensagens vindas do backend
-                      if (data.error?.includes("file too large")) {
-                        alert(
-                          "⚠️ A imagem é muito grande. O limite é de 2 MB."
-                        );
-                      } else if (
-                        data.error?.includes("Tipo de arquivo inválido")
-                      ) {
-                        alert(
-                          "⚠️ Formato inválido. Use apenas JPG, PNG ou WEBP."
-                        );
-                      } else {
-                        alert(
-                          "⚠️ Erro ao enviar imagem: " +
-                            (data.error || "desconhecido")
-                        );
+                      if (!res.ok) {
+                        // Trata mensagens vindas do backend
+                        if (data.error?.includes("file too large")) {
+                          alert(
+                            "⚠️ A imagem é muito grande. O limite é de 2 MB."
+                          );
+                        } else if (
+                          data.error?.includes("Tipo de arquivo inválido")
+                        ) {
+                          alert(
+                            "⚠️ Formato inválido. Use apenas JPG, PNG ou WEBP."
+                          );
+                        } else {
+                          alert(
+                            "⚠️ Erro ao enviar imagem: " +
+                              (data.error || "desconhecido")
+                          );
+                        }
+                        return;
                       }
-                      return;
-                    }
 
-                    if (data.url) {
-                      setItemForm((prev) => ({ ...prev, imagem: data.url }));
+                      if (data.url) {
+                        setItemForm((prev) => ({ ...prev, imagem: data.url }));
+                      }
+                    } catch (err) {
+                      alert(
+                        "❌ Falha na conexão com o servidor. Tente novamente."
+                      );
+                      console.error("Erro ao enviar imagem:", err);
+                    } finally {
+                      setIsImageUploading(false);
+                      e.target.value = null;
                     }
-                  } catch (err) {
-                    alert(
-                      "❌ Falha na conexão com o servidor. Tente novamente."
-                    );
-                    console.error("Erro ao enviar imagem:", err);
-                  } finally {
-                    setIsImageUploading(false);
-                    e.target.value = null;
-                  }
-                }}
-              />
+                  }}
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="btn btn-laranja btn-upload"
+                >
+                  {isImageUploading
+                    ? "Carregando..."
+                    : itemForm.imagem
+                    ? "Trocar Imagem"
+                    : "Escolher Imagem"}
+                </label>
+              </div>
 
               {isImageUploading && (
                 <p style={{ color: "#3f51b5", fontWeight: "bold" }}>
