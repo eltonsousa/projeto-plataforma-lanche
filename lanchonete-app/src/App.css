@@ -103,10 +103,12 @@ header {
 footer {
   margin-top: auto;
   background-color: var(--cor-laranja);
+  padding: 1rem;
+}
+footer p {
   color: var(--cor-branco);
   text-align: center;
-  padding: 1rem;
-  font-size: 1rem;
+  font-size: 0.8rem;
 }
 
 /* =============================== */

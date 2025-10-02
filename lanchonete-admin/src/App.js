@@ -672,7 +672,9 @@ function App() {
         </main>
       )}
       <footer>
-        <p>&copy; 2025 Manú Lanches. Todos os direitos reservados.</p>
+        <p className="footer-admin">
+          &copy; 2025 Manú Lanches. Todos os direitos reservados.
+        </p>
       </footer>
     </div>
   );

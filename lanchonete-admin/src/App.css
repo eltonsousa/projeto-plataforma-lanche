@@ -103,7 +103,7 @@ body {
 }
 
 /* Footer fixo no final (igual ao header) */
-.painel-admin footer {
+footer {
   margin-top: auto;
   background-color: var(--cor-azul);
   color: var(--cor-branco);
@@ -111,8 +111,10 @@ body {
   padding: 1rem;
 }
 
-.painel-admin footer p {
-  font-size: 0.8rem;
+footer p.footer-admin {
+  margin: 0;
+  font-weight: normal;
+  font-size: .8rem;
 }
 
 /* Cabeçalho */
