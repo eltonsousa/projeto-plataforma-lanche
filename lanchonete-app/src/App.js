@@ -328,10 +328,18 @@ function App() {
                   className={
                     categoriaSelecionada === cat ? "categoria-ativa" : ""
                   }
-                  // Ao clicar, atualiza o estado de filtro
-                  onClick={() => setCategoriaSelecionada(cat)}
+                  // 🟢 ATUALIZAÇÃO: Adicionamos o evento 'e' para rolar o elemento
+                  onClick={(e) => {
+                    setCategoriaSelecionada(cat);
+
+                    // 🟢 CRÍTICO: Rola o botão clicado para a esquerda (start) do contêiner
+                    e.currentTarget.scrollIntoView({
+                      behavior: "smooth", // Efeito de rolagem suave
+                      inline: "start", // Rola para o início do contêiner
+                      block: "nearest", // Garante que o elemento esteja visível na vertical
+                    });
+                  }}
                 >
-                  {/* 🟢 Ícone antes do texto */}
                   <span className="categoria-icon">{getCategoryIcon(cat)}</span>
                   {cat}
                 </button>
