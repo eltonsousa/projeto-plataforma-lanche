@@ -3,7 +3,7 @@ import CardapioItem from "./CardapioItem";
 import "./App.css";
 
 // --- Import de ìcones "react-icons/bs"
-import { BsCart3, BsTags, BsCashCoin, BsPhone } from "react-icons/bs";
+import { BsCart3, BsCashCoin, BsPhone } from "react-icons/bs";
 
 // --- Importe iconesd "react-icons/ai"
 import {
@@ -14,6 +14,8 @@ import {
   AiOutlineCheck,
   AiOutlineUser,
 } from "react-icons/ai";
+
+import { CiDeliveryTruck } from "react-icons/ci";
 
 // --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
@@ -503,12 +505,13 @@ function App() {
                 onChange={(e) => setTelefone(e.target.value)}
                 pattern="[0-9]{11}"
                 title="Formato: 11987654321"
+                placeholder="92999999999"
               />
             </label>
 
             <label>
               <div className="icones-finalizar-pedido">
-                <BsTags />
+                <CiDeliveryTruck size={18} />
                 Tipo de Serviço:
               </div>
 
