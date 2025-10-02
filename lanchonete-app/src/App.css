@@ -461,6 +461,16 @@ footer {
   text-align: center;
 }
 
+.icones-finalizar-pedido {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icones-finalizar-pedido svg {
+  color: var(--cor-laranja);
+}
+
 .resumo-pedido {
   text-align: left;
   background-color: #f9f9f9;
@@ -493,6 +503,9 @@ footer {
 }
 
 .checkout-container .btn {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
   width: 100%;
 }
 
@@ -921,3 +934,4 @@ footer {
     /* esconde botão em telas muito pequenas */
   }
 }
+

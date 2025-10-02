@@ -2,16 +2,18 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 
-// --- Import de ìcones
-import { BsCart3 } from "react-icons/bs";
+// --- Import de ìcones "react-icons/bs"
+import { BsCart3, BsTags, BsCashCoin, BsPhone } from "react-icons/bs";
+
+// --- Importe iconesd "react-icons/ai"
 import {
   AiOutlineMinus,
   AiOutlinePlus,
   AiOutlineDelete,
   AiOutlineClose,
   AiOutlineCheck,
+  AiOutlineUser,
 } from "react-icons/ai";
-// --- Import de ìcones
 
 // --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
@@ -479,13 +481,20 @@ function App() {
           <h2>Finalizar Pedido</h2>
           <form onSubmit={handleCheckoutSubmit}>
             <label>
-              Nome:
+              <div className="icones-finalizar-pedido">
+                <AiOutlineUser />
+                Nome:
+              </div>
               <input type="text" name="nome" required />
             </label>
 
             {/* --- NOVO CAMPO --- */}
             <label>
-              Telefone (com DDD, somente números):
+              <div className="icones-finalizar-pedido">
+                <BsPhone />
+                Telefone (com DDD, somente números):
+              </div>
+
               <input
                 type="tel"
                 name="telefone"
@@ -498,7 +507,11 @@ function App() {
             </label>
 
             <label>
-              Tipo de Serviço:
+              <div className="icones-finalizar-pedido">
+                <BsTags />
+                Tipo de Serviço:
+              </div>
+
               <select
                 name="servico"
                 required
@@ -519,7 +532,11 @@ function App() {
             )}
 
             <label>
-              Forma de Pagamento:
+              <div className="icones-finalizar-pedido">
+                <BsCashCoin />
+                Forma de Pagamento:
+              </div>
+
               <select
                 name="pagamento"
                 required
