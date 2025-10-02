@@ -3,18 +3,6 @@ import "./App.css";
 
 // --- Import de ìcones
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from "react-icons/ai";
-// import {
-//   AiOutlineMinus,
-//   AiOutlinePlus,
-//   AiOutlineDelete,
-//   AiOutlineClose,
-//   AiOutlineCheck,
-// } from "react-icons/ai";
-// <AiOutlineMinus size={20} />
-// <AiOutlinePlus size={20} />
-// <AiOutlineDelete size={20} />
-// <AiOutlineCheck />
-// <AiOutlineClose/>
 // --- Import de ìcones
 
 function App() {
@@ -52,6 +40,8 @@ function App() {
     faturamento: "0.00",
   });
   const [filtroStatus, setFiltroStatus] = useState("todos"); // Novo filtro de status
+
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   // FUNÇÕES DE PEDIDOS E RELATÓRIOS (Atualizadas)
 
@@ -573,6 +563,8 @@ function App() {
                   const formData = new FormData();
                   formData.append("imagem", file);
 
+                  setIsImageUploading(true);
+
                   try {
                     const res = await fetch("/api/upload", {
                       method: "POST",
@@ -609,9 +601,19 @@ function App() {
                       "❌ Falha na conexão com o servidor. Tente novamente."
                     );
                     console.error("Erro ao enviar imagem:", err);
+                  } finally {
+                    setIsImageUploading(false);
+                    e.target.value = null;
                   }
                 }}
               />
+
+              {isImageUploading && (
+                <p style={{ color: "#3f51b5", fontWeight: "bold" }}>
+                  Enviando Imagem... Aguarde.
+                </p>
+              )}
+
               {itemForm.imagem && (
                 <img
                   src={itemForm.imagem}
@@ -635,7 +637,11 @@ function App() {
                 <option value="Comidas">Comidas</option>
               </select>
 
-              <button class="btn-add-item btn btn-verde" type="submit">
+              <button
+                class="btn-add-item btn btn-verde"
+                type="submit"
+                disabled={isImageUploading}
+              >
                 <AiOutlineCheck size={20} />{" "}
                 {isEditing ? "Salvar Alterações" : "Adicionar Item"}
               </button>
