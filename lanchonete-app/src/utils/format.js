@@ -1,9 +1,4 @@
-// src/utils/format.js
 export const formatPrice = (value) => {
-  if (value === null || value === undefined || isNaN(value)) return "R$ 0,00";
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  });
+  const number = typeof value === "string" ? parseFloat(value) : value;
+  return number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 };

@@ -253,7 +253,7 @@ function App() {
       servico: servico,
       endereco: servico === "entrega" ? formData.get("endereco") : "",
       pagamento: pagamento,
-      troco: pagamento === "dinheiro" ? formData.get("troco") : "",
+      troco: pagamento === "dinheiro" ? parseFloat(formData.get("troco")) : 0,
     };
 
     const dadosDoPedido = {
@@ -389,14 +389,14 @@ function App() {
                     <div className="carrinho-botoes">
                       <div className="quantidade-botoes-carrinho">
                         <button
-                          class="btn btn-vermelho btn-circle"
+                          className="btn btn-vermelho btn-circle"
                           onClick={() => diminuirQuantidade(item.id)}
                         >
                           <AiOutlineMinus size={20} />
                         </button>
                         <span>{item.quantidade}</span>
                         <button
-                          class="btn btn-verde btn-circle"
+                          className="btn btn-verde btn-circle"
                           onClick={() => aumentarQuantidade(item.id)}
                         >
                           <AiOutlinePlus size={20} />
@@ -446,9 +446,9 @@ function App() {
             {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
               <>
                 <div className="quantidade-botoes">
-                  <div class="modal-actions-bar">
+                  <div className="modal-actions-bar">
                     <button
-                      class="btn btn-vermelho btn-circle"
+                      className="btn btn-vermelho btn-circle"
                       onClick={() => diminuirQuantidade(produtoSelecionado.id)}
                     >
                       <AiOutlineMinus size={20} />
@@ -460,7 +460,7 @@ function App() {
                       }
                     </span>
                     <button
-                      class="btn btn-verde btn-circle"
+                      className="btn btn-verde btn-circle"
                       onClick={() => aumentarQuantidade(produtoSelecionado.id)}
                     >
                       <AiOutlinePlus size={20} />
