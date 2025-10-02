@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
+import "./styles/checkout.css";
 import { formatPrice } from "./utils/format";
 
 // --- Import de ìcones "react-icons/bs"
@@ -580,7 +581,10 @@ function App() {
               </label>
             )}
 
-            <button type="submit" className="btn btn-verde">
+            <button
+              type="submit"
+              className="btn-confirmar-pedido btn btn-verde"
+            >
               <AiOutlineCheck />
               Confirmar Pedido
             </button>

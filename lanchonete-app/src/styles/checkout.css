@@ -1,0 +1,113 @@
+/* =============================== */
+/* Checkout & Confirmação (Visual Melhorado) */
+/* =============================== */
+.checkout-container,
+.confirmacao-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+  width: 85%;
+  max-width: 500px;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+.checkout-container h2 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  color: var(--cor-laranja);
+  font-size: 1.6rem;
+}
+
+.checkout-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.checkout-container label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkout-container input,
+.checkout-container select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.checkout-container input:focus,
+.checkout-container select:focus {
+  border-color: var(--cor-laranja);
+  box-shadow: var(--shadow-lg);
+  outline: none;
+}
+
+.confirmacao-container h2 {
+  color: var(--cor-verde);
+  margin-top: 0;
+  text-align: center;
+}
+
+.icones-finalizar-pedido {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icones-finalizar-pedido svg {
+  color: var(--cor-laranja);
+}
+
+.resumo-pedido {
+  text-align: left;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.resumo-pedido ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.resumo-pedido li {
+  padding: 6px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.resumo-pedido li:last-child {
+  border-bottom: none;
+}
+
+.total-resumo {
+  text-align: right;
+  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.checkout-container button.btn-confirmar-pedido {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+/* =============================== */
+/* Fim checkout-container */
+/* =============================== */

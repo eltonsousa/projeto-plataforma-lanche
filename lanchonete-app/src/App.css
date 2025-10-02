@@ -403,7 +403,7 @@ footer p {
 /* =============================== */
 /* Checkout & Confirmação (Visual Melhorado) */
 /* =============================== */
-.checkout-container,
+/* .checkout-container,
 .confirmacao-container {
   position: fixed;
   top: 50%;
@@ -504,12 +504,16 @@ footer p {
   font-weight: bold;
 }
 
-.checkout-container .btn {
+.checkout-container button.btn-confirmar-pedido {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-}
+} */
+/* =============================== */
+/* Fim checkout-container */
+/* =============================== */
+
 
 /* =============================== */
 /* Modal de Detalhes (Visual Melhorado + Barra Mobile) */
