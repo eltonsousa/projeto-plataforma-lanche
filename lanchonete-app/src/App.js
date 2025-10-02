@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
+import { formatPrice } from "./utils/format";
 
 // --- Import de ìcones "react-icons/bs"
 import { BsCart3, BsCashCoin, BsPhone } from "react-icons/bs";
@@ -227,9 +228,11 @@ function App() {
   };
 
   const calcularTotal = () =>
-    carrinho
-      .reduce((total, item) => total + item.preco * item.quantidade, 0)
-      .toFixed(2);
+    carrinho.reduce(
+      (total, item) =>
+        total + parseFloat(item.preco) * parseInt(item.quantidade),
+      0
+    );
 
   const handleToggleCarrinho = () => {
     if (carrinho.length > 0) setMostraCarrinho(!mostraCarrinho);
@@ -380,8 +383,8 @@ function App() {
                 {carrinho.map((item) => (
                   <div key={item.id} className="carrinho-item">
                     <div className="item-info-carrinho">
-                      <p>{item.nome}</p>
-                      <p>R$ {(item.preco * item.quantidade).toFixed(2)}</p>
+                      <span>{item.nome}</span>
+                      <span>{formatPrice(item.preco * item.quantidade)}</span>
                     </div>
                     <div className="carrinho-botoes">
                       <div className="quantidade-botoes-carrinho">
@@ -410,7 +413,7 @@ function App() {
                 ))}
               </div>
               <div className="carrinho-total">
-                <h3>Total: R$ {calcularTotal()}</h3>
+                <h3>Total: {formatPrice(calcularTotal())}</h3>
                 <button
                   className="btn btn-laranja"
                   onClick={handleFinalizarPedido}
@@ -437,7 +440,7 @@ function App() {
             <h2>{produtoSelecionado.nome}</h2>
             <p>{produtoSelecionado.descricao}</p>
             <span className="preco">
-              R$ {produtoSelecionado.preco.toFixed(2)}
+              {formatPrice(produtoSelecionado.preco)}
             </span>
 
             {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
@@ -471,11 +474,11 @@ function App() {
                   </div>
                 </div>
                 <div className="total-item">
-                  Total: R${" "}
-                  {(
+                  Total:{" "}
+                  {formatPrice(
                     carrinho.find((c) => c.id === produtoSelecionado.id)
                       ?.quantidade * produtoSelecionado.preco
-                  ).toFixed(2)}
+                  )}
                 </div>
               </>
             ) : (
@@ -595,13 +598,13 @@ function App() {
             <ul>
               {ultimoPedido.itens.map((item) => (
                 <li key={item.id}>
-                  {item.nome} (x{item.quantidade}) - R${" "}
-                  {(item.preco * item.quantidade).toFixed(2)}
+                  {item.nome} (x{item.quantidade}) -{" "}
+                  {formatPrice(item.preco * item.quantidade)}
                 </li>
               ))}
             </ul>
             <div className="total-resumo">
-              <strong>Total: R$ {ultimoPedido.total}</strong>
+              <strong>Total: {formatPrice(ultimoPedido.total)}</strong>
             </div>
           </div>
           <button onClick={handleNovoPedido} className="btn btn-laranja">
