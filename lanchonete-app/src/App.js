@@ -157,6 +157,22 @@ function App() {
     }
   }, []); // Dependências vazias, já que não usa estados externos
 
+  // 🟢 NOVO: Função para obter ícone baseado na categoria
+  const getCategoryIcon = (category) => {
+    switch (category) {
+      case "Sanduíches":
+        return "🍔"; // Hambúrguer
+      case "Bebidas":
+        return "🥤"; // Copo de bebida
+      case "Fritas":
+        return "🍟"; // Batata Frita
+      case "Comidas":
+        return "🍝"; // Macarrão/Prato
+      default:
+        return "";
+    }
+  };
+
   // --- EFEITOS ---
   useEffect(() => {
     // primeira carga com spinner
@@ -174,14 +190,6 @@ function App() {
     if (!cardapioLoading) saveCarrinhoToSupabase(carrinho);
     if (carrinho.length === 0) setMostraCarrinho(false);
   }, [carrinho, cardapioLoading, saveCarrinhoToSupabase]);
-
-  // ❌ REMOVIDO: Efeito de carregamento inicial (agora controlado por cardapioLoading)
-  /*
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500); // só libera depois de 0,5s
-    return () => clearTimeout(timer);
-  }, []);
-  */
 
   // --- FUNÇÕES DE CARRINHO ---
   const adicionarAoCarrinho = (item) => {
@@ -317,13 +325,14 @@ function App() {
               {["Sanduíches", "Bebidas", "Fritas", "Comidas"].map((cat) => (
                 <button
                   key={cat}
-                  // Adiciona a classe 'categoria-ativa' se for a selecionada
                   className={
                     categoriaSelecionada === cat ? "categoria-ativa" : ""
                   }
                   // Ao clicar, atualiza o estado de filtro
                   onClick={() => setCategoriaSelecionada(cat)}
                 >
+                  {/* 🟢 Ícone antes do texto */}
+                  <span className="categoria-icon">{getCategoryIcon(cat)}</span>
                   {cat}
                 </button>
               ))}

@@ -937,3 +937,61 @@ footer p {
   }
 }
 
+
+
+
+/* =============================== */
+/* ESTILO DA NAVEGAÇÃO DE CATEGORIAS */
+/* =============================== */
+
+.cardapio-categorias {
+  display: flex;
+  overflow-x: auto; /* Permite a rolagem horizontal */
+  white-space: nowrap; /* Impede a quebra de linha dos botões */
+  padding: 10px 0;
+  gap: 10px; /* Espaçamento entre os botões */
+  
+  /* Melhora a rolagem com o useDraggableScroll */
+  cursor: grab; 
+  user-select: none; /* Impede a seleção de texto ao arrastar */
+  
+  /* Esconde a barra de rolagem padrão (melhora o visual) */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Esconde a barra de rolagem (Chrome/Safari/Opera) */
+.cardapio-categorias::-webkit-scrollbar {
+  display: none;
+}
+
+.cardapio-categorias button {
+  /* Estilo base de 'Pill/Chip' */
+  border: 1px solid var(--cor-cinza-claro); /* Borda sutil */
+  background-color: var(--cor-branca);
+  color: var(--cor-cinza-escuro);
+  padding: 8px 15px;
+  border-radius: 20px; /* CHIP/PASTILHA */
+  flex-shrink: 0; /* Impede o encolhimento dos botões */
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex; /* Para alinhar o ícone e o texto */
+  align-items: center;
+}
+
+/* Estado Ativo: O mais importante visualmente */
+.cardapio-categorias .categoria-ativa {
+  background-color: var(--cor-laranja); /* Cor principal do tema */
+  color: var(--cor-branca);
+  border-color: var(--cor-laranja);
+  font-weight: bold;
+  /* Uma pequena sombra para dar destaque */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+/* Espaçamento do ícone */
+.categoria-icon {
+  margin-right: 6px;
+  font-size: 1.2rem;
+}
