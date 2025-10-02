@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 // Whatsapp
 const { Client, LocalAuth } = require("whatsapp-web.js");
@@ -62,29 +63,54 @@ app.post("/api/upload", (req, res) => {
 
     try {
       const file = req.file;
-      const fileExt = file.originalname.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(2)}.${fileExt}`;
-      const filePath = `cardapio/${fileName}`;
+      const fileBuffer = file.buffer; // O buffer contém os dados binários da imagem
+      const originalFileName = req.body.originalFileName || "image"; // Nome enviado pelo App.js
 
-      // Upload no Supabase
+      // 1. GERAÇÃO DO HASH DE CONTEÚDO (Deduplicação)
+      const hash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
+
+      // 2. CRIAÇÃO DO NOME DETERMINÍSTICO
+      // Pega a extensão original do arquivo
+      const fileExtension = originalFileName.split(".").pop() || "jpeg";
+      // Combina o hash do conteúdo e a extensão para um nome único e estável
+      const deterministicFileName = `${hash}.${fileExtension}`;
+
+      const filePath = `cardapio/${deterministicFileName}`;
+
+      // 3. UPLOAD/DEDUPLICAÇÃO USANDO SUPABASE STORAGE
+      // O Supabase Storage usa 'upsert: true' para reutilizar um arquivo se ele já existir
+      // com o mesmo nome, garantindo que não haja duplicação de arquivo físico
+      // se o conteúdo for idêntico e o nome (o hash) for o mesmo.
       const { data, error } = await supabase.storage
-        .from("imagens")
-        .upload(filePath, file.buffer, {
+        .from("imagens") // Altere o nome do seu Bucket se for diferente
+        .upload(filePath, fileBuffer, {
           contentType: file.mimetype,
+          upsert: true, // 🟢 CHAVE DA DEDUPLICAÇÃO: Sobrescreve ou cria, mas com nome determinístico
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro Supabase Storage:", error);
+        throw new Error(`Falha no Supabase: ${error.message}`);
+      }
 
-      const { data: publicUrl } = supabase.storage
+      // 4. RETORNA A URL PÚBLICA ESTÁVEL
+      const { data: publicURLData } = supabase.storage
         .from("imagens")
         .getPublicUrl(filePath);
 
-      return res.json({ url: publicUrl.publicUrl });
-    } catch (uploadErr) {
-      console.error("Erro ao enviar imagem:", uploadErr);
-      return res.status(500).json({ error: "Erro ao enviar imagem" });
+      if (!publicURLData.publicUrl) {
+        throw new Error("Falha ao gerar URL pública.");
+      }
+
+      // Retorna a URL estável baseada no hash
+      res.status(200).json({ url: publicURLData.publicUrl });
+    } catch (error) {
+      // Trata erros de limite de tamanho/tipo de arquivo do Multer/Supabase
+      let errorMessage = error.message;
+      if (errorMessage.includes("file too large")) {
+        errorMessage = "O arquivo é muito grande. Limite: 2 MB.";
+      }
+      res.status(500).json({ error: errorMessage });
     }
   });
 });
