@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 import "./styles/checkout.css";
+import "./styles/carrinho.css";
+
 import { formatPrice } from "./utils/format";
 
 // --- Import de ìcones "react-icons/bs"

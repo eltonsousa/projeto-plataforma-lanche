@@ -195,7 +195,7 @@ footer p {
 /* =============================== */
 /* Carrinho Flutuante               */
 /* =============================== */
-.carrinho-icon-btn {
+/* .carrinho-icon-btn {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -397,7 +397,8 @@ footer p {
 
 .carrinho-total .finalizar-pedido:hover {
   background: var(--cor-verde-hover);
-}
+} */
+/* Fim Carrinho */
 
 
 /* =============================== */
