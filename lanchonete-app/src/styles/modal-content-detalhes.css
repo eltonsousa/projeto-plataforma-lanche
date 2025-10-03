@@ -1,3 +1,35 @@
+:root {
+  /* 🎨 Paleta de Cores */
+  /* Cor predominante (identidade iFood) */
+  --cor-principal: #EA1D2C;       /* Vermelho iFood */
+  --cor-principal-hover: #c41624; /* Vermelho escuro p/ hover */
+
+  /* Suporte e Destaques */
+  --cor-secundaria: #ff9f43; /* Laranja claro para chamar atenção */
+  --cor-secundaria-hover: #e0861e;
+
+  /* Confirmação / Sucesso */
+  --cor-verde: #27ae60; /* Verde vibrante */
+  --cor-verde-hover: #1e874b;
+
+  /* Erros / Alertas */
+  --cor-vermelho: #dc3545; /* Vermelho de alerta (mais neutro) */
+
+  /* Links / Informações */
+  --cor-azul: #3498db; /* Azul moderno */
+  --cor-azul-hover: #217dbb;
+
+  --cor-cinza-claro: #f4f4f4;
+  --cor-cinza-medio: #666;
+  --cor-cinza-medio-hover: #333;
+  --cor-branco: #fff;
+
+  /* 🌑 Sombras */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
 /* =================================================== */
 /* Modal de Detalhes (Visual Melhorado + Barra Mobile) */
 /* =================================================== */
@@ -140,8 +172,8 @@
   transform: scale(1.1);
 }
 
-.modal-content .btn.btn-verde:hover {
-  background-color: var(--cor-verde-hover);
+.modal-content button.btn.btn-verde {
+  background-color: var(--cor-verde);
 }
 /* ================== */
 /* Fim Modal detalhes */
