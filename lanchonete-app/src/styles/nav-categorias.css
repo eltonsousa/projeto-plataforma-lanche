@@ -1,0 +1,122 @@
+/* =============================== */
+/* Novo Menu de Categorias         */
+/* =============================== */
+.cardapio-categorias {
+  display: flex;
+  justify-content: flex-start;
+  /* Alinha para a esquerda */
+  gap: 15px;
+  margin: 30px 0 20px 0;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  scroll-behavior: smooth;
+  /* --- ROLAGEM HORIZONTAL E ARRASTAR COM MOUSE/TOQUE --- */
+  overflow-x: auto;
+  /* Habilita a rolagem horizontal */
+  white-space: nowrap;
+  /* Impede a quebra de linha dos botões */
+  -webkit-overflow-scrolling: touch;
+  /* Melhora a rolagem em iOS */
+  cursor: grab;
+  /* Indica que é arrastável (para desktop) */
+  /* Oculta a barra de rolagem */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* 🟢 NOVO: Muda o cursor para "grabbing" quando o mouse está pressionado */
+.cardapio-categorias:active {
+  cursor: grabbing;
+}
+
+/* Oculta a barra de rolagem em Webkit (Chrome, Safari) */
+.cardapio-categorias::-webkit-scrollbar {
+  display: none;
+}
+
+.cardapio-categorias button {
+  background-color: #f4f4f4;
+  color: var(--cor-laranja);
+  /* Cor principal (tomate) */
+  border: 1px solid var(--cor-laranja);
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  min-width: 120px;
+}
+
+/* Estilo para a categoria ativa */
+.cardapio-categorias button.categoria-ativa {
+  background-color: var(--cor-laranja);
+  color: var(--cor-branco);
+  box-shadow: 0 4px 8px rgba(255, 99, 71, 0.4);
+}
+
+.cardapio-categorias button:hover:not(.categoria-ativa) {
+  background-color: #ffe0db;
+  /* Cor mais clara no hover */
+}
+
+/* =============================== */
+/* ESTILO DA NAVEGAÇÃO DE CATEGORIAS */
+/* =============================== */
+
+.cardapio-categorias {
+  display: flex;
+  overflow-x: auto; /* Permite a rolagem horizontal */
+  white-space: nowrap; /* Impede a quebra de linha dos botões */
+  padding: 10px 0;
+  gap: 10px; /* Espaçamento entre os botões */
+  
+  /* Melhora a rolagem com o useDraggableScroll */
+  cursor: grab; 
+  user-select: none; /* Impede a seleção de texto ao arrastar */
+  
+  /* Esconde a barra de rolagem padrão (melhora o visual) */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Esconde a barra de rolagem (Chrome/Safari/Opera) */
+.cardapio-categorias::-webkit-scrollbar {
+  display: none;
+}
+
+.cardapio-categorias button {
+  /* Estilo base de 'Pill/Chip' */
+  border: 1px solid var(--cor-cinza-claro); /* Borda sutil */
+  background-color: var(--cor-branca);
+  color: var(--cor-cinza-escuro);
+  padding: 8px 15px;
+  border-radius: 20px; /* CHIP/PASTILHA */
+  flex-shrink: 0; /* Impede o encolhimento dos botões */
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex; /* Para alinhar o ícone e o texto */
+  align-items: center;
+}
+
+/* Estado Ativo: O mais importante visualmente */
+.cardapio-categorias .categoria-ativa {
+  background-color: var(--cor-laranja); /* Cor principal do tema */
+  color: var(--cor-branca);
+  border-color: var(--cor-laranja);
+  font-weight: bold;
+  /* Uma pequena sombra para dar destaque */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+/* Espaçamento do ícone */
+.categoria-icon {
+  margin-right: 6px;
+  font-size: 1.2rem;
+}

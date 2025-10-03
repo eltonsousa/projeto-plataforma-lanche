@@ -1,0 +1,159 @@
+/* =============================== */
+/* Cardápio                        */
+/* =============================== */
+.cardapio {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+
+}
+
+.cardapio-item {
+  background-color: var(--cor-branco);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  width: 95%;
+  max-width: 700px;
+  margin: 0 auto;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+}
+
+.cardapio-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardapio-item img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.cardapio-item h2 {
+  font-size: 1.2rem;
+  margin: 10px 0px 0px 0px;
+  color: #333;
+}
+
+.cardapio-item p {
+  font-size: 0.8rem;
+  color: #666;
+  height: 60px;
+  margin: 10px 30px 0px 0px;
+  overflow: hidden;
+}
+
+.cardapio-item button.btn-verde {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 10px 15px;
+}
+
+.preco {
+  font-size: 1.4rem;
+  color: var(--cor-laranja);
+  font-weight: bold;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Adiciona um pouco de margem na lista de cardápio para não encostar na nav */
+.cardapio {
+  /* ... (manter estilos existentes) ... */
+  padding-top: 0;
+  /* Remove o padding-top se houver */
+}
+
+/* Estilo para mensagem de Sem Itens */
+.sem-itens-cardapio {
+  text-align: center;
+  margin: 50px 0;
+  color: #777;
+  font-size: 1.2rem;
+}
+
+/* =============================== */
+/* Responsividade                  */
+/* =============================== */
+@media (max-width: 768px) {
+  .cardapio-item {
+    padding: 10px;
+  }
+
+  .cardapio-item img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .cardapio-item h2 {
+    font-size: 1.2rem;
+  }
+
+  .cardapio-item p {
+    font-size: 0.8rem;
+    overflow: hidden;
+    max-width: 400px;
+  }
+
+  .btn.btn-verde {
+    font-size: 0.8rem;
+    padding: 7px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardapio-item p {
+    max-width: 200px;
+  }
+}
+
+/* Botão "Adicionar" compacto em telas menores */
+@media (max-width: 450px) {
+  .cardapio-item button.btn.btn-verde {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .cardapio-item button.btn.btn-verde svg {
+    width: 20px;
+    /* deixa o ícone maior */
+    height: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .cardapio-item p {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 350px) {
+
+  .cardapio-item p {
+    max-width: 120px;
+  }
+
+  .cardapio-item button.btn.btn-verde {
+    display: none;
+    /* esconde botão em telas muito pequenas */
+  }
+}

@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
+import "./styles/cardapio.css";
 import "./styles/checkout.css";
 import "./styles/carrinho.css";
+import "./styles/modal-content-detalhes.css";
+import "./styles/nav-categorias.css";
 
 import { formatPrice } from "./utils/format";
 

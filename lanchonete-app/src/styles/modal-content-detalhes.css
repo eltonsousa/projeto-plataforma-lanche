@@ -1,0 +1,265 @@
+/* =================================================== */
+/* Modal de Detalhes (Visual Melhorado + Barra Mobile) */
+/* =================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  padding: 25px;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.modal-content h2 {
+  margin: 10px 0;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-content p {
+  font-size: 1rem;
+  color: #666;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+.modal-content .preco {
+  font-size: 1.3rem;
+  color: var(--cor-laranja);
+  font-weight: bold;
+  display: block;
+  margin: 20px 0;
+}
+
+.modal-content .total-item {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--cor-verde);
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Modal detalhes */
+.quantidade-botoes .modal-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  /* controla o espaçamento uniforme */
+  margin-top: 20px;
+  flex-wrap: nowrap;
+}
+
+.quantidade-botoes .modal-actions-bar .btn-circle {
+  width: 44px;
+  height: 44px;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.quantidade-botoes .modal-actions-bar .btn-circle.btn-verde {
+  background: var(--cor-verde);
+  color: var(--cor-branco);
+}
+
+.quantidade-botoes .modal-actions-bar .btn-circle.btn-verde:hover {
+  background: var(--cor-verde-hover);
+}
+
+.quantidade-botoes .modal-actions-bar .btn-circle.btn-vermelho {
+  background: var(--cor-vermelho);
+  color: var(--cor-branco);
+}
+
+.quantidade-botoes .modal-actions-bar .btn-circle.btn-vermelho:hover {
+  background: var(--cor-vermelho-hover);
+}
+
+.quantidade-botoes .modal-actions-bar span {
+  min-width: 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+}
+
+.modal-close-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 2rem;
+  color: var(--cor-laranja);
+  background-color: var(--cor-branco);
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px var(--shadow-lg);
+  transition: background-color 0.3s, color 0.3s, transform 0.2s;
+}
+
+.modal-close-icon:hover {
+  background-color: var(--cor-laranja);
+  color: var(--cor-branco);
+  transform: scale(1.1);
+}
+
+.modal-content .btn.btn-verde {
+  padding: 10px 20px;
+  font-size: 1rem;
+}
+
+.modal-content .btn.btn-verde:hover {
+  background-color: var(--cor-verde-hover);
+}
+/* ================== */
+/* Fim Modal detalhes */
+/* ================== */
+
+/* =============================== */
+/* Barra fixa de ações no mobile   */
+/* =============================== */
+@media (max-width: 480px) {
+  .quantidade-botoes .modal-content {
+    padding-bottom: 80px;
+    /* espaço para a barra fixa */
+  }
+
+  .quantidade-botoes .modal-actions-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-sm);
+    z-index: 250;
+  }
+
+  .quantidade-botoes .modal-actions-bar.btn.btn-circle {
+    flex: 1;
+    font-size: 1rem;
+  }
+
+
+  .quantidade-botoes .modal-actions-bar span {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .quantidade-botoes .modal-actions-bar .btn-circle {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 1.2rem;
+  }
+
+  .quantidade-botoes .modal-actions-bar .btn-circle.btn-vermelho {
+    background: #f44336;
+    border-radius: 50%;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    max-width: 320px;
+    padding: 15px;
+    max-height: 85vh;
+  }
+
+  .modal-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-content p {
+    font-size: 0.9rem;
+  }
+
+  .modal-content .preco {
+    font-size: 1.1rem;
+  }
+
+  .cardapio-item p {
+    max-width: 200px;
+  }
+}
+
+/* Botão "Adicionar" compacto em telas menores */
+@media (max-width: 450px) {
+  
+}
+
+@media (max-width: 400px) {
+
+}
+
+@media (max-width: 350px) {
+  .modal-content {
+    max-width: 300px;
+    padding: 12px;
+  }
+
+  .modal-content h2 {
+    font-size: 1.1rem;
+  }
+
+  .modal-content p {
+    font-size: 0.85rem;
+  }
+
+  .modal-content .preco {
+    font-size: 1rem;
+  }
+
+}
