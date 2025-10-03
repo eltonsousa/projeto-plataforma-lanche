@@ -6,7 +6,7 @@
   top: 20px;
   right: 20px;
   background-color: var(--cor-branco);
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
   border: none;
   border-radius: 50%;
   width: 50px;
@@ -22,7 +22,7 @@
 }
 
 .carrinho-icon-btn:hover {
-  background-color: var(--cor-laranja);
+  background-color: var(--cor-principal);
   color: var(--cor-branco);
   transform: scale(1.05);
 }
@@ -49,7 +49,7 @@
   position: fixed;
   top: 100px;
   right: 20px;
-  background: #fff;
+  background: var(--cor-cinza-claro);
   border-radius: 12px;
   box-shadow: var(--shadow-md);
   width: 30vh;
@@ -63,11 +63,11 @@
 
 .carrinho-container h2 {
   text-align: center;
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
   font-size: 1.4rem;
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--cor-laranja);
+  border-bottom: 2px solid var(--cor-principal);
 }
 
 .carrinho-itens {
@@ -80,7 +80,7 @@
 .carrinho-item {
   display: flex;
   flex-direction: column;
-  background: #fafafa;
+  background: var(--cor-cinza-claro);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
@@ -104,7 +104,7 @@
   margin: 0px 0px 10px 0px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #333;
+  color: var(--cor-cinza-medio-hover);
 }
 
 .carrinho-botoes {
@@ -132,14 +132,14 @@
 }
 
 .quantidade-botoes-carrinho .btn-circle.btn-vermelho:hover {
-  background: var(--cor-vermelho-hover);
+  background: var(--cor-principal-hover);
 }
 
 .quantidade-botoes-carrinho .btn-circle.btn-verde {
   width: 34px;
   height: 34px;
   border: none;
-  color: #fff;
+  color: var(--cor-cinza-claro);
   font-weight: bold;
   font-size: 1rem;
   padding: 0px;
@@ -156,13 +156,13 @@
   min-width: 24px;
   text-align: center;
   font-weight: bold;
-  color: #444;
+  color: var(--cor-cinza-medio-hover);
 }
 
 .remover-item.btn-circle.btn-vermelho {
   width: 34px;
   height: 34px;
-  background: #f44336;
+  background: var(--cor-principal);
   border: none;
   color: var(--cor-branco);
   padding: 0px;
@@ -173,18 +173,18 @@
 }
 
 .remover-item:hover {
-  background: #d32f2f;
+  background: var(--cor-principal-hover);
 }
 
 .carrinho-total {
-  border-top: 2px solid #eee;
+  border-top: 2px solid var(--cor-cinza-claro);
   padding-top: 1rem;
   text-align: right;
 }
 
 .carrinho-total h3 {
   margin: 0px 0px 10px 0px;
-  color: #333;
+  color: var(--cor-cinza-medio-hover);
   font-size: 1.2rem;
 }
 

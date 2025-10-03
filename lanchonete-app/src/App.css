@@ -1,18 +1,25 @@
 :root {
   /* 🎨 Paleta de Cores */
-  /* --cor-laranja: #ff6347; */
-  /* --cor-laranja-hover: #e5533d; */
+  /* Cor predominante (identidade iFood) */
+  --cor-principal: #EA1D2C;       /* Vermelho iFood */
+  --cor-principal-hover: #c41624; /* Vermelho escuro p/ hover */
 
-  --cor-laranja: #EA1D2C; /* modificado */
-  --cor-laranja-hover: #c41624; /* modificado */
-  --cor-verde: #4caf50;
-  --cor-verde-hover: #43a047;
-  /* --cor-vermelho: #f44336;
-  --cor-vermelho-hover: #d32f2f; */
+  /* Suporte e Destaques */
+  --cor-secundaria: #ff9f43; /* Laranja claro para chamar atenção */
+  --cor-secundaria-hover: #e0861e;
 
-  --cor-vermelho: #EA1D2C; /* modificado */
-  --cor-vermelho-hover: #c41624; /* modificado */
+  /* Confirmação / Sucesso */
+  --cor-verde: #27ae60; /* Verde vibrante */
+  --cor-verde-hover: #1e874b;
 
+  /* Erros / Alertas */
+  --cor-vermelho: #dc3545; /* Vermelho de alerta (mais neutro) */
+
+  /* Links / Informações */
+  --cor-azul: #3498db; /* Azul moderno */
+  --cor-azul-hover: #217dbb;
+
+  --cor-cinza-claro: #f4f4f4;
   --cor-cinza-medio: #666;
   --cor-cinza-medio-hover: #333;
   --cor-branco: #fff;
@@ -40,13 +47,13 @@
 }
 
 /* Variantes */
-.btn-laranja {
-  background-color: var(--cor-laranja);
+.btn-vermelho {
+  background-color: var(--cor-principal);
   color: var(--cor-branco);
 }
 
-.btn-laranja:hover {
-  background-color: var(--cor-laranja-hover);
+.btn-vermelho:hover {
+  background-color: var(--cor-principal-hover);
 }
 
 .btn-verde {
@@ -58,22 +65,22 @@
   background-color: var(--cor-verde-hover);
 }
 
-/* .btn-vermelho {
-  background-color: var(--cor-vermelho);
+.btn-azul {
+  background-color: var(--cor-azul);
   color: var(--cor-branco);
 }
 
-.btn-vermelho:hover {
-  background-color: var(--cor-vermelho-hover);
-} */
+.btn-azul:hover {
+  background-color: var(--cor-azul-hover);
+}
 
-.btn-vermelho {
-  background-color: var(--cor-laranja);
+.btn-laranja {
+  background-color: var(--cor-secundaria);
   color: var(--cor-branco);
 }
 
-.btn-vermelho:hover {
-  background-color: var(--cor-laranja-hover);
+.btn-laranja:hover {
+  background-color: var(--cor-secundaria-hover);
 }
 
 /* ================= */
@@ -97,8 +104,8 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
-  color: #333;
+  background-color: var(--cor-cinza-claro);
+  color: var(--cor-cinza-medio-hover);
 }
 
 .App {
@@ -112,7 +119,7 @@ body {
 }
 
 header {
-  background-color: var(--cor-laranja);
+  background-color: var(--cor-principal);
   color: var(--cor-branco);
   padding: 2rem 1rem;
   text-align: center;
@@ -120,7 +127,7 @@ header {
 
 footer {
   margin-top: auto;
-  background-color: var(--cor-laranja);
+  background-color: var(--cor-principal);
   padding: 1rem;
 }
 footer p {
@@ -139,12 +146,12 @@ footer p {
   align-items: center;
   height: 100vh;
   font-size: 1.2rem;
-  color: #555;
+  color: var(--cor-cinza-medio)
 }
 
 .spinner {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #ff5722;
+  border: 6px solid var(--cor-cinza-claro);
+  border-top: 6px solid var(--cor-principal);
   border-radius: 50%;
   width: 40px;
   height: 40px;

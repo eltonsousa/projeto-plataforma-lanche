@@ -45,12 +45,12 @@
 .cardapio-item h2 {
   font-size: 1.2rem;
   margin: 10px 0px 0px 0px;
-  color: #333;
+  color: var(--cor-cinza-medio-hover);
 }
 
 .cardapio-item p {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--cor-cinza-medio);
   height: 60px;
   margin: 10px 30px 0px 0px;
   overflow: hidden;
@@ -64,7 +64,7 @@
 
 .preco {
   font-size: 1.4rem;
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
   font-weight: bold;
   margin-top: 5px;
   display: block;
@@ -81,7 +81,7 @@
 .sem-itens-cardapio {
   text-align: center;
   margin: 50px 0;
-  color: #777;
+  color: var(--cor-cinza-medio);
   font-size: 1.2rem;
 }
 

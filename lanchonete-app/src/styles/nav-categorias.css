@@ -40,10 +40,10 @@
 }
 
 .cardapio-categorias button {
-  background-color: #f4f4f4;
-  color: var(--cor-laranja);
+  background-color: var(--cor-cinza-claro);
+  color: var(--cor-principal);
   /* Cor principal (tomate) */
-  border: 1px solid var(--cor-laranja);
+  border: 1px solid var(--cor-principal-hover);
   padding: 10px 20px;
   border-radius: 20px;
   cursor: pointer;
@@ -55,7 +55,7 @@
 
 /* Estilo para a categoria ativa */
 .cardapio-categorias button.categoria-ativa {
-  background-color: var(--cor-laranja);
+  background-color: var(--cor-principal);
   color: var(--cor-branco);
   box-shadow: 0 4px 8px rgba(255, 99, 71, 0.4);
 }
@@ -93,7 +93,7 @@
 .cardapio-categorias button {
   /* Estilo base de 'Pill/Chip' */
   border: 1px solid var(--cor-cinza-claro); /* Borda sutil */
-  background-color: var(--cor-branca);
+  background-color: var(--cor-branco);
   color: var(--cor-cinza-escuro);
   padding: 8px 15px;
   border-radius: 20px; /* CHIP/PASTILHA */
@@ -107,9 +107,9 @@
 
 /* Estado Ativo: O mais importante visualmente */
 .cardapio-categorias .categoria-ativa {
-  background-color: var(--cor-laranja); /* Cor principal do tema */
-  color: var(--cor-branca);
-  border-color: var(--cor-laranja);
+  background-color: var(--cor-principal); /* Cor principal do tema */
+  color: var(--cor-branco);
+  border-color: var(--cor-principal);
   font-weight: bold;
   /* Uma pequena sombra para dar destaque */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 

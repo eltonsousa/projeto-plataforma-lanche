@@ -421,7 +421,7 @@ function App() {
               <div className="carrinho-total">
                 <h3>Total: {formatPrice(calcularTotal())}</h3>
                 <button
-                  className="btn btn-laranja"
+                  className="btn btn-azul"
                   onClick={handleFinalizarPedido}
                 >
                   Finalizar Pedido

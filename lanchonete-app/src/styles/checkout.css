@@ -7,7 +7,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #fff;
+  background: var(--cor-cinza-claro);
   border-radius: 12px;
   box-shadow: var(--shadow-md);
   padding: 2rem;
@@ -20,7 +20,7 @@
 .checkout-container h2 {
   margin: 0 0 1.5rem 0;
   text-align: center;
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
   font-size: 1.6rem;
 }
 
@@ -33,7 +33,7 @@
 .checkout-container label {
   font-weight: 600;
   font-size: 0.95rem;
-  color: #444;
+  color: var(--cor-cinza-medio);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -42,7 +42,7 @@
 .checkout-container input,
 .checkout-container select {
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--cor-cinza-medio);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -50,7 +50,7 @@
 
 .checkout-container input:focus,
 .checkout-container select:focus {
-  border-color: var(--cor-laranja);
+  border-color: var(--cor-principal);
   box-shadow: var(--shadow-lg);
   outline: none;
 }
@@ -68,13 +68,13 @@
 }
 
 .icones-finalizar-pedido svg {
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
 }
 
 .resumo-pedido {
   text-align: left;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
+  background-color: var(--cor-cinza-claro);
+  border: 1px solid var(--cor-cinza-claro);
   padding: 1rem;
   border-radius: 8px;
   margin-top: 1.5rem;
@@ -88,7 +88,7 @@
 
 .resumo-pedido li {
   padding: 6px 0;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--cor-cinza-claro);
 }
 
 .resumo-pedido li:last-child {

@@ -17,7 +17,7 @@
 }
 
 .modal-content {
-  background: #fff;
+  background: var(--cor-cinza-claro);
   border-radius: 16px;
   width: 90%;
   max-width: 500px;
@@ -43,19 +43,19 @@
   margin: 10px 0;
   font-size: 1.6rem;
   font-weight: bold;
-  color: #333;
+  color: var(--cor-cinza-medio-hover);
 }
 
 .modal-content p {
   font-size: 1rem;
-  color: #666;
+  color: var(--cor-cinza-medio);
   margin: 10px 0;
   line-height: 1.4;
 }
 
 .modal-content .preco {
   font-size: 1.3rem;
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
   font-weight: bold;
   display: block;
   margin: 20px 0;
@@ -66,7 +66,7 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--cor-verde);
-  background: #f9f9f9;
+  background: var(--cor-cinza-claro);
   padding: 10px;
   border-radius: 8px;
 }
@@ -104,12 +104,12 @@
 }
 
 .quantidade-botoes .modal-actions-bar .btn-circle.btn-vermelho {
-  background: var(--cor-vermelho);
+  background: var(--cor-principal);
   color: var(--cor-branco);
 }
 
 .quantidade-botoes .modal-actions-bar .btn-circle.btn-vermelho:hover {
-  background: var(--cor-vermelho-hover);
+  background: var(--cor-principal-hover);
 }
 
 .quantidade-botoes .modal-actions-bar span {
@@ -117,7 +117,7 @@
   text-align: center;
   font-weight: bold;
   font-size: 1rem;
-  color: #333;
+  color: var(--cor-cinza-medio-hover);
 }
 
 .modal-close-icon {
@@ -125,7 +125,7 @@
   top: 12px;
   right: 12px;
   font-size: 2rem;
-  color: var(--cor-laranja);
+  color: var(--cor-principal);
   background-color: var(--cor-branco);
   border-radius: 50%;
   padding: 6px;
@@ -135,7 +135,7 @@
 }
 
 .modal-close-icon:hover {
-  background-color: var(--cor-laranja);
+  background-color: var(--cor-principal);
   color: var(--cor-branco);
   transform: scale(1.1);
 }
@@ -163,8 +163,8 @@
     transform: translateX(-50%);
     width: 100%;
     max-width: 500px;
-    background: #fff;
-    border-top: 1px solid #eee;
+    background: var(--cor-cinza-claro);
+    border-top: 1px solid var(--cor-cinza-claro);
     padding: 10px;
     display: flex;
     justify-content: space-around;
@@ -183,7 +183,7 @@
   .quantidade-botoes .modal-actions-bar span {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #333;
+    color: var(--cor-cinza-medio-hover);
   }
 
   .quantidade-botoes .modal-actions-bar .btn-circle {
@@ -199,7 +199,7 @@
   }
 
   .quantidade-botoes .modal-actions-bar .btn-circle.btn-vermelho {
-    background: #f44336;
+    background: var(--cor-principal);
     border-radius: 50%;
     padding: 0;
   }
