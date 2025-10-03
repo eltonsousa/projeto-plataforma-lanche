@@ -140,11 +140,6 @@
   transform: scale(1.1);
 }
 
-.modal-content .btn.btn-verde {
-  padding: 10px 20px;
-  font-size: 1rem;
-}
-
 .modal-content .btn.btn-verde:hover {
   background-color: var(--cor-verde-hover);
 }
