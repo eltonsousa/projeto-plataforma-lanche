@@ -5,6 +5,12 @@
 │   │   └── App.css
 ├── lanchonete-app/
 │   ├── src/
+│   │   ├── styles/
+│   │   │   ├── cardapio.css
+│   │   │   ├── carrinho.css           
+│   │   │   ├── checkout.css           
+│   │   │   ├── modal-content-detalhes.css           
+│   │   │   └── nav-categorias.css           
 │   │   ├── App.js
 │   │   └── App.css
 │   │   └── CardapioItem.js

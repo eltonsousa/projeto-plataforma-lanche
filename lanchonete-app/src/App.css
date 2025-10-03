@@ -1,11 +1,18 @@
 :root {
   /* 🎨 Paleta de Cores */
-  --cor-laranja: #ff6347;
-  --cor-laranja-hover: #e5533d;
+  /* --cor-laranja: #ff6347; */
+  /* --cor-laranja-hover: #e5533d; */
+
+  --cor-laranja: #EA1D2C; /* modificado */
+  --cor-laranja-hover: #c41624; /* modificado */
   --cor-verde: #4caf50;
   --cor-verde-hover: #43a047;
-  --cor-vermelho: #f44336;
-  --cor-vermelho-hover: #d32f2f;
+  /* --cor-vermelho: #f44336;
+  --cor-vermelho-hover: #d32f2f; */
+
+  --cor-vermelho: #EA1D2C; /* modificado */
+  --cor-vermelho-hover: #c41624; /* modificado */
+
   --cor-cinza-medio: #666;
   --cor-cinza-medio-hover: #333;
   --cor-branco: #fff;
@@ -51,13 +58,22 @@
   background-color: var(--cor-verde-hover);
 }
 
-.btn-vermelho {
+/* .btn-vermelho {
   background-color: var(--cor-vermelho);
   color: var(--cor-branco);
 }
 
 .btn-vermelho:hover {
   background-color: var(--cor-vermelho-hover);
+} */
+
+.btn-vermelho {
+  background-color: var(--cor-laranja);
+  color: var(--cor-branco);
+}
+
+.btn-vermelho:hover {
+  background-color: var(--cor-laranja-hover);
 }
 
 /* ================= */
