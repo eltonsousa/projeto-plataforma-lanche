@@ -252,6 +252,15 @@ app.post("/api/cardapio", async (req, res) => {
     const novoItem = req.body;
     delete novoItem.id;
 
+    // 🔹 Garantir que 'adicionais' seja JSON ou null
+    if (novoItem.adicionais && typeof novoItem.adicionais === "string") {
+      try {
+        novoItem.adicionais = JSON.parse(novoItem.adicionais);
+      } catch {
+        novoItem.adicionais = null;
+      }
+    }
+
     const { data, error } = await supabase
       .from("cardapio")
       .insert([novoItem])
@@ -269,6 +278,15 @@ app.put("/api/cardapio/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const itemToUpdate = req.body;
   delete itemToUpdate.id;
+
+  // 🔹 Garantir que 'adicionais' seja JSON ou null
+  if (itemToUpdate.adicionais && typeof itemToUpdate.adicionais === "string") {
+    try {
+      itemToUpdate.adicionais = JSON.parse(itemToUpdate.adicionais);
+    } catch {
+      itemToUpdate.adicionais = null;
+    }
+  }
 
   try {
     const { data, error } = await supabase

@@ -10,7 +10,9 @@
 │   │   │   ├── carrinho.css           
 │   │   │   ├── checkout.css           
 │   │   │   ├── modal-content-detalhes.css           
-│   │   │   └── nav-categorias.css           
+│   │   │   └── nav-categorias.css   
+│   │   ├── utils/
+│   │   │   └── format.js        
 │   │   ├── App.js
 │   │   └── App.css
 │   │   └── CardapioItem.js

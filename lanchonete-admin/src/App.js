@@ -43,6 +43,25 @@ function App() {
 
   const [isImageUploading, setIsImageUploading] = useState(false);
 
+  // adicionais
+  const [adicionais, setAdicionais] = useState(itemForm?.adicionais || []);
+
+  const addAdicional = () =>
+    setAdicionais([...adicionais, { nome: "", preco: "" }]);
+
+  const updateAdicional = (index, field, value) => {
+    const newAdicionais = [...adicionais];
+    newAdicionais[index][field] = value;
+    setAdicionais(newAdicionais);
+  };
+
+  const removeAdicional = (index) => {
+    const newAdicionais = [...adicionais];
+    newAdicionais.splice(index, 1);
+    setAdicionais(newAdicionais);
+  };
+  // adicionais
+
   // FUNÇÕES DE PEDIDOS E RELATÓRIOS (Atualizadas)
 
   // 🟢 NOVO: Função Única para buscar pedidos/relatório com filtros de data e status
@@ -128,7 +147,11 @@ function App() {
 
     try {
       // Cria um objeto com os valores corretos (preço já é um número)
-      const itemToSave = { ...itemForm, preco: parseFloat(itemForm.preco) };
+      const itemToSave = {
+        ...itemForm,
+        preco: parseFloat(itemForm.preco),
+        adicionais,
+      };
 
       await fetch(url, {
         method,
@@ -137,6 +160,7 @@ function App() {
       });
       fetchCardapio();
       setItemForm({ id: null, nome: "", descricao: "", preco: "", imagem: "" });
+      setAdicionais([]); // limpa os adicionais após salvar
       setIsEditing(false);
     } catch (error) {
       console.error("Erro ao salvar item:", error);
@@ -149,6 +173,7 @@ function App() {
       // Garante que o itemForm receba a categoria do item (ou um padrão se estiver faltando)
       categoria: item.categoria || "Sanduíches",
     });
+    setAdicionais(item.adicionais || []);
     setIsEditing(true);
 
     // 🟢 NOVA LÓGICA DE ROLAGEM
@@ -548,6 +573,35 @@ function App() {
                 step="0.01"
                 required
               />
+
+              <h4>Adicionais:</h4>
+              {adicionais.map((ad, i) => (
+                <div
+                  key={i}
+                  style={{ display: "flex", gap: "8px", marginBottom: "4px" }}
+                >
+                  <input
+                    placeholder="Nome"
+                    value={ad.nome}
+                    onChange={(e) => updateAdicional(i, "nome", e.target.value)}
+                  />
+                  <input
+                    placeholder="Preço"
+                    type="number"
+                    value={ad.preco}
+                    onChange={(e) =>
+                      updateAdicional(i, "preco", e.target.value)
+                    }
+                  />
+                  <button type="button" onClick={() => removeAdicional(i)}>
+                    ❌
+                  </button>
+                </div>
+              ))}
+              <button type="button" onClick={addAdicional}>
+                ➕ Adicional
+              </button>
+
               <div className="custom-file-upload">
                 <input
                   type="file"
