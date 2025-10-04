@@ -360,6 +360,40 @@ app.post("/api/pedidos", async (req, res) => {
         mensagemResumo += `${item.quantidade}x ${item.nome} - R$ ${precoItem}\n`;
       });
 
+      // Lista de itens com adicionais e observações
+      if (pedido.itens && Array.isArray(pedido.itens)) {
+        pedido.itens.forEach((item) => {
+          const precoItem = parseFloat(item.preco || 0).toFixed(2);
+
+          // Linha principal
+          mensagemResumo += `${item.quantidade}x ${item.nome} - R$ ${precoItem}\n`;
+
+          // Adicionais
+          if (
+            item.adicionais &&
+            Array.isArray(item.adicionais) &&
+            item.adicionais.length > 0
+          ) {
+            mensagemResumo += `   ➕ Adicionais:\n`;
+            item.adicionais.forEach((adicional) => {
+              const precoAdicional = parseFloat(adicional.preco || 0).toFixed(
+                2
+              );
+              mensagemResumo += `      • ${adicional.nome} (+R$ ${precoAdicional})\n`;
+            });
+          }
+
+          // Observação (se houver)
+          if (item.observacao && item.observacao.trim() !== "") {
+            mensagemResumo += `   📝 Obs: ${item.observacao}\n`;
+          }
+
+          mensagemResumo += "\n";
+        });
+      } else {
+        mensagemResumo += "_Nenhum item encontrado no pedido._\n";
+      }
+
       const totalPedido = parseFloat(pedido.total || 0).toFixed(2);
       mensagemResumo += `\n*💰 Total:* R$ ${totalPedido}`;
       mensagemResumo += `\n*🚚 Serviço:* ${pedido.tipo_servico}`;
