@@ -1,22 +1,28 @@
 :root {
   /* 🎨 Paleta de Cores */
   /* Cor predominante (identidade iFood) */
-  --cor-principal: #EA1D2C;       /* Vermelho iFood */
-  --cor-principal-hover: #c41624; /* Vermelho escuro p/ hover */
+  --cor-principal: #EA1D2C;
+  /* Vermelho iFood */
+  --cor-principal-hover: #c41624;
+  /* Vermelho escuro p/ hover */
 
   /* Suporte e Destaques */
-  --cor-secundaria: #ff9f43; /* Laranja claro para chamar atenção */
+  --cor-secundaria: #ff9f43;
+  /* Laranja claro para chamar atenção */
   --cor-secundaria-hover: #e0861e;
 
   /* Confirmação / Sucesso */
-  --cor-verde: #27ae60; /* Verde vibrante */
+  --cor-verde: #27ae60;
+  /* Verde vibrante */
   --cor-verde-hover: #1e874b;
 
   /* Erros / Alertas */
-  --cor-vermelho: #dc3545; /* Vermelho de alerta (mais neutro) */
+  --cor-vermelho: #dc3545;
+  /* Vermelho de alerta (mais neutro) */
 
   /* Links / Informações */
-  --cor-azul: #3498db; /* Azul moderno */
+  --cor-azul: #3498db;
+  /* Azul moderno */
   --cor-azul-hover: #217dbb;
 
   --cor-cinza-claro: #f4f4f4;
@@ -92,6 +98,25 @@
   display: block;
   margin: 20px 0;
 }
+
+/* Adicionais */
+.adicional-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.adicional-quantidade {
+
+  display: flex;
+  align-content: center;
+  align-items: center;
+  margin-left: auto;
+  gap: 10px;
+
+}
+/*  */
+
 
 .modal-content .total-item {
   margin-top: 20px;
@@ -175,6 +200,7 @@
 .modal-content button.btn.btn-verde {
   background-color: var(--cor-verde);
 }
+
 /* ================== */
 /* Fim Modal detalhes */
 /* ================== */
@@ -263,13 +289,9 @@
 }
 
 /* Botão "Adicionar" compacto em telas menores */
-@media (max-width: 450px) {
-  
-}
+@media (max-width: 450px) {}
 
-@media (max-width: 400px) {
-
-}
+@media (max-width: 400px) {}
 
 @media (max-width: 350px) {
   .modal-content {
