@@ -313,6 +313,7 @@ footer p.footer-admin {
 }
 
 .cardapio-form input {
+  width: 95%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -340,12 +341,12 @@ footer p.footer-admin {
 
 /* Estiliza o LABEL (nosso botão customizado) */
 .btn-upload {
- display: flex;
-    align-content: center;
-    align-items: center;
-    gap: 6px;
-    text-align: center;
-    justify-content: center;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  justify-content: center;
 }
 
 /* Garante que o botão de upload não seja desabilitado visualmente pelo isImageUploading */
@@ -377,6 +378,24 @@ footer p.footer-admin {
 
 .cardapio-form .btn-add-item svg {
   margin-right: 10px;
+}
+
+.formulario-item h4 {
+
+  margin: 10px 0 10px 0;
+
+}
+
+.formulario-item .adicionais {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.btn-remover-adicionais {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .cardapio-lista {
@@ -794,6 +813,19 @@ footer p.footer-admin {
 
     margin-top: 1.5rem;
   }
+
+  .btn-remover-adicionais {
+    display: flex;
+    font-size: 0px;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+  }
+
 }
 
 @media (max-width: 450px) {

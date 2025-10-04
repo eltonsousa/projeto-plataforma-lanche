@@ -580,25 +580,26 @@ function App() {
 
               <h4>Adicionais:</h4>
               {adicionais.map((ad, i) => (
-                <div
-                  key={i}
-                  style={{ display: "flex", gap: "8px", marginBottom: "4px" }}
-                >
+                <div className="adicionais" key={i}>
                   <input
-                    placeholder="Nome"
+                    placeholder="Nome Adicional"
                     value={ad.nome}
                     onChange={(e) => updateAdicional(i, "nome", e.target.value)}
                   />
                   <input
-                    placeholder="Preço"
+                    placeholder="Preço R$"
                     type="number"
                     value={ad.preco}
                     onChange={(e) =>
                       updateAdicional(i, "preco", e.target.value)
                     }
                   />
-                  <button type="button" onClick={() => removeAdicional(i)}>
-                    ❌
+                  <button
+                    className="btn-remover-adicionais btn btn-vermelho"
+                    type="button"
+                    onClick={() => removeAdicional(i)}
+                  >
+                    <AiOutlineDelete size={20} /> Remover
                   </button>
                 </div>
               ))}
