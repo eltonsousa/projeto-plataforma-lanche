@@ -544,6 +544,7 @@ function App() {
         <main className="painel-cardapio">
           <h2>Gerenciar Cardápio</h2>
           <div className="cardapio-form">
+            <h4>Adicionar Produtos:</h4>
             <form
               ref={formRef}
               onSubmit={handleItemSubmit}
@@ -578,7 +579,7 @@ function App() {
                 required
               />
 
-              <h4>Adicionais:</h4>
+              <h4>Incluir adicionais:</h4>
               {adicionais.map((ad, i) => (
                 <div className="adicionais" key={i}>
                   <input
@@ -677,11 +678,13 @@ function App() {
                   className="btn btn-laranja btn-upload"
                 >
                   <MdOutlineAddPhotoAlternate size={20} />
-                  {isImageUploading
-                    ? "Carregando..."
-                    : itemForm.imagem
-                    ? "Trocar Imagem"
-                    : "Escolher Imagem"}
+                  {isImageUploading ? (
+                    "Carregando..."
+                  ) : itemForm.imagem ? (
+                    "Trocar Imagem"
+                  ) : (
+                    <span>Escolher Imagem</span>
+                  )}
                 </label>
               </div>
 
