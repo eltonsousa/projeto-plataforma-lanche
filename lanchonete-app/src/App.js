@@ -574,9 +574,7 @@ function App() {
                 <div className="total-item">
                   Total:{" "}
                   {formatPrice(
-                    carrinho.find((c) => c.id === produtoSelecionado.id)
-                      ?.quantidade *
-                      produtoSelecionado.preco +
+                    produtoSelecionado.preco +
                       adicionaisSelecionados.reduce(
                         (acc, ad) => acc + ad.preco,
                         0
