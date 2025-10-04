@@ -107,20 +107,44 @@ function App() {
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState("Sanduíches");
   ////////////////////
-  const [adicionaisSelecionados, setAdicionaisSelecionados] = useState([]);
-  const [mostraAdicionais, setMostraAdicionais] = useState(false);
-  const handleAdicionalChange = (adicional, checked) => {
-    if (checked) {
-      setAdicionaisSelecionados([...adicionaisSelecionados, adicional]);
-    } else {
-      setAdicionaisSelecionados(
-        adicionaisSelecionados.filter((a) => a.nome !== adicional.nome)
-      );
-    }
+  // Observação
+  const [observacao, setObservacao] = useState("");
+
+  // Adicionais com quantidade
+  const [adicionaisSelecionados, setAdicionaisSelecionados] = useState({});
+
+  // Funções
+  const aumentarAdicional = (adicional) => {
+    setAdicionaisSelecionados((prev) => ({
+      ...prev,
+      [adicional.nome]: {
+        ...adicional,
+        quantidade: (prev[adicional.nome]?.quantidade || 0) + 1,
+      },
+    }));
   };
 
-  const adicionarAoCarrinho = (produto, adicionais = []) => {
+  const diminuirAdicional = (adicional) => {
+    setAdicionaisSelecionados((prev) => {
+      const atual = prev[adicional.nome]?.quantidade || 0;
+      if (atual <= 1) {
+        const novo = { ...prev };
+        delete novo[adicional.nome];
+        return novo;
+      }
+      return {
+        ...prev,
+        [adicional.nome]: {
+          ...adicional,
+          quantidade: atual - 1,
+        },
+      };
+    });
+  };
+
+  const adicionarAoCarrinho = (produto) => {
     const itemExistente = carrinho.find((c) => c.id === produto.id);
+
     if (itemExistente) return;
 
     setCarrinho([
@@ -128,10 +152,14 @@ function App() {
       {
         ...produto,
         quantidade: 1,
-        adicionais: adicionais,
+        adicionais: Object.values(adicionaisSelecionados), // salva adicionais
+        observacao: observacao, // salva observação
       },
     ]);
-    setAdicionaisSelecionados([]); // limpa seleção após adicionar
+
+    // limpa os campos após adicionar
+    setAdicionaisSelecionados({});
+    setObservacao("");
   };
   //////////////////////////////
 
@@ -269,7 +297,7 @@ function App() {
         parseFloat(item.preco) * parseInt(item.quantidade) +
         (item.adicionais
           ? item.adicionais.reduce(
-              (acc, ad) => acc + ad.preco * item.quantidade,
+              (acc, ad) => acc + ad.preco * ad.quantidade * item.quantidade,
               0
             )
           : 0),
@@ -495,94 +523,89 @@ function App() {
               {formatPrice(produtoSelecionado.preco)}
             </span>
 
-            {!carrinho.some((c) => c.id === produtoSelecionado.id) ? (
-              <>
-                {!mostraAdicionais ? (
-                  // Botão inicial que mostra os adicionais
-                  <button
-                    className="btn btn-verde"
-                    onClick={() => setMostraAdicionais(true)}
-                  >
-                    <BsCart3 size={20} /> Adicionar ao Carrinho
-                  </button>
-                ) : (
-                  // Bloco de adicionais aparece após clicar
-                  <div className="adicionais-modal">
-                    <h3>Adicionais:</h3>
-                    {produtoSelecionado.adicionais.map((ad, index) => (
-                      <label key={index} className="adicional-item">
-                        <input
-                          type="checkbox"
-                          value={ad.nome}
-                          checked={adicionaisSelecionados.some(
-                            (a) => a.nome === ad.nome
-                          )}
-                          onChange={(e) =>
-                            handleAdicionalChange(ad, e.target.checked)
-                          }
-                        />
-                        {ad.nome} (+ {formatPrice(ad.preco)})
-                      </label>
-                    ))}
-                    <button
-                      className="btn btn-verde"
-                      onClick={() => {
-                        adicionarAoCarrinho(
-                          produtoSelecionado,
-                          adicionaisSelecionados
-                        );
-                        setMostraAdicionais(false); // reseta estado
-                        setProdutoSelecionado(null); // fecha modal
-                      }}
-                    >
-                      Confirmar e Adicionar ao Carrinho
-                    </button>
-                  </div>
-                )}
-              </>
-            ) : (
-              // Se já estiver no carrinho, exibe a quantidade
-              <>
-                <div className="quantidade-botoes">
-                  <div className="modal-actions-bar">
-                    <button
-                      className="btn btn-vermelho btn-circle"
-                      onClick={() => diminuirQuantidade(produtoSelecionado.id)}
-                    >
-                      <AiOutlineMinus size={20} />
-                    </button>
-                    <span>
-                      {
-                        carrinho.find((c) => c.id === produtoSelecionado.id)
-                          ?.quantidade
-                      }
-                    </span>
-                    <button
-                      className="btn btn-verde btn-circle"
-                      onClick={() => aumentarQuantidade(produtoSelecionado.id)}
-                    >
-                      <AiOutlinePlus size={20} />
-                    </button>
-                    <button
-                      className="btn btn-vermelho btn-circle"
-                      onClick={() => removerDoCarrinho(produtoSelecionado.id)}
-                    >
-                      <AiOutlineDelete size={20} />
-                    </button>
-                  </div>
+            {/* ADICIONAIS */}
+            {produtoSelecionado.adicionais &&
+              produtoSelecionado.adicionais.length > 0 && (
+                <div className="adicionais-modal">
+                  <h3>Adicionais:</h3>
+                  {produtoSelecionado.adicionais.map((ad, index) => (
+                    <div key={index} className="adicional-item">
+                      <span>
+                        {ad.nome} (+{formatPrice(ad.preco)})
+                      </span>
+                      <div className="adicional-quantidade">
+                        <button
+                          className="btn btn-vermelho btn-circle"
+                          onClick={() => diminuirAdicional(ad)}
+                        >
+                          <AiOutlineMinus size={16} />
+                        </button>
+                        <span>
+                          {adicionaisSelecionados[ad.nome]?.quantidade || 0}
+                        </span>
+                        <button
+                          className="btn btn-verde btn-circle"
+                          onClick={() => aumentarAdicional(ad)}
+                        >
+                          <AiOutlinePlus size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="total-item">
-                  Total:{" "}
-                  {formatPrice(
-                    produtoSelecionado.preco +
-                      adicionaisSelecionados.reduce(
-                        (acc, ad) => acc + ad.preco,
-                        0
-                      )
-                  )}
-                </div>
-              </>
-            )}
+              )}
+
+            {/* OBSERVAÇÕES */}
+            <div className="observacoes">
+              <h3>Observações:</h3>
+              <textarea
+                placeholder="Ex: sem salada, sem maionese..."
+                value={observacao}
+                onChange={(e) => setObservacao(e.target.value)}
+              />
+            </div>
+
+            {/* CONTROLES DE QUANTIDADE DO PRODUTO */}
+            <div className="quantidade-botoes">
+              <div className="modal-actions-bar">
+                <button
+                  className="btn btn-vermelho btn-circle"
+                  onClick={() => diminuirQuantidade(produtoSelecionado.id)}
+                >
+                  <AiOutlineMinus size={20} />
+                </button>
+                <span>
+                  {carrinho.find((c) => c.id === produtoSelecionado.id)
+                    ?.quantidade || 1}
+                </span>
+                <button
+                  className="btn btn-verde btn-circle"
+                  onClick={() => aumentarQuantidade(produtoSelecionado.id)}
+                >
+                  <AiOutlinePlus size={20} />
+                </button>
+                <button
+                  className="btn btn-vermelho btn-circle"
+                  onClick={() => removerDoCarrinho(produtoSelecionado.id)}
+                >
+                  <AiOutlineDelete size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* TOTAL */}
+            <div className="total-item">
+              Total:{" "}
+              {formatPrice(
+                (produtoSelecionado.preco +
+                  Object.values(adicionaisSelecionados).reduce(
+                    (acc, ad) => acc + ad.preco * ad.quantidade,
+                    0
+                  )) *
+                  (carrinho.find((c) => c.id === produtoSelecionado.id)
+                    ?.quantidade || 1)
+              )}
+            </div>
 
             <AiOutlineClose
               className="modal-close-icon"
