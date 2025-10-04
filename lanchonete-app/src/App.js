@@ -104,6 +104,7 @@ function App() {
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [quantidadeProduto, setQuantidadeProduto] = useState(1);
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState("Sanduíches");
   ////////////////////
@@ -426,7 +427,12 @@ function App() {
               cardapioFiltrado.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => setProdutoSelecionado(item)}
+                  onClick={() => {
+                    setProdutoSelecionado(item);
+                    setQuantidadeProduto(1);
+                    setAdicionaisSelecionados({});
+                    setObservacao("");
+                  }}
                   style={{
                     cursor: "pointer",
                     display: "flex",
@@ -570,25 +576,33 @@ function App() {
               <div className="modal-actions-bar">
                 <button
                   className="btn btn-vermelho btn-circle"
-                  onClick={() => diminuirQuantidade(produtoSelecionado.id)}
+                  onClick={() =>
+                    setQuantidadeProduto((prev) => Math.max(1, prev - 1))
+                  }
                 >
                   <AiOutlineMinus size={20} />
                 </button>
-                <span>
-                  {carrinho.find((c) => c.id === produtoSelecionado.id)
-                    ?.quantidade || 1}
-                </span>
+
+                <span>{quantidadeProduto}</span>
+
                 <button
                   className="btn btn-verde btn-circle"
-                  onClick={() => aumentarQuantidade(produtoSelecionado.id)}
+                  onClick={() => setQuantidadeProduto((prev) => prev + 1)}
                 >
                   <AiOutlinePlus size={20} />
                 </button>
+
                 <button
-                  className="btn btn-vermelho btn-circle"
-                  onClick={() => removerDoCarrinho(produtoSelecionado.id)}
+                  className="btn btn-azul"
+                  onClick={() => {
+                    adicionarAoCarrinho({
+                      ...produtoSelecionado,
+                      quantidade: quantidadeProduto,
+                    });
+                    setProdutoSelecionado(null); // fecha o modal
+                  }}
                 >
-                  <AiOutlineDelete size={20} />
+                  Adicionar ao Carrinho
                 </button>
               </div>
             </div>
@@ -602,8 +616,7 @@ function App() {
                     (acc, ad) => acc + ad.preco * ad.quantidade,
                     0
                   )) *
-                  (carrinho.find((c) => c.id === produtoSelecionado.id)
-                    ?.quantidade || 1)
+                  quantidadeProduto
               )}
             </div>
 
