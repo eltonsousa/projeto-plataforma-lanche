@@ -146,19 +146,39 @@ function App() {
   const adicionarAoCarrinho = (produto) => {
     const itemExistente = carrinho.find((c) => c.id === produto.id);
 
-    if (itemExistente) return;
+    if (itemExistente) {
+      // Se o item já existir, apenas soma a quantidade
+      setCarrinho(
+        carrinho.map((c) =>
+          c.id === produto.id
+            ? {
+                ...c,
+                quantidade: c.quantidade + produto.quantidade,
+                adicionais: [
+                  ...(c.adicionais || []),
+                  ...Object.values(adicionaisSelecionados),
+                ],
+                observacao: observacao
+                  ? `${c.observacao || ""} ${observacao}`
+                  : c.observacao,
+              }
+            : c
+        )
+      );
+    } else {
+      // Se for novo item, adiciona normalmente com a quantidade escolhida
+      setCarrinho([
+        ...carrinho,
+        {
+          ...produto,
+          quantidade: produto.quantidade,
+          adicionais: Object.values(adicionaisSelecionados),
+          observacao,
+        },
+      ]);
+    }
 
-    setCarrinho([
-      ...carrinho,
-      {
-        ...produto,
-        quantidade: 1,
-        adicionais: Object.values(adicionaisSelecionados), // salva adicionais
-        observacao: observacao, // salva observação
-      },
-    ]);
-
-    // limpa os campos após adicionar
+    // Limpa campos e fecha modal
     setAdicionaisSelecionados({});
     setObservacao("");
   };
