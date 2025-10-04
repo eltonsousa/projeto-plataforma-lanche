@@ -283,11 +283,11 @@ textarea {
   }
 
   .modal-content h2 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .modal-content p {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .modal-content .preco {
@@ -297,6 +297,30 @@ textarea {
   .cardapio-item p {
     max-width: 200px;
   }
+
+  .adicionais-modal h3{
+font-size: 1.1rem;
+  }
+  .adicional-item span {
+    
+    font-size: .8rem;
+}
+
+.adicional-quantidade button.btn.btn-vermelho.btn-circle{
+width: 22px;
+height: 22px;
+}
+
+.adicional-quantidade button.btn.btn-verde.btn-circle{
+width: 22px;
+height: 22px;
+padding: 0;
+}
+
+.observacoes h3{
+  font-size: 1.1rem;
+}
+
 }
 
 /* Botão "Adicionar" compacto em telas menores */
