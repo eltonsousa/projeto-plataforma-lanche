@@ -115,6 +115,12 @@
   gap: 10px;
 
 }
+
+textarea {
+  border-radius: 5px;
+  width: 90%;
+  border: solid 1px var(--cor-cinza-medio);
+}
 /*  */
 
 
