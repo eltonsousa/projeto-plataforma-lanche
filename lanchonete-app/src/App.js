@@ -106,6 +106,34 @@ function App() {
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState("Sanduíches");
+  ////////////////////
+  const [adicionaisSelecionados, setAdicionaisSelecionados] = useState([]);
+  const handleAdicionalChange = (adicional, checked) => {
+    if (checked) {
+      setAdicionaisSelecionados([...adicionaisSelecionados, adicional]);
+    } else {
+      setAdicionaisSelecionados(
+        adicionaisSelecionados.filter((a) => a.nome !== adicional.nome)
+      );
+    }
+  };
+
+  const adicionarAoCarrinho = (produto, adicionais = []) => {
+    const itemExistente = carrinho.find((c) => c.id === produto.id);
+    if (itemExistente) return;
+
+    setCarrinho([
+      ...carrinho,
+      {
+        ...produto,
+        quantidade: 1,
+        adicionais: adicionais,
+      },
+    ]);
+    setAdicionaisSelecionados([]); // limpa seleção após adicionar
+  };
+  //////////////////////////////
+
   // 🟢 ESTADO USADO PARA CONTROLE DE CARREGAMENTO
   const [cardapioLoading, setCardapioLoading] = useState(true);
 
@@ -199,18 +227,18 @@ function App() {
   }, [carrinho, cardapioLoading, saveCarrinhoToSupabase]);
 
   // --- FUNÇÕES DE CARRINHO ---
-  const adicionarAoCarrinho = (item) => {
-    const itemExistente = carrinho.find((c) => c.id === item.id);
-    if (itemExistente) {
-      setCarrinho(
-        carrinho.map((c) =>
-          c.id === item.id ? { ...c, quantidade: c.quantidade + 1 } : c
-        )
-      );
-    } else {
-      setCarrinho([...carrinho, { ...item, quantidade: 1 }]);
-    }
-  };
+  // const adicionarAoCarrinho = (item) => {
+  //   const itemExistente = carrinho.find((c) => c.id === item.id);
+  //   if (itemExistente) {
+  //     setCarrinho(
+  //       carrinho.map((c) =>
+  //         c.id === item.id ? { ...c, quantidade: c.quantidade + 1 } : c
+  //       )
+  //     );
+  //   } else {
+  //     setCarrinho([...carrinho, { ...item, quantidade: 1 }]);
+  //   }
+  // };
 
   const aumentarQuantidade = (itemId) => {
     setCarrinho(
@@ -236,7 +264,14 @@ function App() {
   const calcularTotal = () =>
     carrinho.reduce(
       (total, item) =>
-        total + parseFloat(item.preco) * parseInt(item.quantidade),
+        total +
+        parseFloat(item.preco) * parseInt(item.quantidade) +
+        (item.adicionais
+          ? item.adicionais.reduce(
+              (acc, ad) => acc + ad.preco * item.quantidade,
+              0
+            )
+          : 0),
       0
     );
 
@@ -390,7 +425,17 @@ function App() {
                   <div key={item.id} className="carrinho-item">
                     <div className="item-info-carrinho">
                       <span>{item.nome}</span>
-                      <span>{formatPrice(item.preco * item.quantidade)}</span>
+                      <span>
+                        {formatPrice(
+                          item.preco * item.quantidade +
+                            (item.adicionais
+                              ? item.adicionais.reduce(
+                                  (acc, ad) => acc + ad.preco * item.quantidade,
+                                  0
+                                )
+                              : 0)
+                        )}
+                      </span>
                     </div>
                     <div className="carrinho-botoes">
                       <div className="quantidade-botoes-carrinho">
@@ -449,6 +494,29 @@ function App() {
               {formatPrice(produtoSelecionado.preco)}
             </span>
 
+            {/* ADICIONAIS */}
+            {produtoSelecionado.adicionais &&
+              produtoSelecionado.adicionais.length > 0 && (
+                <div className="adicionais-modal">
+                  <h3>Adicionais:</h3>
+                  {produtoSelecionado.adicionais.map((ad, index) => (
+                    <label key={index} className="adicional-item">
+                      <input
+                        type="checkbox"
+                        value={ad.nome}
+                        checked={adicionaisSelecionados.some(
+                          (a) => a.nome === ad.nome
+                        )}
+                        onChange={(e) =>
+                          handleAdicionalChange(ad, e.target.checked)
+                        }
+                      />
+                      {ad.nome} (+ {formatPrice(ad.preco)})
+                    </label>
+                  ))}
+                </div>
+              )}
+
             {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
               <>
                 <div className="quantidade-botoes">
@@ -483,18 +551,29 @@ function App() {
                   Total:{" "}
                   {formatPrice(
                     carrinho.find((c) => c.id === produtoSelecionado.id)
-                      ?.quantidade * produtoSelecionado.preco
+                      ?.quantidade *
+                      produtoSelecionado.preco +
+                      adicionaisSelecionados.reduce(
+                        (acc, ad) => acc + ad.preco,
+                        0
+                      )
                   )}
                 </div>
               </>
             ) : (
               <button
                 className="btn btn-verde"
-                onClick={() => adicionarAoCarrinho(produtoSelecionado)}
+                onClick={() =>
+                  adicionarAoCarrinho(
+                    produtoSelecionado,
+                    adicionaisSelecionados
+                  )
+                }
               >
                 <BsCart3 size={20} /> Adicionar ao Carrinho
               </button>
             )}
+
             <AiOutlineClose
               className="modal-close-icon"
               onClick={() => setProdutoSelecionado(null)}
