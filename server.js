@@ -354,12 +354,6 @@ app.post("/api/pedidos", async (req, res) => {
 
       let mensagemResumo = `👋 Olá *${pedido.cliente.nome}*! Estamos preparando seu pedido e avisaremos quando estiver pronto.\n\n*🏷️ Resumo do seu Pedido:*\n`;
 
-      // Lista de itens
-      pedido.itens.forEach((item) => {
-        const precoItem = parseFloat(item.preco || 0).toFixed(2);
-        mensagemResumo += `${item.quantidade}x ${item.nome} - R$ ${precoItem}\n`;
-      });
-
       // Lista de itens com adicionais e observações
       if (pedido.itens && Array.isArray(pedido.itens)) {
         pedido.itens.forEach((item) => {
@@ -393,6 +387,7 @@ app.post("/api/pedidos", async (req, res) => {
       } else {
         mensagemResumo += "_Nenhum item encontrado no pedido._\n";
       }
+      // Fim lista de itens com adicionais e observações
 
       const totalPedido = parseFloat(pedido.total || 0).toFixed(2);
       mensagemResumo += `\n*💰 Total:* R$ ${totalPedido}`;
