@@ -406,6 +406,11 @@ footer p.footer-admin {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.cardapio-lista h3 {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
 .item-cardapio-admin {
   display: flex;
   align-items: center;
@@ -878,19 +883,16 @@ footer p.footer-admin {
   /** Fim Botões Editar e Remover Itens **/
 
   /** Título Item Painel Gerenciar Item **/
-  .item-cardapio-admin h4 {
-    max-width: 200px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: #505050;
-    margin: 0;
-    font-size: 1rem;
-    font-weight: bold;
-  }
+
 
   .item-cardapio-admin h4 {
     max-width: 170px;
+
+  }
+
+  .item-cardapio-admin {
+
+    gap: 10px;
 
   }
 
