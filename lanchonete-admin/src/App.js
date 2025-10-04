@@ -3,6 +3,10 @@ import "./App.css";
 
 // --- Import de ìcones
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from "react-icons/ai";
+import {
+  MdOutlinePlaylistAdd,
+  MdOutlineAddPhotoAlternate,
+} from "react-icons/md";
 // --- Import de ìcones
 
 function App() {
@@ -598,8 +602,12 @@ function App() {
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={addAdicional}>
-                ➕ Adicional
+              <button
+                className="btn-add-adicionais btn btn-azul"
+                type="button"
+                onClick={addAdicional}
+              >
+                <MdOutlinePlaylistAdd size={24} /> Adicional
               </button>
 
               <div className="custom-file-upload">
@@ -667,6 +675,7 @@ function App() {
                   htmlFor="file-upload"
                   className="btn btn-laranja btn-upload"
                 >
+                  <MdOutlineAddPhotoAlternate size={20} />
                   {isImageUploading
                     ? "Carregando..."
                     : itemForm.imagem

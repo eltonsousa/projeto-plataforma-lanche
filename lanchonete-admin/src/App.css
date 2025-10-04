@@ -318,6 +318,17 @@ footer p.footer-admin {
   border-radius: 5px;
 }
 
+.btn-add-adicionais {
+
+  display: flex;
+  align-content: center;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  justify-content: center;
+
+}
+
 /* =============================== */
 /* Customização do Input File      */
 /* =============================== */
@@ -329,20 +340,12 @@ footer p.footer-admin {
 
 /* Estiliza o LABEL (nosso botão customizado) */
 .btn-upload {
-  /* Garante que o label se comporte como um botão */
-  display: block;
-  text-align: center;
-
-  /* Você pode querer mudar a cor para laranja ou outro destaque */
-  /* Ele herda a classe .btn e .btn-laranja/verde */
-
-  /* Adiciona um padding maior para ser mais clicável */
-  padding: 10px 15px;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
-  /* Confirma que é clicável */
-  margin-bottom: 10px;
-  /* Espaço entre ele e a pré-visualização/input */
+ display: flex;
+    align-content: center;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    justify-content: center;
 }
 
 /* Garante que o botão de upload não seja desabilitado visualmente pelo isImageUploading */
