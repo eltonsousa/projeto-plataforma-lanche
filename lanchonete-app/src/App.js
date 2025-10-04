@@ -108,6 +108,7 @@ function App() {
     useState("Sanduíches");
   ////////////////////
   const [adicionaisSelecionados, setAdicionaisSelecionados] = useState([]);
+  const [mostraAdicionais, setMostraAdicionais] = useState(false);
   const handleAdicionalChange = (adicional, checked) => {
     if (checked) {
       setAdicionaisSelecionados([...adicionaisSelecionados, adicional]);
@@ -494,30 +495,53 @@ function App() {
               {formatPrice(produtoSelecionado.preco)}
             </span>
 
-            {/* ADICIONAIS */}
-            {produtoSelecionado.adicionais &&
-              produtoSelecionado.adicionais.length > 0 && (
-                <div className="adicionais-modal">
-                  <h3>Adicionais:</h3>
-                  {produtoSelecionado.adicionais.map((ad, index) => (
-                    <label key={index} className="adicional-item">
-                      <input
-                        type="checkbox"
-                        value={ad.nome}
-                        checked={adicionaisSelecionados.some(
-                          (a) => a.nome === ad.nome
-                        )}
-                        onChange={(e) =>
-                          handleAdicionalChange(ad, e.target.checked)
-                        }
-                      />
-                      {ad.nome} (+ {formatPrice(ad.preco)})
-                    </label>
-                  ))}
-                </div>
-              )}
-
-            {carrinho.some((c) => c.id === produtoSelecionado.id) ? (
+            {!carrinho.some((c) => c.id === produtoSelecionado.id) ? (
+              <>
+                {!mostraAdicionais ? (
+                  // Botão inicial que mostra os adicionais
+                  <button
+                    className="btn btn-verde"
+                    onClick={() => setMostraAdicionais(true)}
+                  >
+                    <BsCart3 size={20} /> Adicionar ao Carrinho
+                  </button>
+                ) : (
+                  // Bloco de adicionais aparece após clicar
+                  <div className="adicionais-modal">
+                    <h3>Adicionais:</h3>
+                    {produtoSelecionado.adicionais.map((ad, index) => (
+                      <label key={index} className="adicional-item">
+                        <input
+                          type="checkbox"
+                          value={ad.nome}
+                          checked={adicionaisSelecionados.some(
+                            (a) => a.nome === ad.nome
+                          )}
+                          onChange={(e) =>
+                            handleAdicionalChange(ad, e.target.checked)
+                          }
+                        />
+                        {ad.nome} (+ {formatPrice(ad.preco)})
+                      </label>
+                    ))}
+                    <button
+                      className="btn btn-verde"
+                      onClick={() => {
+                        adicionarAoCarrinho(
+                          produtoSelecionado,
+                          adicionaisSelecionados
+                        );
+                        setMostraAdicionais(false); // reseta estado
+                        setProdutoSelecionado(null); // fecha modal
+                      }}
+                    >
+                      Confirmar e Adicionar ao Carrinho
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              // Se já estiver no carrinho, exibe a quantidade
               <>
                 <div className="quantidade-botoes">
                   <div className="modal-actions-bar">
@@ -560,18 +584,6 @@ function App() {
                   )}
                 </div>
               </>
-            ) : (
-              <button
-                className="btn btn-verde"
-                onClick={() =>
-                  adicionarAoCarrinho(
-                    produtoSelecionado,
-                    adicionaisSelecionados
-                  )
-                }
-              >
-                <BsCart3 size={20} /> Adicionar ao Carrinho
-              </button>
             )}
 
             <AiOutlineClose
