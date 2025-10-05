@@ -9,6 +9,7 @@ import "./styles/nav-categorias.css";
 
 import { formatPrice } from "./utils/format";
 
+import { TbNews } from "react-icons/tb";
 // --- Import de ìcones "react-icons/bs"
 import { BsCart3, BsCashCoin, BsPhone } from "react-icons/bs";
 
@@ -752,8 +753,22 @@ function App() {
             <ul>
               {ultimoPedido.itens.map((item) => (
                 <li key={item.id}>
-                  {item.nome} (x{item.quantidade}) -{" "}
-                  {formatPrice(item.preco * item.quantidade)}
+                  <strong>
+                    {item.nome} (x{item.quantidade})
+                  </strong>{" "}
+                  - {formatPrice(item.preco * item.quantidade)}
+                  {/* Adicionais */}
+                  {item.adicionais && item.adicionais.length > 0 && (
+                    <ul className="adicionais-resumo">
+                      {item.adicionais.map((ad, i) => (
+                        <li key={i}>
+                          {ad.nome} (x{ad.quantidade}) — {formatPrice(ad.preco)}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {/* Observação */}
+                  {item.observacao && <p>Observação: {item.observacao}</p>}
                 </li>
               ))}
             </ul>
@@ -761,7 +776,11 @@ function App() {
               <strong>Total: {formatPrice(ultimoPedido.total)}</strong>
             </div>
           </div>
-          <button onClick={handleNovoPedido} className="btn btn-laranja">
+          <button
+            onClick={handleNovoPedido}
+            className="btn-new-pedido btn btn-azul"
+          >
+            <TbNews size={22} />
             Fazer um novo pedido
           </button>
         </div>
