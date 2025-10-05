@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const { formatPrice } = require("./utils/format");
 
 // Whatsapp
 const { Client, LocalAuth } = require("whatsapp-web.js");
@@ -357,10 +358,10 @@ app.post("/api/pedidos", async (req, res) => {
       // Lista de itens com adicionais e observações
       if (pedido.itens && Array.isArray(pedido.itens)) {
         pedido.itens.forEach((item) => {
-          const precoItem = parseFloat(item.preco || 0).toFixed(2);
+          const precoItem = formatPrice(item.preco || 0);
 
           // Linha principal
-          mensagemResumo += `${item.quantidade}x ${item.nome} - R$ ${precoItem}\n`;
+          mensagemResumo += `${item.quantidade}x ${item.nome} - ${precoItem}\n`;
 
           // Adicionais
           if (
@@ -370,10 +371,8 @@ app.post("/api/pedidos", async (req, res) => {
           ) {
             mensagemResumo += `   ➕ Adicionais:\n`;
             item.adicionais.forEach((adicional) => {
-              const precoAdicional = parseFloat(adicional.preco || 0).toFixed(
-                2
-              );
-              mensagemResumo += `      • ${adicional.nome} (+R$ ${precoAdicional})\n`;
+              const precoAdicional = formatPrice(adicional.preco || 0);
+              mensagemResumo += `      • ${adicional.nome} (+${precoAdicional})\n`;
             });
           }
 
@@ -389,8 +388,8 @@ app.post("/api/pedidos", async (req, res) => {
       }
       // Fim lista de itens com adicionais e observações
 
-      const totalPedido = parseFloat(pedido.total || 0).toFixed(2);
-      mensagemResumo += `\n*💰 Total:* R$ ${totalPedido}`;
+      const totalPedido = formatPrice(pedido.total || 0);
+      mensagemResumo += `\n*💰 Total:* ${totalPedido}`;
       mensagemResumo += `\n*🚚 Serviço:* ${pedido.tipo_servico}`;
 
       // Lógica tipo pagamento
