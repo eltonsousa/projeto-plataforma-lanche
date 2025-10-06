@@ -1,7 +1,7 @@
 :root {
   /* 🎨 Paleta de Cores */
   /* Cor predominante (identidade iFood) */
-  --cor-principal: #EA1D2C;
+  --cor-principal: #ea1d2c;
   /* Vermelho iFood */
   --cor-principal-hover: #c41624;
   /* Vermelho escuro p/ hover */
@@ -112,13 +112,11 @@
 }
 
 .adicional-quantidade {
-
   display: flex;
   align-content: center;
   align-items: center;
   margin-left: auto;
   gap: 10px;
-
 }
 
 textarea {
@@ -127,7 +125,6 @@ textarea {
   border: solid 1px var(--cor-cinza-medio);
 }
 /*  */
-
 
 .modal-content .total-item {
   margin-top: 20px;
@@ -248,7 +245,6 @@ textarea {
     font-size: 1rem;
   }
 
-
   .quantidade-botoes .modal-actions-bar span {
     font-size: 1.1rem;
     font-weight: bold;
@@ -298,35 +294,35 @@ textarea {
     max-width: 200px;
   }
 
-  .adicionais-modal h3{
-font-size: 1.1rem;
+  .adicionais-modal h3 {
+    font-size: 1.1rem;
   }
   .adicional-item span {
-    
-    font-size: .8rem;
-}
+    font-size: 0.8rem;
+  }
 
-.adicional-quantidade button.btn.btn-vermelho.btn-circle{
-width: 22px;
-height: 22px;
-}
+  .adicional-quantidade button.btn.btn-vermelho.btn-circle {
+    width: 22px;
+    height: 22px;
+  }
 
-.adicional-quantidade button.btn.btn-verde.btn-circle{
-width: 22px;
-height: 22px;
-padding: 0;
-}
+  .adicional-quantidade button.btn.btn-verde.btn-circle {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+  }
 
-.observacoes h3{
-  font-size: 1.1rem;
-}
-
+  .observacoes h3 {
+    font-size: 1.1rem;
+  }
 }
 
 /* Botão "Adicionar" compacto em telas menores */
-@media (max-width: 450px) {}
+@media (max-width: 450px) {
+}
 
-@media (max-width: 400px) {}
+@media (max-width: 400px) {
+}
 
 @media (max-width: 350px) {
   .modal-content {
@@ -345,5 +341,4 @@ padding: 0;
   .modal-content .preco {
     font-size: 1rem;
   }
-
 }

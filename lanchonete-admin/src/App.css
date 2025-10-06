@@ -85,8 +85,6 @@
   justify-content: center;
 }
 
-
-
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f2f5;
@@ -114,7 +112,7 @@ footer {
 footer p.footer-admin {
   margin: 0;
   font-weight: normal;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 /* Cabeçalho */
@@ -320,14 +318,12 @@ footer p.footer-admin {
 }
 
 .btn-add-adicionais {
-
   display: flex;
   align-content: center;
   align-items: center;
   gap: 6px;
   text-align: center;
   justify-content: center;
-
 }
 
 /* =============================== */
@@ -347,7 +343,7 @@ footer p.footer-admin {
   gap: 6px;
   text-align: center;
   justify-content: center;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 /* Garante que o botão de upload não seja desabilitado visualmente pelo isImageUploading */
@@ -355,13 +351,6 @@ footer p.footer-admin {
   opacity: 0.7;
   cursor: not-allowed;
 }
-
-
-
-
-
-
-
 
 .cardapio-form select {
   padding: 10px;
@@ -382,9 +371,7 @@ footer p.footer-admin {
 }
 
 .formulario-item h4 {
-
   margin: 10px 0 10px 0;
-
 }
 
 .formulario-item .adicionais {
@@ -451,7 +438,6 @@ footer p.footer-admin {
   text-align: center;
   display: flex;
   align-items: center;
-
 }
 
 .item-botoes-admin .btn svg {
@@ -715,7 +701,6 @@ footer p.footer-admin {
 
 /*estilo botao atualizar pedidos*/
 .botao-atualizar {
-
   margin-top: 8px;
 }
 
@@ -739,9 +724,6 @@ footer p.footer-admin {
   padding: 20px;
 }
 
-
-
-
 /* =================================== */
 /* 🟢 ESTILOS DE ÊNFASE DO FORMULÁRIO */
 /* =================================== */
@@ -763,7 +745,6 @@ footer p.footer-admin {
 /* 📱 Ajustes responsivos Mobile */
 /* ============================= */
 @media (max-width: 768px) {
-
   /* Blocos do resumo financeiro em coluna */
   .resumo-financeiro {
     flex-direction: column;
@@ -816,7 +797,6 @@ footer p.footer-admin {
 
   /*estilo botao atualizar pedidos*/
   .botao-atualizar {
-
     margin-top: 1.5rem;
   }
 
@@ -831,11 +811,9 @@ footer p.footer-admin {
     text-align: center;
     flex-direction: column;
   }
-
 }
 
 @media (max-width: 450px) {
-
   .painel-admin h1 {
     margin: 0;
     font-size: 1.5rem;
@@ -884,23 +862,16 @@ footer p.footer-admin {
 
   /** Título Item Painel Gerenciar Item **/
 
-
   .item-cardapio-admin h4 {
     max-width: 170px;
-
   }
 
   .item-cardapio-admin {
-
     gap: 10px;
-
   }
-
-
 }
 
 @media (max-width: 400px) {
-
   .controles-pedidos select {
     margin: 10px 0px 0px 0px;
     width: 100%;
@@ -979,10 +950,8 @@ footer p.footer-admin {
 }
 
 @media (max-width: 350px) {
-
   /** Título Item Painel Gerenciar Item **/
   .item-cardapio-admin h4 {
     max-width: 120px;
-
   }
 }

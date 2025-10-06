@@ -75,11 +75,11 @@
   white-space: nowrap; /* Impede a quebra de linha dos botões */
   padding: 10px 0;
   gap: 10px; /* Espaçamento entre os botões */
-  
+
   /* Melhora a rolagem com o useDraggableScroll */
-  cursor: grab; 
+  cursor: grab;
   user-select: none; /* Impede a seleção de texto ao arrastar */
-  
+
   /* Esconde a barra de rolagem padrão (melhora o visual) */
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -112,7 +112,7 @@
   border-color: var(--cor-principal);
   font-weight: bold;
   /* Uma pequena sombra para dar destaque */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Espaçamento do ícone */

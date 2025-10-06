@@ -129,7 +129,6 @@
 /* Fim checkout-container */
 /* =============================== */
 
-
 /* =============================== */
 /* Melhoria visual: resumo do pedido */
 /* =============================== */
@@ -174,10 +173,8 @@
 
 /* Responsividade */
 @media (max-width: 400px) {
-  .btn-new-pedido{
-    
+  .btn-new-pedido {
     width: 100%;
     justify-content: center;
   }
-
 }

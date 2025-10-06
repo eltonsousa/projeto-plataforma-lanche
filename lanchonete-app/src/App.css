@@ -1,7 +1,7 @@
 :root {
   /* 🎨 Paleta de Cores */
   /* Cor predominante (identidade iFood) */
-  --cor-principal: #EA1D2C;       /* Vermelho iFood */
+  --cor-principal: #ea1d2c; /* Vermelho iFood */
   --cor-principal-hover: #c41624; /* Vermelho escuro p/ hover */
 
   /* Suporte e Destaques */
@@ -146,7 +146,7 @@ footer p {
   align-items: center;
   height: 100vh;
   font-size: 1.2rem;
-  color: var(--cor-cinza-medio)
+  color: var(--cor-cinza-medio);
 }
 
 .spinner {
