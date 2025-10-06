@@ -9,11 +9,10 @@ import "./styles/nav-categorias.css";
 
 import { formatPrice } from "./utils/format";
 
+// ---- Import icones ---- //
 import { TbNews } from "react-icons/tb";
-// --- Import de ìcones "react-icons/bs"
 import { BsCart3, BsCashCoin, BsPhone } from "react-icons/bs";
 
-// --- Importe iconesd "react-icons/ai"
 import {
   AiOutlineMinus,
   AiOutlinePlus,
@@ -22,6 +21,7 @@ import {
   AiOutlineCheck,
   AiOutlineUser,
 } from "react-icons/ai";
+// ---- Import icones ---- //
 
 import { CiDeliveryTruck } from "react-icons/ci";
 
@@ -254,6 +254,8 @@ function App() {
         return "🍟"; // Batata Frita
       case "Comidas":
         return "🍝"; // Macarrão/Prato
+      case "Pizzas":
+        return "🍕";
       default:
         return "";
     }
@@ -417,28 +419,32 @@ function App() {
             {/* 🟢 Menu de Categorias */}
             <nav className="cardapio-categorias" ref={categoriaNavRef}>
               {/* Define as categorias e mapeia para botões */}
-              {["Sanduíches", "Bebidas", "Fritas", "Comidas"].map((cat) => (
-                <button
-                  key={cat}
-                  className={
-                    categoriaSelecionada === cat ? "categoria-ativa" : ""
-                  }
-                  // 🟢 ATUALIZAÇÃO: Adicionamos o evento 'e' para rolar o elemento
-                  onClick={(e) => {
-                    setCategoriaSelecionada(cat);
+              {["Sanduíches", "Bebidas", "Fritas", "Comidas", "Pizzas"].map(
+                (cat) => (
+                  <button
+                    key={cat}
+                    className={
+                      categoriaSelecionada === cat ? "categoria-ativa" : ""
+                    }
+                    // 🟢 ATUALIZAÇÃO: Adicionamos o evento 'e' para rolar o elemento
+                    onClick={(e) => {
+                      setCategoriaSelecionada(cat);
 
-                    // 🟢 CRÍTICO: Rola o botão clicado para a esquerda (start) do contêiner
-                    e.currentTarget.scrollIntoView({
-                      behavior: "smooth", // Efeito de rolagem suave
-                      inline: "start", // Rola para o início do contêiner
-                      block: "nearest", // Garante que o elemento esteja visível na vertical
-                    });
-                  }}
-                >
-                  <span className="categoria-icon">{getCategoryIcon(cat)}</span>
-                  {cat}
-                </button>
-              ))}
+                      // 🟢 CRÍTICO: Rola o botão clicado para a esquerda (start) do contêiner
+                      e.currentTarget.scrollIntoView({
+                        behavior: "smooth", // Efeito de rolagem suave
+                        inline: "start", // Rola para o início do contêiner
+                        block: "nearest", // Garante que o elemento esteja visível na vertical
+                      });
+                    }}
+                  >
+                    <span className="categoria-icon">
+                      {getCategoryIcon(cat)}
+                    </span>
+                    {cat}
+                  </button>
+                )
+              )}
             </nav>
             {/* 🟢 FIM: Menu de Categorias */}
 

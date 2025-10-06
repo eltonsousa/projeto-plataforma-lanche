@@ -715,6 +715,7 @@ function App() {
                 <option value="Bebidas">Bebidas</option>
                 <option value="Fritas">Fritas</option>
                 <option value="Comidas">Comidas</option>
+                <option value="Pizzas">Pizzas</option>
               </select>
 
               <button
