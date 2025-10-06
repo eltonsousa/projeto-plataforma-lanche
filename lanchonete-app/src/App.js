@@ -21,6 +21,7 @@ import {
   AiOutlineCheck,
   AiOutlineUser,
 } from "react-icons/ai";
+import { MdOutlineArrowBackIosNew } from "react-icons/md";
 // ---- Import icones ---- //
 
 import { CiDeliveryTruck } from "react-icons/ci";
@@ -665,6 +666,14 @@ function App() {
       {/* CHECKOUT */}
       {mostraCheckout && (
         <div className="checkout-container">
+          <MdOutlineArrowBackIosNew
+            className="btn-voltar-checkout"
+            onClick={() => {
+              setMostraCheckout(false); // Fecha o checkout
+              setMostraCarrinho(true); // Reabre o carrinho (se houver itens)
+            }}
+          />
+
           <h2>Finalizar Pedido</h2>
           <form onSubmit={handleCheckoutSubmit}>
             <label>
