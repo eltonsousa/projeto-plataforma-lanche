@@ -688,7 +688,7 @@ function App() {
             <label>
               <div className="icones-finalizar-pedido">
                 <BsPhone />
-                Telefone (com DDD, somente números):
+                Telefone (DDD + números):
               </div>
 
               <input

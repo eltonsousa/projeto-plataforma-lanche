@@ -31,6 +31,12 @@
   transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
+.btn-voltar-checkout:hover {
+  background-color: var(--cor-principal);
+  color: var(--cor-branco);
+  transform: scale(1.1);
+}
+
 .checkout-container h2 {
   margin: 0 0 1.5rem 0;
   text-align: center;
@@ -137,6 +143,9 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 1rem;
 }
 
 /* =============================== */
