@@ -267,6 +267,12 @@ function App() {
     fetchCardapio(true);
     loadCarrinhoFromSupabase();
 
+    // 🟢 NOVO: Tenta carregar o telefone do Local Storage
+    const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
+    if (telefoneSalvo) {
+      setTelefone(telefoneSalvo);
+    }
+
     // atualizações periódicas em segundo plano (sem spinner)
     const intervalId = setInterval(() => fetchCardapio(false), 10000);
     return () => clearInterval(intervalId);
@@ -366,6 +372,7 @@ function App() {
       });
 
       if (response.ok) {
+        localStorage.setItem("lanchonete_telefone", telefone);
         setUltimoPedido({ itens: carrinho, total: calcularTotal() });
         await saveCarrinhoToSupabase([]); // limpa no backend
         setCarrinho([]); // limpa no front
