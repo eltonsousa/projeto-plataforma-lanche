@@ -550,7 +550,7 @@ function App() {
       {/* MODAL DETALHES */}
       {produtoSelecionado && (
         <div
-          className="modal-overlay"
+          className="modal-overlay overlay"
           onClick={() => setProdutoSelecionado(null)}
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -665,146 +665,151 @@ function App() {
 
       {/* CHECKOUT */}
       {mostraCheckout && (
-        <div className="checkout-container">
-          <MdOutlineArrowBackIosNew
-            className="btn-voltar-checkout"
-            onClick={() => {
-              setMostraCheckout(false); // Fecha o checkout
-              setMostraCarrinho(true); // Reabre o carrinho (se houver itens)
-            }}
-          />
+        <div className="overlay">
+          <div className="checkout-container">
+            <MdOutlineArrowBackIosNew
+              className="btn-voltar-checkout"
+              onClick={() => {
+                setMostraCheckout(false); // Fecha o checkout
+                setMostraCarrinho(true); // Reabre o carrinho (se houver itens)
+              }}
+            />
 
-          <h2>Finalizar Pedido</h2>
-          <form onSubmit={handleCheckoutSubmit}>
-            <label>
-              <div className="icones-finalizar-pedido">
-                <AiOutlineUser />
-                Nome:
-              </div>
-              <input type="text" name="nome" required />
-            </label>
-
-            {/* --- NOVO CAMPO --- */}
-            <label>
-              <div className="icones-finalizar-pedido">
-                <BsPhone />
-                Telefone (DDD + números):
-              </div>
-
-              <input
-                type="tel"
-                name="telefone"
-                required
-                value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
-                pattern="[0-9]{11}"
-                title="Formato: 11987654321"
-                placeholder="92999999999"
-              />
-            </label>
-
-            <label>
-              <div className="icones-finalizar-pedido">
-                <CiDeliveryTruck size={18} />
-                Tipo de Serviço:
-              </div>
-
-              <select
-                name="servico"
-                required
-                value={servico}
-                onChange={(e) => setServico(e.target.value)}
-              >
-                <option value="">Selecione...</option>
-                <option value="entrega">Entrega</option>
-                <option value="retirada">Retirada</option>
-              </select>
-            </label>
-
-            {servico === "entrega" && (
+            <h2>Finalizar Pedido</h2>
+            <form onSubmit={handleCheckoutSubmit}>
               <label>
-                Endereço de Entrega:
-                <input type="text" name="endereco" required />
+                <div className="icones-finalizar-pedido">
+                  <AiOutlineUser />
+                  Nome:
+                </div>
+                <input type="text" name="nome" required />
               </label>
-            )}
 
-            <label>
-              <div className="icones-finalizar-pedido">
-                <BsCashCoin />
-                Forma de Pagamento:
-              </div>
-
-              <select
-                name="pagamento"
-                required
-                value={pagamento}
-                onChange={(e) => setPagamento(e.target.value)}
-              >
-                <option value="">Selecione...</option>
-                <option value="pix">PIX</option>
-                <option value="cartao">Cartão de Crédito/Débito</option>
-                <option value="dinheiro">Dinheiro</option>
-              </select>
-            </label>
-
-            {pagamento === "dinheiro" && (
+              {/* --- NOVO CAMPO --- */}
               <label>
-                Troco para:
-                <input type="number" name="troco" step="0.01" required />
-              </label>
-            )}
+                <div className="icones-finalizar-pedido">
+                  <BsPhone />
+                  Telefone (DDD + números):
+                </div>
 
-            <button
-              type="submit"
-              className="btn-confirmar-pedido btn btn-verde"
-            >
-              <AiOutlineCheck />
-              Confirmar Pedido
-            </button>
-          </form>
+                <input
+                  type="tel"
+                  name="telefone"
+                  required
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.target.value)}
+                  pattern="[0-9]{11}"
+                  title="Formato: 11987654321"
+                  placeholder="92999999999"
+                />
+              </label>
+
+              <label>
+                <div className="icones-finalizar-pedido">
+                  <CiDeliveryTruck size={18} />
+                  Tipo de Serviço:
+                </div>
+
+                <select
+                  name="servico"
+                  required
+                  value={servico}
+                  onChange={(e) => setServico(e.target.value)}
+                >
+                  <option value="">Selecione...</option>
+                  <option value="entrega">Entrega</option>
+                  <option value="retirada">Retirada</option>
+                </select>
+              </label>
+
+              {servico === "entrega" && (
+                <label>
+                  Endereço de Entrega:
+                  <input type="text" name="endereco" required />
+                </label>
+              )}
+
+              <label>
+                <div className="icones-finalizar-pedido">
+                  <BsCashCoin />
+                  Forma de Pagamento:
+                </div>
+
+                <select
+                  name="pagamento"
+                  required
+                  value={pagamento}
+                  onChange={(e) => setPagamento(e.target.value)}
+                >
+                  <option value="">Selecione...</option>
+                  <option value="pix">PIX</option>
+                  <option value="cartao">Cartão de Crédito/Débito</option>
+                  <option value="dinheiro">Dinheiro</option>
+                </select>
+              </label>
+
+              {pagamento === "dinheiro" && (
+                <label>
+                  Troco para:
+                  <input type="number" name="troco" step="0.01" required />
+                </label>
+              )}
+
+              <button
+                type="submit"
+                className="btn-confirmar-pedido btn btn-verde"
+              >
+                <AiOutlineCheck />
+                Confirmar Pedido
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
       {/* CONFIRMAÇÃO */}
       {pedidoFinalizado && ultimoPedido && (
-        <div className="confirmacao-container">
-          <h2>Pedido Confirmado!</h2>
-          <p>Obrigado por sua compra! Seu pedido será preparado em breve.</p>
-          <div className="resumo-pedido">
-            <h3>Resumo do Pedido:</h3>
-            <ul>
-              {ultimoPedido.itens.map((item) => (
-                <li key={item.id}>
-                  <strong>
-                    {item.nome} (x{item.quantidade})
-                  </strong>{" "}
-                  - {formatPrice(item.preco * item.quantidade)}
-                  {/* Adicionais */}
-                  {item.adicionais && item.adicionais.length > 0 && (
-                    <ul className="adicionais-resumo">
-                      {item.adicionais.map((ad, i) => (
-                        <li key={i}>
-                          {ad.nome} (x{ad.quantidade}) — {formatPrice(ad.preco)}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* Observação */}
-                  {item.observacao && <p>Observação: {item.observacao}</p>}
-                </li>
-              ))}
-            </ul>
-            <div className="total-resumo">
-              <strong>Total: {formatPrice(ultimoPedido.total)}</strong>
+        <div className="overlay">
+          <div className="confirmacao-container">
+            <h2>Pedido Confirmado!</h2>
+            <p>Obrigado por sua compra! Seu pedido será preparado em breve.</p>
+            <div className="resumo-pedido">
+              <h3>Resumo do Pedido:</h3>
+              <ul>
+                {ultimoPedido.itens.map((item) => (
+                  <li key={item.id}>
+                    <strong>
+                      {item.nome} (x{item.quantidade})
+                    </strong>{" "}
+                    - {formatPrice(item.preco * item.quantidade)}
+                    {/* Adicionais */}
+                    {item.adicionais && item.adicionais.length > 0 && (
+                      <ul className="adicionais-resumo">
+                        {item.adicionais.map((ad, i) => (
+                          <li key={i}>
+                            {ad.nome} (x{ad.quantidade}) —{" "}
+                            {formatPrice(ad.preco)}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {/* Observação */}
+                    {item.observacao && <p>Observação: {item.observacao}</p>}
+                  </li>
+                ))}
+              </ul>
+              <div className="total-resumo">
+                <strong>Total: {formatPrice(ultimoPedido.total)}</strong>
+              </div>
             </div>
+            <button
+              onClick={handleNovoPedido}
+              className="btn-new-pedido btn btn-azul"
+            >
+              <TbNews size={22} />
+              Fazer um novo pedido
+            </button>
           </div>
-          <button
-            onClick={handleNovoPedido}
-            className="btn-new-pedido btn btn-azul"
-          >
-            <TbNews size={22} />
-            Fazer um novo pedido
-          </button>
         </div>
       )}
 
