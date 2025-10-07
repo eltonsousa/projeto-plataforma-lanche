@@ -14,7 +14,11 @@ function CardapioItem({ item, onAdicionar }) {
       </div>
       <button
         className="btn btn-verde"
-        onClick={() => onAdicionar(item)} // 1. Chama a função onAdicionar
+        // 🚨 MUDANÇA AQUI: Recebe 'e' e impede a propagação
+        onClick={(e) => {
+          e.stopPropagation(); // Impede o clique de atingir o <div> pai
+          onAdicionar({ ...item, quantidade: 1 }); // Adiciona com quantidade padrão 1
+        }}
       >
         <BsCart3 size={14} /> Adicionar
       </button>

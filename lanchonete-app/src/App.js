@@ -287,18 +287,6 @@ function App() {
   }, [carrinho, cardapioLoading, saveCarrinhoToSupabase]);
 
   // --- FUNÇÕES DE CARRINHO ---
-  // const adicionarAoCarrinho = (item) => {
-  //   const itemExistente = carrinho.find((c) => c.id === item.id);
-  //   if (itemExistente) {
-  //     setCarrinho(
-  //       carrinho.map((c) =>
-  //         c.id === item.id ? { ...c, quantidade: c.quantidade + 1 } : c
-  //       )
-  //     );
-  //   } else {
-  //     setCarrinho([...carrinho, { ...item, quantidade: 1 }]);
-  //   }
-  // };
 
   const aumentarQuantidade = (itemId) => {
     setCarrinho(
