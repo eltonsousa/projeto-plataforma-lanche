@@ -429,7 +429,7 @@ function App() {
                       // 🟢 CRÍTICO: Rola o botão clicado para a esquerda (start) do contêiner
                       e.currentTarget.scrollIntoView({
                         behavior: "smooth", // Efeito de rolagem suave
-                        inline: "start", // Rola para o início do contêiner
+                        inline: "center", // Rola para o início do contêiner
                         block: "nearest", // Garante que o elemento esteja visível na vertical
                       });
                     }}
