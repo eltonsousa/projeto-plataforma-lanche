@@ -1,0 +1,51 @@
+/* status-indicator.css */
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+  }
+}
+
+.status-indicator {
+  /* Posição Fixa no canto superior direito */
+  position: fixed;
+  top: 20px;
+  right: 20px;
+
+  /* Estilos Visuais */
+  animation: pulse 2s infinite;
+  padding: 3px 6px;
+  border-radius: 3px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.7rem;
+  /* text-align: center; */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); */
+  /* 🟢 ALINHAMENTO HORIZONTAL: Use Flexbox */
+  display: flex;
+  align-items: center; /* Alinha o ícone e o texto verticalmente (ao centro) */
+  gap: 4px; /* Adiciona um pequeno espaço entre o ícone e o texto */
+  z-index: 1000; /* Garante que fique acima de outros elementos */
+  transition: background-color 0.3s ease; /* Transição suave de cor */
+}
+
+.status-indicator:hover {
+  background-color: lightgreen;
+}
+
+/* Cores dinâmicas definidas por classes */
+.status-indicator.aberta {
+  background-color: #4caf50; /* Verde */
+}
+
+.status-indicator.fechada {
+  background-color: #f44336; /* Vermelho */
+}
+
+.status-indicator-schedule {
+  font-size: 10px;
+  opacity: 0.8;
+}

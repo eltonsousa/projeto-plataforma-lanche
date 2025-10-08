@@ -6,12 +6,13 @@ import "./styles/checkout.css";
 import "./styles/carrinho.css";
 import "./styles/modal-content-detalhes.css";
 import "./styles/nav-categorias.css";
+import "./styles/status-indicator.css";
 
 import { formatPrice } from "./utils/format";
 
 // ---- Import icones ---- //
 import { TbNews } from "react-icons/tb";
-import { BsCart3, BsCashCoin, BsPhone } from "react-icons/bs";
+import { BsCart3, BsCashCoin, BsPhone, BsShopWindow } from "react-icons/bs";
 
 import {
   AiOutlineMinus,
@@ -22,9 +23,130 @@ import {
   AiOutlineUser,
 } from "react-icons/ai";
 import { MdOutlineArrowBackIosNew } from "react-icons/md";
+import { CiDeliveryTruck } from "react-icons/ci";
 // ---- Import icones ---- //
 
-import { CiDeliveryTruck } from "react-icons/ci";
+// ----------------------------------------------------
+// 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO
+// ----------------------------------------------------
+
+// 1. CONFIGURAÇÃO DE HORÁRIO: 18:00h às 23:40h, todos os dias (0=Dom, 6=Sáb)
+const BUSINESS_HOURS = {
+  0: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+  1: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+  2: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+  3: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+  4: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+  5: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+  6: {
+    isOpen: true,
+    startHour: 18,
+    startMinute: 0,
+    endHour: 23,
+    endMinute: 40,
+  },
+};
+
+// 2. LÓGICA DE VERIFICAÇÃO
+const checkIsStoreOpen = () => {
+  const now = new Date();
+  const currentDay = now.getDay();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+
+  const currentTimeInMinutes = currentHour * 60 + currentMinute;
+  const dayHours = BUSINESS_HOURS[currentDay];
+
+  if (!dayHours || !dayHours.isOpen) {
+    return false;
+  }
+
+  const openingTimeInMinutes = dayHours.startHour * 60 + dayHours.startMinute;
+  const closingTimeInMinutes = dayHours.endHour * 60 + dayHours.endMinute;
+
+  // Aberto: [Hora de Abertura] <= [Hora Atual] < [Hora de Fechamento]
+  const isCurrentlyOpen =
+    currentTimeInMinutes >= openingTimeInMinutes &&
+    currentTimeInMinutes < closingTimeInMinutes;
+
+  return isCurrentlyOpen;
+};
+
+// 3. CUSTOM HOOK PARA USAR O STATUS NO COMPONENTE
+const useOperatingStatus = () => {
+  const [isStoreOpen, setIsStoreOpen] = useState(checkIsStoreOpen());
+
+  useEffect(() => {
+    // Verifica a cada minuto (60000ms) para atualização em tempo real
+    const intervalId = setInterval(() => {
+      setIsStoreOpen(checkIsStoreOpen());
+    }, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return isStoreOpen;
+};
+
+// 4. COMPONENTE INDICADOR DE STATUS (O FLAG)
+const StatusIndicator = ({ isStoreOpen }) => {
+  const text = isStoreOpen ? "Aberto" : "Fechado";
+
+  // Usa BsShopWindow para ambos os estados
+  const IconComponent = BsShopWindow;
+
+  // Define a classe dinâmica com base no status (para a cor)
+  const statusClass = isStoreOpen ? "aberta" : "fechada";
+
+  return (
+    <div className={`status-indicator ${statusClass}`}>
+      {/* 🟢 ÍCONE E TEXTO AGORA SÃO FILHOS DIRETOS DO STATUS-INDICATOR */}
+      <IconComponent size={12} />{" "}
+      {/* Reduzi o size para 12px para caber melhor no font-size 0.7rem */}
+      <span>{text}</span>
+    </div>
+  );
+};
+
+// ----------------------------------------------------
+// FIM: NOVAS FUNÇÕES
+// ----------------------------------------------------
 
 // --- FUNÇÕES DE PERSISTÊNCIA ---
 const getSessionId = () => {
@@ -85,8 +207,16 @@ const useDraggableScroll = () => {
 };
 
 // COMPONENTE: Ícone do carrinho
-const CartIcon = ({ count, onClick }) => (
-  <button className="carrinho-icon-btn" onClick={onClick}>
+const CartIcon = ({ count, onClick, isStoreOpen }) => (
+  <button
+    className="carrinho-icon-btn"
+    onClick={isStoreOpen ? onClick : null} // 🔴 Desativa o click se estiver fechada
+    disabled={!isStoreOpen} // 🔴 Desabilita o botão visualmente
+    style={{
+      opacity: isStoreOpen ? 1 : 0.5,
+      cursor: isStoreOpen ? "pointer" : "not-allowed",
+    }}
+  >
     <BsCart3 size={24} />
     {count > 0 && <span className="carrinho-count">{count}</span>}
   </button>
@@ -94,6 +224,8 @@ const CartIcon = ({ count, onClick }) => (
 
 function App() {
   const sessionId = getSessionId();
+
+  const isStoreOpen = useOperatingStatus();
 
   // 🟢 REFERÊNCIA para o elemento de categorias (para o hook)
   const categoriaNavRef = useDraggableScroll();
@@ -324,10 +456,13 @@ function App() {
     );
 
   const handleToggleCarrinho = () => {
-    if (carrinho.length > 0) setMostraCarrinho(!mostraCarrinho);
+    // 🔴 ATUALIZADO: Só abre o carrinho se a loja estiver aberta
+    if (carrinho.length > 0 && isStoreOpen) setMostraCarrinho(!mostraCarrinho);
   };
 
   const handleFinalizarPedido = () => {
+    // 🔴 ATUALIZADO: Só permite finalizar se a loja estiver aberta
+    if (!isStoreOpen) return;
     setMostraCheckout(true);
     setMostraCarrinho(false);
   };
@@ -400,11 +535,17 @@ function App() {
 
   return (
     <div className="App">
+      {/* 🔴 NOVO: O FLAG de status no canto da tela */}
+      <StatusIndicator isStoreOpen={isStoreOpen} />
       <header>
         <h1>Manú Lanches</h1>
         <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
         {carrinho.length > 0 && !mostraCheckout && !pedidoFinalizado && (
-          <CartIcon count={totalItensCarrinho} onClick={handleToggleCarrinho} />
+          <CartIcon
+            count={totalItensCarrinho}
+            onClick={handleToggleCarrinho}
+            isStoreOpen={isStoreOpen} // 🔴 Passa o status para desabilitar o ícone
+          />
         )}
       </header>
 
@@ -450,14 +591,20 @@ function App() {
               cardapioFiltrado.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => {
-                    setProdutoSelecionado(item);
-                    setQuantidadeProduto(1);
-                    setAdicionaisSelecionados({});
-                    setObservacao("");
-                  }}
+                  // 🔴 ATUALIZADO: Só permite abrir o modal se a loja estiver aberta
+                  onClick={
+                    isStoreOpen
+                      ? () => {
+                          setProdutoSelecionado(item);
+                          setQuantidadeProduto(1);
+                          setAdicionaisSelecionados({});
+                          setObservacao("");
+                        }
+                      : null
+                  }
                   style={{
-                    cursor: "pointer",
+                    cursor: isStoreOpen ? "pointer" : "not-allowed", // 🔴 Muda o cursor
+                    opacity: isStoreOpen ? 1 : 0.6, // 🔴 Efeito visual de desabilitado
                     display: "flex",
                     justifyContent: "center",
                     width: "100%",
@@ -526,9 +673,17 @@ function App() {
                 <button
                   className="btn btn-azul"
                   onClick={handleFinalizarPedido}
+                  disabled={!isStoreOpen} // 🔴 DESABILITA o botão Finalizar Pedido
+                  style={{ opacity: isStoreOpen ? 1 : 0.5 }}
                 >
                   Finalizar Pedido
                 </button>
+                {/* 🔴 FEEDBACK VISUAL: Mensagem de loja fechada perto do botão principal */}
+                {!isStoreOpen && (
+                  <p style={{ color: "red", marginTop: "10px" }}>
+                    Fechado para pedidos. Horário: 18:00h às 23:40h
+                  </p>
+                )}
               </div>
             </aside>
           )}
@@ -536,7 +691,7 @@ function App() {
       )}
 
       {/* MODAL DETALHES */}
-      {produtoSelecionado && (
+      {produtoSelecionado && isStoreOpen && (
         <div
           className="modal-overlay overlay"
           onClick={() => setProdutoSelecionado(null)}
