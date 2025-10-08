@@ -30,6 +30,19 @@ import { CiDeliveryTruck } from "react-icons/ci";
 // 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO
 // ----------------------------------------------------
 
+// 🟢 MODO DE DESENVOLVIMENTO/MANUTENÇÃO
+// Se TRUE, a loja SEMPRE estará aberta, ignorando o horário.
+// Mude para FALSE ao fazer o deploy para produção.
+// LÊ DO ARQUIVO .env.local: (REACT_APP_FORCE_OPEN_DEV = true)
+const IS_DEV_OVERRIDE_ACTIVE = process.env.REACT_APP_FORCE_OPEN_DEV === "true";
+
+// 🟢 DEBUG CRÍTICO: Verifique o valor lido no console
+console.log("Variável lida do .env:", process.env.REACT_APP_FORCE_OPEN_DEV);
+console.log(
+  "Status de Sobrescrita Ativo (TRUE esperado):",
+  IS_DEV_OVERRIDE_ACTIVE
+);
+
 // 1. CONFIGURAÇÃO DE HORÁRIO: 18:00h às 23:40h, todos os dias (0=Dom, 6=Sáb)
 const BUSINESS_HOURS = {
   0: {
@@ -85,6 +98,11 @@ const BUSINESS_HOURS = {
 
 // 2. LÓGICA DE VERIFICAÇÃO
 const checkIsStoreOpen = () => {
+  // 🟢 SOBRESCRITA .ENV: Se o flag de desenvolvimento estiver ativo, retorna TRUE imediatamente.
+  if (IS_DEV_OVERRIDE_ACTIVE) {
+    return true;
+  }
+
   const now = new Date();
   const currentDay = now.getDay();
   const currentHour = now.getHours();

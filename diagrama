@@ -3,6 +3,7 @@
 │   ├── src/
 │   │   ├── App.js
 │   │   └── App.css
+│   └── package.json
 ├── lanchonete-app/
 │   ├── src/
 │   │   ├── styles/
@@ -14,10 +15,17 @@
 │   │   ├── utils/
 │   │   │   └── format.js        
 │   │   ├── App.js
-│   │   └── App.css
+│   │   ├── App.css
 │   │   └── CardapioItem.js
+│   ├── public/
+│   ├── node_modules/
+│   ├── package.json
+│   └── .env.local
 ├── node_modules/
+├── utils/
+│   └── format.js
 ├── cardapio.json
 ├── package.json
 ├── server.js
+├── .env
 └── usuarios.json
