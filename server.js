@@ -623,6 +623,63 @@ app.get("/api/carrinho/:sessionId", async (req, res) => {
 });
 
 // ---------------------------------------------
+// CONFIGURAÇÕES GLOBAIS (STATUS DA LOJA)
+// ---------------------------------------------
+
+// Rota para LER o status de abertura forçada (consumida pelo lanchonete-app)
+app.get("/api/admin/status", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("configuracoes")
+      .select("is_forced_open")
+      .limit(1); // Esperamos apenas um registro
+
+    if (error) throw error;
+
+    const isForcedOpen = data.length > 0 ? data[0].is_forced_open : false;
+    res.status(200).json({ isForcedOpen });
+  } catch (err) {
+    console.error("Erro GET /api/admin/status:", err);
+    res.status(500).json({ message: "Erro ao buscar status de configuração." });
+  }
+});
+
+// Rota para ATUALIZAR o status de abertura forçada (consumida pelo Painel Admin)
+app.put("/api/admin/status", async (req, res) => {
+  const { isForcedOpen } = req.body;
+  if (typeof isForcedOpen !== "boolean") {
+    return res.status(400).json({ message: "O valor deve ser booleano." });
+  }
+
+  try {
+    // 🔹 Buscamos o ID do único registro de configurações
+    const { data: existingConfig, error: fetchError } = await supabase
+      .from("configuracoes")
+      .select("id")
+      .limit(1);
+
+    if (fetchError) throw fetchError;
+
+    // Se houver, atualizamos o registro existente (usando o primeiro ID encontrado)
+    const configId = existingConfig[0].id;
+    const { data: updatedData, error: updateError } = await supabase
+      .from("configuracoes")
+      .update({ is_forced_open: isForcedOpen })
+      .eq("id", configId)
+      .select();
+
+    if (updateError) throw updateError;
+
+    res.status(200).json({ isForcedOpen: updatedData[0].is_forced_open });
+  } catch (err) {
+    console.error("Erro PUT /api/admin/status:", err);
+    res
+      .status(500)
+      .json({ message: "Erro ao atualizar status de configuração." });
+  }
+});
+
+// ---------------------------------------------
 // FRONTEND
 // ---------------------------------------------
 app.use(
