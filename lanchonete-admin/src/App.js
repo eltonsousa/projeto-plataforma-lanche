@@ -45,6 +45,10 @@ function App() {
   });
   const [filtroStatus, setFiltroStatus] = useState("todos"); // Novo filtro de status
 
+  // 🟢 NOVOS ESTADOS PARA O CONTROLE DE STATUS DA LOJA
+  const [isStoreForcedOpen, setIsStoreForcedOpen] = useState(false); // Status da flag de override
+  const [isStatusLoading, setIsStatusLoading] = useState(true); // Carregamento do status inicial
+
   const [isImageUploading, setIsImageUploading] = useState(false);
 
   // adicionais
@@ -208,6 +212,56 @@ function App() {
     }
   };
 
+  // ---------------------------------------------
+  // FUNÇÕES DE STATUS DA LOJA (ABERTO/FECHADO FORÇADO)
+  // ---------------------------------------------
+
+  const fetchStoreStatus = async () => {
+    try {
+      const response = await fetch("/api/admin/status");
+      if (!response.ok) throw new Error("Erro ao buscar status da loja.");
+
+      const data = await response.json();
+
+      // Atualiza o estado local com o valor lido do servidor
+      setIsStoreForcedOpen(data.isForcedOpen);
+      setError(null);
+    } catch (error) {
+      console.error("Erro ao buscar status da loja:", error);
+      setError(error.message);
+    } finally {
+      // Desliga o loading
+      setIsStatusLoading(false);
+    }
+  };
+
+  const handleToggleStoreStatus = async (newStatus) => {
+    setIsStatusLoading(true);
+    try {
+      const response = await fetch("/api/admin/status", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        // Envia o novo status (true ou false) no corpo da requisição
+        body: JSON.stringify({ isForcedOpen: newStatus }),
+      });
+
+      if (!response.ok) throw new Error("Falha ao atualizar status da loja.");
+
+      // Se a atualização foi bem-sucedida, atualiza o estado local e dá feedback
+      setIsStoreForcedOpen(newStatus);
+      alert(
+        `Status da Loja atualizado para: ${
+          newStatus ? "ABERTA (Forçado)" : "Seguindo Horário"
+        }`
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      alert("Erro ao tentar atualizar o status da loja.");
+    } finally {
+      setIsStatusLoading(false);
+    }
+  };
+
   // FUNÇÕES DE AUTENTICAÇÃO (Inalteradas)
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -292,6 +346,7 @@ function App() {
       if (currentPage === "pedidos" || currentPage === "relatorios") {
         // Chama a busca apenas quando a página ou os filtros mudam
         fetchRelatorio(filtroPeriodo, filtroStatus);
+        fetchStoreStatus();
       } else if (currentPage === "cardapio") {
         fetchCardapio();
       }
@@ -353,9 +408,58 @@ function App() {
             Relatórios
           </button>
           <button onClick={() => setCurrentPage("cardapio")}>Cardápio</button>
+          <button onClick={() => setCurrentPage("configuracoes")}>
+            Configurações
+          </button>
           <button onClick={handleLogout}>Sair</button>
         </nav>
       </header>
+
+      {/* 🟢 CONTEÚDO DA PÁGINA DE CONFIGURAÇÕES */}
+      {currentPage === "configuracoes" && (
+        <main className="painel-configuracoes">
+          <h2>Configurações da Loja</h2>
+          <div className="config-card">
+            <h3>Status de Abertura Forçada</h3>
+            <p>
+              Esta opção permite que você force a loja a aparecer como ABERTA
+              para todos os clientes, ignorando o horário de funcionamento.
+            </p>
+
+            {isStatusLoading ? (
+              <p className="loading">Carregando status...</p>
+            ) : (
+              <div className="status-toggle-container">
+                <span style={{ fontWeight: "bold" }}>
+                  Status Atual:
+                  {isStoreForcedOpen
+                    ? " 🟢 ABERTA (Forçado)"
+                    : " 🟠 Seguindo Horário"}
+                </span>
+
+                <button
+                  className={`btn ${
+                    isStoreForcedOpen ? "btn-vermelho" : "btn-verde"
+                  }`}
+                  onClick={() => handleToggleStoreStatus(!isStoreForcedOpen)}
+                  disabled={isStatusLoading}
+                  style={{ marginLeft: "20px" }}
+                >
+                  {isStoreForcedOpen
+                    ? "Desativar Forçar Abertura"
+                    : "Forçar Loja Aberta Agora"}
+                </button>
+              </div>
+            )}
+          </div>
+          {error && (
+            <p className="error" style={{ marginTop: "20px" }}>
+              Erro: {error}
+            </p>
+          )}
+        </main>
+      )}
+
       {/* Conteúdo da página de Pedidos */}
       {currentPage === "pedidos" && (
         <div className="painel-conteudo">

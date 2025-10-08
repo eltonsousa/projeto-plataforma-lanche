@@ -96,18 +96,19 @@ const BUSINESS_HOURS = {
   },
 };
 
-// 2. LÓGICA DE VERIFICAÇÃO
-const checkIsStoreOpen = () => {
-  // 🟢 SOBRESCRITA .ENV: Se o flag de desenvolvimento estiver ativo, retorna TRUE imediatamente.
-  if (IS_DEV_OVERRIDE_ACTIVE) {
+// 2. LÓGICA DE VERIFICAÇÃO (Agora aceita um objeto de sobrescrita)
+const checkIsStoreOpen = (overrideStatus = { isForcedOpen: false }) => {
+  // 🟢 PRIORIDADE MÁXIMA: Se o painel de administração forçar a abertura, retorna TRUE.
+  if (overrideStatus.isForcedOpen) {
     return true;
   }
 
+  // Lógica de horário base (só é executada se não houver sobrescrita)
   const now = new Date();
   const currentDay = now.getDay();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
-
+  // ... (Restante da sua lógica de horário) ...
   const currentTimeInMinutes = currentHour * 60 + currentMinute;
   const dayHours = BUSINESS_HOURS[currentDay];
 
@@ -118,7 +119,6 @@ const checkIsStoreOpen = () => {
   const openingTimeInMinutes = dayHours.startHour * 60 + dayHours.startMinute;
   const closingTimeInMinutes = dayHours.endHour * 60 + dayHours.endMinute;
 
-  // Aberto: [Hora de Abertura] <= [Hora Atual] < [Hora de Fechamento]
   const isCurrentlyOpen =
     currentTimeInMinutes >= openingTimeInMinutes &&
     currentTimeInMinutes < closingTimeInMinutes;
@@ -126,18 +126,55 @@ const checkIsStoreOpen = () => {
   return isCurrentlyOpen;
 };
 
-// 3. CUSTOM HOOK PARA USAR O STATUS NO COMPONENTE
+// 3. CUSTOM HOOK PARA USAR O STATUS NO COMPONENTE (Agora busca status do servidor)
 const useOperatingStatus = () => {
-  const [isStoreOpen, setIsStoreOpen] = useState(checkIsStoreOpen());
+  // Estado para armazenar o status de abertura forçada lido do servidor
+  const [storeOverride, setStoreOverride] = useState({
+    isForcedOpen: false,
+    isFetching: true,
+  });
 
+  const [isStoreOpen, setIsStoreOpen] = useState(
+    checkIsStoreOpen({ isForcedOpen: false })
+  );
+
+  // Função para buscar o status no seu backend a cada 30 segundos
+  const fetchOverrideStatus = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/status");
+      if (response.ok) {
+        const data = await response.json();
+        setStoreOverride({
+          isForcedOpen: data.isForcedOpen,
+          isFetching: false,
+        });
+      }
+    } catch (error) {
+      console.error("Falha ao buscar status do Admin:", error);
+      setStoreOverride((prev) => ({ ...prev, isFetching: false }));
+    }
+  }, []);
+
+  // Efeito 1: Busca o status do admin a cada 30 segundos
   useEffect(() => {
+    fetchOverrideStatus();
+    const intervalId = setInterval(fetchOverrideStatus, 30000); // Repete a cada 30s
+    return () => clearInterval(intervalId);
+  }, [fetchOverrideStatus]);
+
+  // Efeito 2: Recalcula o status de abertura quando a hora ou a sobrescrita muda
+  useEffect(() => {
+    const calculateStatus = () => {
+      setIsStoreOpen(checkIsStoreOpen(storeOverride));
+    };
+
+    calculateStatus(); // Roda quando o storeOverride muda
+
     // Verifica a cada minuto (60000ms) para atualização em tempo real
-    const intervalId = setInterval(() => {
-      setIsStoreOpen(checkIsStoreOpen());
-    }, 60000);
+    const intervalId = setInterval(calculateStatus, 60000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [storeOverride]);
 
   return isStoreOpen;
 };
