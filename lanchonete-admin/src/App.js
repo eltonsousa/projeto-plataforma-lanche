@@ -250,9 +250,7 @@ function App() {
       // Se a atualização foi bem-sucedida, atualiza o estado local e dá feedback
       setIsStoreForcedOpen(newStatus);
       alert(
-        `Status da Loja atualizado para: ${
-          newStatus ? "ABERTA (Forçado)" : "Seguindo Horário"
-        }`
+        `Status da Loja atualizado para: ${newStatus ? "ABERTO" : "FECHADO"}`
       );
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
@@ -432,9 +430,7 @@ function App() {
               <div className="status-toggle-container">
                 <span style={{ fontWeight: "bold" }}>
                   Status Atual:
-                  {isStoreForcedOpen
-                    ? " 🟢 ABERTA (Forçado)"
-                    : " 🟠 Seguindo Horário"}
+                  {isStoreForcedOpen ? " 🟢 ABERTA" : " 🟠 FECHADO"}
                 </span>
 
                 <button
@@ -445,9 +441,7 @@ function App() {
                   disabled={isStatusLoading}
                   style={{ marginLeft: "20px" }}
                 >
-                  {isStoreForcedOpen
-                    ? "Desativar Forçar Abertura"
-                    : "Forçar Loja Aberta Agora"}
+                  {isStoreForcedOpen ? "Fechar Loja" : "Abrir Loja"}
                 </button>
               </div>
             )}
@@ -823,7 +817,7 @@ function App() {
               </select>
 
               <button
-                class="btn-add-item btn btn-verde"
+                className="btn-add-item btn btn-verde"
                 type="submit"
                 disabled={isImageUploading}
               >
@@ -839,19 +833,19 @@ function App() {
                 <img src={item.imagem} alt={item.nome} />
                 <div className="item-info-admin">
                   <h4>{item.nome}</h4>
-                  <p class="valor-item-info-admin">
+                  <p className="valor-item-info-admin">
                     R$ {item.preco ? item.preco.toFixed(2) : "0.00"}
                   </p>
                 </div>
                 <div className="item-botoes-admin">
                   <button
-                    class="btn btn-verde"
+                    className="btn btn-verde"
                     onClick={() => handleEdit(item)}
                   >
                     <AiOutlineEdit size={20} /> Editar
                   </button>
                   <button
-                    class="btn btn-laranja"
+                    className="btn btn-laranja"
                     onClick={() => handleDelete(item.id)}
                   >
                     <AiOutlineDelete size={20} /> Deletar

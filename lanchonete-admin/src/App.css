@@ -786,6 +786,45 @@ footer p.footer-admin {
   }
 }
 
+/* Ativa/Desativa Loja */
+.painel-configuracoes {
+  padding: 20px;
+  max-width: 1200px;
+  /* mais largo no PC */
+  width: 100%;
+  /* ocupa toda a largura disponível */
+  margin: auto;
+  box-sizing: border-box;
+}
+
+.painel-configuracoes h2 {
+  text-align: center;
+  color: #3f51b5;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.config-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.config-card p {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.status-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0px 20px 0px;
+}
+/* Fim Ativa/Desativa Loja */
+
 @media (max-width: 480px) {
   .controles-pedidos {
     padding: 12px;
@@ -817,6 +856,10 @@ footer p.footer-admin {
   .painel-admin h1 {
     margin: 0;
     font-size: 1.5rem;
+  }
+
+  .nav-menu {
+    flex-direction: column;
   }
 
   /** Título Cardápio **/
