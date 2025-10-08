@@ -7,6 +7,7 @@ import {
   MdOutlinePlaylistAdd,
   MdOutlineAddPhotoAlternate,
 } from "react-icons/md";
+import { BsToggleOff, BsToggleOn } from "react-icons/bs";
 // --- Import de ìcones
 
 function App() {
@@ -441,7 +442,19 @@ function App() {
                   disabled={isStatusLoading}
                   style={{ marginLeft: "20px" }}
                 >
-                  {isStoreForcedOpen ? "Fechar Loja" : "Abrir Loja"}
+                  {isStoreForcedOpen ? (
+                    // Icone 'ON' quando a loja está forçada a ABRIR
+                    <>
+                      <BsToggleOff size={20} style={{ marginRight: "5px" }} />
+                      Fechar Loja
+                    </>
+                  ) : (
+                    // Icone 'OFF' quando a loja está forçada a FECHAR
+                    <>
+                      <BsToggleOn size={20} style={{ marginRight: "5px" }} />
+                      Abrir Loja
+                    </>
+                  )}
                 </button>
               </div>
             )}
