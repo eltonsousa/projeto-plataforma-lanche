@@ -7,8 +7,37 @@ import {
   MdOutlinePlaylistAdd,
   MdOutlineAddPhotoAlternate,
 } from "react-icons/md";
-import { BsToggleOff, BsToggleOn } from "react-icons/bs";
+import { BsToggleOff, BsToggleOn, BsClockFill } from "react-icons/bs";
 // --- Import de ìcones
+
+// Estrutura de horário padrão para a semana (0=Domingo, 6=Sábado)
+const defaultSchedule = [
+  { day: 0, name: "Domingo", isActive: false, start: "18:00", end: "23:00" },
+  {
+    day: 1,
+    name: "Segunda-feira",
+    isActive: true,
+    start: "18:00",
+    end: "23:00",
+  },
+  { day: 2, name: "Terça-feira", isActive: true, start: "18:00", end: "23:00" },
+  {
+    day: 3,
+    name: "Quarta-feira",
+    isActive: true,
+    start: "18:00",
+    end: "23:00",
+  },
+  {
+    day: 4,
+    name: "Quinta-feira",
+    isActive: true,
+    start: "18:00",
+    end: "23:00",
+  },
+  { day: 5, name: "Sexta-feira", isActive: true, start: "18:00", end: "23:00" },
+  { day: 6, name: "Sábado", isActive: true, start: "18:00", end: "23:00" },
+];
 
 function App() {
   const [pedidos, setPedidos] = useState([]);
@@ -49,6 +78,11 @@ function App() {
   // 🟢 NOVOS ESTADOS PARA O CONTROLE DE STATUS DA LOJA
   const [isStoreForcedOpen, setIsStoreForcedOpen] = useState(false); // Status da flag de override
   const [isStatusLoading, setIsStatusLoading] = useState(true); // Carregamento do status inicial
+
+  // 🟢 NOVOS ESTADOS PARA CONFIGURAÇÕES DE HORÁRIO (ADICIONE AQUI)
+  const [scheduleConfig, setScheduleConfig] = useState(defaultSchedule); // Estado principal do horário
+  const [isScheduleSaving, setIsScheduleSaving] = useState(false); // Estado de carregamento do formulário de horário
+  const [scheduleSaveSuccess, setScheduleSaveSuccess] = useState(false); // Estado de sucesso (feedback visual)
 
   const [isImageUploading, setIsImageUploading] = useState(false);
 
@@ -214,44 +248,101 @@ function App() {
   };
 
   // ---------------------------------------------
-  // FUNÇÕES DE STATUS DA LOJA (ABERTO/FECHADO FORÇADO)
+  // FUNÇÕES DE STATUS DA LOJA E HORÁRIO (COMPLETAS E DINÂMICAS)
   // ---------------------------------------------
 
+  // 🟢 NOVO: Manipula a mudança de inputs no formulário de horário
+  const handleScheduleChange = (day, field, value) => {
+    const newSchedule = scheduleConfig.map((s) => {
+      if (s.day === day) {
+        return {
+          ...s,
+          [field]: value, // Atualiza o campo (isActive, start, end)
+        };
+      }
+      return s;
+    });
+    setScheduleConfig(newSchedule);
+  };
+
+  // 🟢 NOVO: Salva a configuração de horários no servidor
+  const handleSaveSchedule = async (e) => {
+    e.preventDefault();
+    setIsScheduleSaving(true);
+    setScheduleSaveSuccess(false);
+
+    try {
+      // Usa a nova rota genérica de PUT
+      const response = await fetch("/api/admin/configuracoes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        // Envia o payload com o nome do campo do banco de dados
+        body: JSON.stringify({ schedule_config: scheduleConfig }),
+      });
+
+      if (!response.ok) throw new Error("Falha ao salvar horários.");
+
+      const data = await response.json();
+      setScheduleConfig(data.scheduleConfig); // Sincroniza com o valor confirmado do servidor
+
+      setScheduleSaveSuccess(true);
+      setTimeout(() => setScheduleSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error("Erro ao salvar horários:", err);
+      alert("Erro ao salvar horários de funcionamento. Verifique o console.");
+    } finally {
+      setIsScheduleSaving(false);
+    }
+  };
+
+  // 🟢 ATUALIZADA: Busca status forçado E configuração de horário
   const fetchStoreStatus = async () => {
     try {
+      // A rota AGORA retorna { isForcedOpen, scheduleConfig }
       const response = await fetch("/api/admin/status");
       if (!response.ok) throw new Error("Erro ao buscar status da loja.");
 
       const data = await response.json();
 
-      // Atualiza o estado local com o valor lido do servidor
+      // Atualiza o estado local com os valores lidos do servidor
       setIsStoreForcedOpen(data.isForcedOpen);
+
+      // Usa a configuração salva, se existir, senão usa o padrão
+      if (data.scheduleConfig) {
+        setScheduleConfig(data.scheduleConfig);
+      } else {
+        setScheduleConfig(defaultSchedule);
+      }
+
       setError(null);
     } catch (error) {
       console.error("Erro ao buscar status da loja:", error);
       setError(error.message);
     } finally {
-      // Desliga o loading
       setIsStatusLoading(false);
     }
   };
 
-  const handleToggleStoreStatus = async (newStatus) => {
+  // 🟢 ATUALIZADA: Agora usa a rota genérica PUT /api/admin/configuracoes
+  const handleToggleStoreStatus = async (newState) => {
     setIsStatusLoading(true);
     try {
-      const response = await fetch("/api/admin/status", {
+      const response = await fetch("/api/admin/configuracoes", {
+        // 👈 NOVA ROTA
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        // Envia o novo status (true ou false) no corpo da requisição
-        body: JSON.stringify({ isForcedOpen: newStatus }),
+        // Envia o novo status no corpo com o nome do campo do banco de dados
+        body: JSON.stringify({ is_forced_open: newState }),
       });
 
       if (!response.ok) throw new Error("Falha ao atualizar status da loja.");
 
-      // Se a atualização foi bem-sucedida, atualiza o estado local e dá feedback
-      setIsStoreForcedOpen(newStatus);
+      const data = await response.json();
+      // Atualiza o estado local com o valor retornado pelo servidor
+      setIsStoreForcedOpen(data.isForcedOpen);
+
       alert(
-        `Status da Loja atualizado para: ${newStatus ? "ABERTO" : "FECHADO"}`
+        `Status da Loja atualizado para: ${newState ? "ABERTO" : "FECHADO"}`
       );
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
@@ -260,6 +351,10 @@ function App() {
       setIsStatusLoading(false);
     }
   };
+
+  // ---------------------------------------------
+  // FIM FUNÇÕES DE STATUS DA LOJA E HORÁRIO
+  // ---------------------------------------------
 
   // FUNÇÕES DE AUTENTICAÇÃO (Inalteradas)
   const handleChange = (e) => {
@@ -418,6 +513,102 @@ function App() {
       {currentPage === "configuracoes" && (
         <main className="painel-configuracoes">
           <h2>Configurações da Loja</h2>
+
+          {/* ------------------------------------------------------------- */}
+          {/* 🟢 NOVO CARD: CONFIGURAÇÃO DE HORÁRIOS */}
+          {/* ------------------------------------------------------------- */}
+          <div className="config-card">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <BsClockFill size={24} style={{ marginRight: "10px" }} />
+              <h3>Horário de Funcionamento Programado</h3>
+            </div>
+            <p>
+              Defina os dias e horários em que a loja aceita pedidos
+              automaticamente. Esta configuração é ignorada se o **Status de
+              Abertura Forçada** abaixo estiver ativo.
+            </p>
+
+            <form onSubmit={handleSaveSchedule}>
+              {/* 🚨 Atenção: Este CSS (.schedule-form-grid e .schedule-row) deve ser adicionado ao seu App.css! */}
+              <div className="schedule-form-grid">
+                <label>Dia</label>
+                <label>Aberto?</label>
+                <label>Início (HH:MM)</label>
+                <label>Fim (HH:MM)</label>
+              </div>
+
+              {scheduleConfig.map((dayConfig) => (
+                <div key={dayConfig.day} className="schedule-row">
+                  <span>{dayConfig.name}</span>
+
+                  <input
+                    type="checkbox"
+                    checked={dayConfig.isActive}
+                    onChange={(e) =>
+                      handleScheduleChange(
+                        dayConfig.day,
+                        "isActive",
+                        e.target.checked
+                      )
+                    }
+                  />
+
+                  <input
+                    type="time"
+                    value={dayConfig.start}
+                    onChange={(e) =>
+                      handleScheduleChange(
+                        dayConfig.day,
+                        "start",
+                        e.target.value
+                      )
+                    }
+                    disabled={!dayConfig.isActive}
+                    required
+                  />
+
+                  <input
+                    type="time"
+                    value={dayConfig.end}
+                    onChange={(e) =>
+                      handleScheduleChange(dayConfig.day, "end", e.target.value)
+                    }
+                    disabled={!dayConfig.isActive}
+                    required
+                  />
+                </div>
+              ))}
+
+              <button
+                type="submit"
+                className={`btn ${
+                  isScheduleSaving ? "btn-laranja" : "btn-verde"
+                }`}
+                disabled={isScheduleSaving}
+                style={{ marginTop: "20px" }}
+              >
+                <AiOutlineCheck size={20} />
+                {isScheduleSaving ? "Salvando Horários..." : "Salvar Horários"}
+              </button>
+
+              {scheduleSaveSuccess && (
+                <p style={{ color: "green", marginTop: "10px" }}>
+                  Horários salvos com sucesso!
+                </p>
+              )}
+            </form>
+          </div>
+          {/* ------------------------------------------------------------- */}
+          {/* FIM NOVO CARD: CONFIGURAÇÃO DE HORÁRIOS */}
+          {/* ------------------------------------------------------------- */}
+
+          {/* CARD EXISTENTE: STATUS DE ABERTURA FORÇADA (COMEÇA AQUI) */}
           <div className="config-card">
             <h3>Status de Abertura Forçada</h3>
             <p>

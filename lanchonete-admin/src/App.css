@@ -1022,3 +1022,39 @@ footer p.footer-admin {
     max-width: 120px;
   }
 }
+
+.schedule-form-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr; /* Dia | Aberto? | Início | Fim */
+  gap: 10px;
+  font-weight: bold;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  margin-top: 15px;
+}
+
+.schedule-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.schedule-row:last-of-type {
+  border-bottom: none;
+}
+
+.schedule-row input[type="time"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.schedule-row input[type="checkbox"] {
+  justify-self: center; /* Centraliza o checkbox */
+  width: 20px;
+  height: 20px;
+}

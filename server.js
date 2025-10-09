@@ -626,33 +626,43 @@ app.get("/api/carrinho/:sessionId", async (req, res) => {
 // CONFIGURAÇÕES GLOBAIS (STATUS DA LOJA)
 // ---------------------------------------------
 
-// Rota para LER o status de abertura forçada (consumida pelo lanchonete-app)
+// Rota para LER o status completo (consumida pelo lanchonete-app e lanchonete-admin)
 app.get("/api/admin/status", async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("configuracoes")
-      .select("is_forced_open")
-      .limit(1); // Esperamos apenas um registro
+      // 🟢 Modificação: Seleciona os dois campos
+      .select("is_forced_open, schedule_config")
+      .limit(1);
 
     if (error) throw error;
 
+    // Se o registro não existe, retorna valores padrão
     const isForcedOpen = data.length > 0 ? data[0].is_forced_open : false;
-    res.status(200).json({ isForcedOpen });
+    // Retorna a configuração de horário ou null
+    const scheduleConfig = data.length > 0 ? data[0].schedule_config : null;
+
+    // Retorna ambos os dados
+    res.status(200).json({ isForcedOpen, scheduleConfig });
   } catch (err) {
     console.error("Erro GET /api/admin/status:", err);
     res.status(500).json({ message: "Erro ao buscar status de configuração." });
   }
 });
 
-// Rota para ATUALIZAR o status de abertura forçada (consumida pelo Painel Admin)
-app.put("/api/admin/status", async (req, res) => {
-  const { isForcedOpen } = req.body;
-  if (typeof isForcedOpen !== "boolean") {
-    return res.status(400).json({ message: "O valor deve ser booleano." });
+// -------------------------------------------------------------------
+// 🟢 NOVA ROTA: Rota genérica para ATUALIZAR QUALQUER CONFIGURAÇÃO
+// -------------------------------------------------------------------
+app.put("/api/admin/configuracoes", async (req, res) => {
+  // O payload pode conter 'is_forced_open' ou 'schedule_config'
+  const updatePayload = req.body;
+
+  if (Object.keys(updatePayload).length === 0) {
+    return res.status(400).json({ message: "Nenhum campo para atualizar." });
   }
 
   try {
-    // 🔹 Buscamos o ID do único registro de configurações
+    // 1. Busca o ID existente
     const { data: existingConfig, error: fetchError } = await supabase
       .from("configuracoes")
       .select("id")
@@ -660,24 +670,45 @@ app.put("/api/admin/status", async (req, res) => {
 
     if (fetchError) throw fetchError;
 
-    // Se houver, atualizamos o registro existente (usando o primeiro ID encontrado)
-    const configId = existingConfig[0].id;
-    const { data: updatedData, error: updateError } = await supabase
-      .from("configuracoes")
-      .update({ is_forced_open: isForcedOpen })
-      .eq("id", configId)
-      .select();
+    let updatedData;
+    let updateError;
+
+    // Lógica robusta: INSERE se não existe, ATUALIZA se existe
+    if (existingConfig.length === 0) {
+      // INSERE
+      ({ data: updatedData, error: updateError } = await supabase
+        .from("configuracoes")
+        .insert([updatePayload])
+        .select("is_forced_open, schedule_config"));
+    } else {
+      // ATUALIZA
+      const configId = existingConfig[0].id;
+      ({ data: updatedData, error: updateError } = await supabase
+        .from("configuracoes")
+        .update(updatePayload)
+        .eq("id", configId)
+        .select("is_forced_open, schedule_config"));
+    }
 
     if (updateError) throw updateError;
+    if (!updatedData || updatedData.length === 0) {
+      throw new Error("Falha ao atualizar/inserir configuração.");
+    }
 
-    res.status(200).json({ isForcedOpen: updatedData[0].is_forced_open });
+    const { is_forced_open, schedule_config } = updatedData[0];
+
+    // Retorna a configuração completa atualizada
+    res.status(200).json({
+      isForcedOpen: is_forced_open,
+      scheduleConfig: schedule_config,
+    });
   } catch (err) {
-    console.error("Erro PUT /api/admin/status:", err);
-    res
-      .status(500)
-      .json({ message: "Erro ao atualizar status de configuração." });
+    console.error("Erro PUT /api/admin/configuracoes:", err);
+    res.status(500).json({ message: "Erro ao atualizar configuração." });
   }
 });
+
+// 🔴 Rota PUT /api/admin/status REMOVIDA: A função de atualização foi migrada para a rota PUT /api/admin/configuracoes
 
 // ---------------------------------------------
 // FIM CONFIGURAÇÕES GLOBAIS (STATUS DA LOJA)

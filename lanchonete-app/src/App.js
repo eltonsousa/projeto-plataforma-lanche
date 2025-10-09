@@ -42,112 +42,94 @@ import { CiDeliveryTruck } from "react-icons/ci";
 /* Código antigo não usar!!! */
 
 // ----------------------------------------------------
-// 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO
+// 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO (DINÂMICAS)
 // ----------------------------------------------------
 
-// 1. CONFIGURAÇÃO DE HORÁRIO: 18:00h às 23:40h, todos os dias (0=Dom, 6=Sáb)
-const BUSINESS_HOURS = {
-  0: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
-  1: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
-  2: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
-  3: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
-  4: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
-  5: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
-  6: {
-    isOpen: true,
-    startHour: 18,
-    startMinute: 0,
-    endHour: 23,
-    endMinute: 40,
-  },
+// 🟢 1. FUNÇÃO DE CÁLCULO: Verifica se a loja está aberta APENAS pelo horário programado
+const isStoreOpenBySchedule = (scheduleConfig) => {
+  // Se a configuração ainda não carregou ou está vazia (nunca foi salva)
+  if (!scheduleConfig || scheduleConfig.length === 0) return false;
+
+  const now = new Date();
+  // getDay retorna: 0 (Domingo), 1 (Segunda), ..., 6 (Sábado)
+  const dayOfWeek = now.getDay();
+  const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // Encontra a configuração do dia atual (o formato é um array de objetos, não um objeto indexado)
+  const todaySchedule = scheduleConfig.find((s) => s.day === dayOfWeek);
+
+  // 2. Se o dia não tem configuração ou está desativado no Admin
+  if (!todaySchedule || !todaySchedule.isActive) return false;
+
+  // Função utilitária para converter "HH:MM" para minutos totais
+  const timeToMinutes = (timeStr) => {
+    // Assume o formato "HH:MM" que o Admin envia
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  try {
+    const startMinutes = timeToMinutes(todaySchedule.start);
+    const endMinutes = timeToMinutes(todaySchedule.end);
+
+    // Caso normal (Ex: 18:00 - 23:00)
+    if (startMinutes <= endMinutes) {
+      return (
+        currentTimeInMinutes >= startMinutes &&
+        currentTimeInMinutes <= endMinutes
+      );
+    } else {
+      // Caso que vira o dia (Ex: 22:00 - 02:00)
+      // Aberto se (Hora atual >= Hora de início) OU (Hora atual <= Hora de fim)
+      return (
+        currentTimeInMinutes >= startMinutes ||
+        currentTimeInMinutes <= endMinutes
+      );
+    }
+  } catch (e) {
+    console.error("Erro ao processar horário dinâmico:", e);
+    return false;
+  }
 };
 
-// 2. LÓGICA DE VERIFICAÇÃO (Agora aceita um objeto de sobrescrita)
-const checkIsStoreOpen = (overrideStatus = { isForcedOpen: false }) => {
+// 2. LÓGICA DE VERIFICAÇÃO (Agora aceita a configuração completa)
+const checkIsStoreOpen = (
+  overrideStatus = { isForcedOpen: false, scheduleConfig: null } // 🟢 Recebe a configuração
+) => {
   // 🟢 PRIORIDADE MÁXIMA: Se o painel de administração forçar a abertura, retorna TRUE.
   if (overrideStatus.isForcedOpen) {
     return true;
   }
 
-  // Lógica de horário base (só é executada se não houver sobrescrita)
-  const now = new Date();
-  const currentDay = now.getDay();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  // ... (Restante da sua lógica de horário) ...
-  const currentTimeInMinutes = currentHour * 60 + currentMinute;
-  const dayHours = BUSINESS_HOURS[currentDay];
-
-  if (!dayHours || !dayHours.isOpen) {
-    return false;
-  }
-
-  const openingTimeInMinutes = dayHours.startHour * 60 + dayHours.startMinute;
-  const closingTimeInMinutes = dayHours.endHour * 60 + dayHours.endMinute;
-
-  const isCurrentlyOpen =
-    currentTimeInMinutes >= openingTimeInMinutes &&
-    currentTimeInMinutes < closingTimeInMinutes;
-
-  return isCurrentlyOpen;
+  // 🟢 NOVO CÁLCULO: Usa o horário configurado no Admin
+  return isStoreOpenBySchedule(overrideStatus.scheduleConfig);
 };
 
-// 3. CUSTOM HOOK PARA USAR O STATUS NO COMPONENTE (Agora busca status do servidor)
+// 3. CUSTOM HOOK PARA USAR O STATUS NO COMPONENTE (Agora busca status completo do servidor)
 const useOperatingStatus = () => {
   // Estado para armazenar o status de abertura forçada lido do servidor
   const [storeOverride, setStoreOverride] = useState({
     isForcedOpen: false,
+    scheduleConfig: null, // 🟢 NOVO CAMPO NO ESTADO
     isFetching: true,
   });
 
   const [isStoreOpen, setIsStoreOpen] = useState(
-    checkIsStoreOpen({ isForcedOpen: false })
+    checkIsStoreOpen({ isForcedOpen: false, scheduleConfig: null }) // Inicialização com valores nulos
   );
 
   // Função para buscar o status no seu backend a cada 30 segundos
   const fetchOverrideStatus = useCallback(async () => {
     try {
+      // Esta rota DEVE AGORA retornar { isForcedOpen, scheduleConfig }
       const response = await fetch("/api/admin/status");
       if (response.ok) {
         const data = await response.json();
+
+        // 🟢 ATUALIZA O ESTADO COM AMBOS OS CAMPOS
         setStoreOverride({
           isForcedOpen: data.isForcedOpen,
+          scheduleConfig: data.scheduleConfig,
           isFetching: false,
         });
       }
@@ -164,9 +146,10 @@ const useOperatingStatus = () => {
     return () => clearInterval(intervalId);
   }, [fetchOverrideStatus]);
 
-  // Efeito 2: Recalcula o status de abertura quando a hora ou a sobrescrita muda
+  // Efeito 2: Recalcula o status de abertura quando a hora, sobrescrita ou o SCHEDULE muda
   useEffect(() => {
     const calculateStatus = () => {
+      // 🟢 Passa a configuração completa para a lógica de verificação
       setIsStoreOpen(checkIsStoreOpen(storeOverride));
     };
 
@@ -176,7 +159,7 @@ const useOperatingStatus = () => {
     const intervalId = setInterval(calculateStatus, 60000);
 
     return () => clearInterval(intervalId);
-  }, [storeOverride]);
+  }, [storeOverride]); // O hook reage a qualquer mudança em storeOverride (incluindo scheduleConfig)
 
   return isStoreOpen;
 };
@@ -193,9 +176,7 @@ const StatusIndicator = ({ isStoreOpen }) => {
 
   return (
     <div className={`status-indicator ${statusClass}`}>
-      {/* 🟢 ÍCONE E TEXTO AGORA SÃO FILHOS DIRETOS DO STATUS-INDICATOR */}
-      <IconComponent size={12} />{" "}
-      {/* Reduzi o size para 12px para caber melhor no font-size 0.7rem */}
+      <IconComponent size={12} />
       <span>{text}</span>
     </div>
   );
