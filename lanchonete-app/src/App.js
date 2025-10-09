@@ -26,22 +26,24 @@ import { MdOutlineArrowBackIosNew } from "react-icons/md";
 import { CiDeliveryTruck } from "react-icons/ci";
 // ---- Import icones ---- //
 
-// ----------------------------------------------------
-// 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO
-// ----------------------------------------------------
-
-// 🟢 MODO DE DESENVOLVIMENTO/MANUTENÇÃO
+/* Código antigo não usar!!! */
+// 🟢 MODO DE DESENVOLVIMENTO/MANUTENÇÃO UTILIZANDO .ENV.LOCAL
 // Se TRUE, a loja SEMPRE estará aberta, ignorando o horário.
 // Mude para FALSE ao fazer o deploy para produção.
 // LÊ DO ARQUIVO .env.local: (REACT_APP_FORCE_OPEN_DEV = true)
-const IS_DEV_OVERRIDE_ACTIVE = process.env.REACT_APP_FORCE_OPEN_DEV === "true";
+// const IS_DEV_OVERRIDE_ACTIVE = process.env.REACT_APP_FORCE_OPEN_DEV === "true";
 
 // 🟢 DEBUG CRÍTICO: Verifique o valor lido no console
-console.log("Variável lida do .env:", process.env.REACT_APP_FORCE_OPEN_DEV);
-console.log(
-  "Status de Sobrescrita Ativo (TRUE esperado):",
-  IS_DEV_OVERRIDE_ACTIVE
-);
+// console.log("Variável lida do .env:", process.env.REACT_APP_FORCE_OPEN_DEV);
+// console.log(
+//   "Status de Sobrescrita Ativo (TRUE esperado):",
+//   IS_DEV_OVERRIDE_ACTIVE
+// );
+/* Código antigo não usar!!! */
+
+// ----------------------------------------------------
+// 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO
+// ----------------------------------------------------
 
 // 1. CONFIGURAÇÃO DE HORÁRIO: 18:00h às 23:40h, todos os dias (0=Dom, 6=Sáb)
 const BUSINESS_HOURS = {
@@ -296,7 +298,7 @@ function App() {
   const [quantidadeProduto, setQuantidadeProduto] = useState(1);
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState("Sanduíches");
-  ////////////////////
+
   // Observação
   const [observacao, setObservacao] = useState("");
 
@@ -371,7 +373,6 @@ function App() {
     setAdicionaisSelecionados({});
     setObservacao("");
   };
-  //////////////////////////////
 
   // 🟢 ESTADO USADO PARA CONTROLE DE CARREGAMENTO
   const [cardapioLoading, setCardapioLoading] = useState(true);
@@ -474,7 +475,6 @@ function App() {
   }, [carrinho, cardapioLoading, saveCarrinhoToSupabase]);
 
   // --- FUNÇÕES DE CARRINHO ---
-
   const aumentarQuantidade = (itemId) => {
     setCarrinho(
       carrinho.map((item) =>
