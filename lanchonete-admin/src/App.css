@@ -812,6 +812,11 @@ footer p.footer-admin {
   margin-bottom: 20px;
 }
 
+.titulo-config-card {
+  display: flex;
+  align-items: center;
+}
+
 .config-card p {
   margin-bottom: 30px;
   color: #333;
@@ -926,7 +931,28 @@ footer p.footer-admin {
     gap: 10px;
   }
 
+  /** Painel Configurações **/
+
+  .titulo-config-card {
+    font-size: 0.9rem;
+    justify-content: center;
+  }
+
+  .config-card p {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .schedule-form-grid label {
+    font-size: 0.9rem;
+  }
+
+  .schedule-row span {
+    font-size: 0.9rem;
+  }
+
   .config-card button {
+    margin-left: 0px;
+    margin: 0px;
     width: 100%;
   }
 }

@@ -518,13 +518,7 @@ function App() {
           {/* 🟢 NOVO CARD: CONFIGURAÇÃO DE HORÁRIOS */}
           {/* ------------------------------------------------------------- */}
           <div className="config-card">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
+            <div className="titulo-config-card">
               <BsClockFill size={24} style={{ marginRight: "10px" }} />
               <h3>Horário de Funcionamento Programado</h3>
             </div>
@@ -591,7 +585,6 @@ function App() {
                   isScheduleSaving ? "btn-laranja" : "btn-verde"
                 }`}
                 disabled={isScheduleSaving}
-                style={{ marginTop: "20px" }}
               >
                 <AiOutlineCheck size={20} />
                 {isScheduleSaving ? "Salvando Horários..." : "Salvar Horários"}
@@ -610,7 +603,10 @@ function App() {
 
           {/* CARD EXISTENTE: STATUS DE ABERTURA FORÇADA (COMEÇA AQUI) */}
           <div className="config-card">
-            <h3>Status de Abertura Forçada</h3>
+            <div className="titulo-config-card">
+              <BsClockFill size={24} style={{ marginRight: "10px" }} />
+              <h3>Status de Abertura Forçada</h3>
+            </div>
             <p>
               Esta opção permite que você force a loja a aparecer como ABERTA
               para todos os clientes, ignorando o horário de funcionamento.
@@ -620,7 +616,7 @@ function App() {
               <p className="loading">Carregando status...</p>
             ) : (
               <div className="status-toggle-container">
-                <span style={{ fontWeight: "bold" }}>
+                <span>
                   Status Atual:
                   {isStoreForcedOpen ? " 🟢 ABERTA" : " 🟠 FECHADO"}
                 </span>
@@ -631,7 +627,6 @@ function App() {
                   }`}
                   onClick={() => handleToggleStoreStatus(!isStoreForcedOpen)}
                   disabled={isStatusLoading}
-                  style={{ marginLeft: "20px" }}
                 >
                   {isStoreForcedOpen ? (
                     // Icone 'ON' quando a loja está forçada a ABRIR
