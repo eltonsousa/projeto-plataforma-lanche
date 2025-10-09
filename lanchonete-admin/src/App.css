@@ -817,6 +817,13 @@ footer p.footer-admin {
   color: #333;
 }
 
+.config-card button {
+  display: flex;
+  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
 .status-toggle-container {
   display: flex;
   align-items: center;
@@ -917,6 +924,10 @@ footer p.footer-admin {
 
   .item-cardapio-admin {
     gap: 10px;
+  }
+
+  .config-card button {
+    width: 100%;
   }
 }
 
