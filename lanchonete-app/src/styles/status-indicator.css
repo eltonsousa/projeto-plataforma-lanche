@@ -13,7 +13,7 @@
   /* Posição Fixa no canto superior direito */
   position: fixed;
   top: 20px;
-  right: 20px;
+  left: 20px;
 
   /* Estilos Visuais */
   animation: pulse 2s infinite;
