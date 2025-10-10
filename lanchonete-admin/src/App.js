@@ -524,15 +524,18 @@ function App() {
             </div>
             <p>
               Defina os dias e horários em que a loja aceita pedidos
-              automaticamente. Esta configuração é ignorada se o **Status de
-              Abertura Forçada** abaixo estiver ativo.
+              automaticamente. Esta configuração é ignorada se o{" "}
+              <span style={{ color: "#f44336" }}>
+                Status de Abertura Forçada
+              </span>{" "}
+              abaixo estiver ativo.
             </p>
 
             <form onSubmit={handleSaveSchedule}>
               {/* 🚨 Atenção: Este CSS (.schedule-form-grid e .schedule-row) deve ser adicionado ao seu App.css! */}
               <div className="schedule-form-grid">
-                <label>Dia</label>
-                <label>Aberto?</label>
+                <label>Dia:</label>
+                <label>Aberto:</label>
                 <label>Início (HH:MM)</label>
                 <label>Fim (HH:MM)</label>
               </div>

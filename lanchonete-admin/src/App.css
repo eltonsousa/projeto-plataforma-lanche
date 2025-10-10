@@ -1,7 +1,7 @@
 :root {
   /* 🎨 Paleta de Cores */
   --cor-azul: #3f51b5;
-  --cor-azul-hover: #3f51b5;
+  --cor-azul-hover: #5366cf;
 
   --cor-laranja: #ff6347;
   --cor-laranja-hover: #e5533d;
@@ -9,6 +9,7 @@
   --cor-verde-hover: #43a047;
   --cor-vermelho: #f44336;
   --cor-vermelho-hover: #d32f2f;
+  --cor-cinza-claro: #f0f2f5;
   --cor-cinza-medio: #666;
   --cor-cinza-medio-hover: #333;
   --cor-branco: #fff;
@@ -87,10 +88,10 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
+  background-color: var(--cor-cinza-claro);
   margin: 0;
   padding: 0;
-  color: #333;
+  color: var(--cor-cinza-medio-hover);
 }
 
 /* Painel principal ocupa toda a tela e organiza em coluna */
@@ -129,7 +130,7 @@ footer p.footer-admin {
 }
 
 .item-cardapio-admin h4 {
-  color: #505050;
+  color: var(--cor-cinza-medio);
   margin: 0;
   font-size: 1rem;
   font-weight: bold;
@@ -142,7 +143,7 @@ footer p.footer-admin {
 }
 
 .valor-item-info-admin {
-  color: #7d7d7d;
+  color: var(--cor-cinza-medio);
 }
 
 /* Menu navegação */
@@ -156,36 +157,36 @@ footer p.footer-admin {
 .nav-menu button {
   /* composes: btn; */
   cursor: pointer;
-  background-color: #5c6bc0;
-  color: white;
+  background-color: var(--cor-azul-hover);
+  color: var(--cor-branco);
   border-radius: 5px;
   border: none;
   padding: 6px 10px 6px 10px;
 }
 
 .nav-menu button:hover {
-  background-color: #7986cb;
+  background-color: var(--cor-azul);
 }
 
 /* Pedidos */
 .titulo-pedidos-recebidos {
   text-align: center;
   margin: 20px 0;
-  color: #3f51b5;
+  color: var(--cor-azul);
 }
 
 .pedido-card {
-  background-color: white;
+  background-color: var(--cor-branco);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   width: 300px;
-  border-left: 5px solid #3f51b5;
+  border-left: 5px solid var(--cor-azul);
 }
 
 .pedido-card h3 {
   margin-top: 0;
-  color: #3f51b5;
+  color: var(--cor-azul);
 }
 
 .pedido-card ul {
@@ -194,7 +195,7 @@ footer p.footer-admin {
 }
 
 .pedido-card li {
-  background-color: #f8f8f8;
+  background-color: var(--cor-cinza-claro);
   margin-bottom: 5px;
   padding: 8px;
   border-radius: 4px;
@@ -204,13 +205,13 @@ footer p.footer-admin {
   display: flex;
   gap: 10px;
   padding: 25px 0px 25px 0px;
-  border-bottom: solid 1px #ccc;
+  border-bottom: solid 1px var(--cor-cinza-claro);
 }
 
 .status-btn {
-  background-color: #f0f2f5;
-  color: #666;
-  border: 1px solid #ddd;
+  background-color: var(--cor-cinza-claro);
+  color: var(--cor-cinza-medio);
+  border: 1px solid var(--cor-cinza-claro);
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -219,15 +220,15 @@ footer p.footer-admin {
 }
 
 .active-status-btn {
-  background-color: #3f51b5;
-  color: white;
-  border-color: #3f51b5;
+  background-color: var(--cor-azul);
+  color: var(--cor-branco);
+  border-color: var(--cor-azul);
   font-weight: bold;
 }
 
 .status-btn:hover {
   background-color: #cdd5ff;
-  color: #3f51b5;
+  color: var(--cor-azul);
 }
 
 /* Status tags */
@@ -235,7 +236,7 @@ footer p.footer-admin {
 .status-pronto-para-entrega,
 .status-entregue,
 .status-concluído {
-  color: white;
+  color: var(--cor-branco);
   font-weight: bold;
   padding: 5px 10px;
   border-radius: 3px;
@@ -271,7 +272,7 @@ footer p.footer-admin {
   text-align: center;
   padding: 20px;
   font-size: 1.2rem;
-  color: #666;
+  color: var(--cor-cinza-medio);
 }
 
 .error-state {
@@ -291,13 +292,13 @@ footer p.footer-admin {
 
 .painel-cardapio h2 {
   text-align: center;
-  color: #3f51b5;
-  border-bottom: 2px solid #eee;
+  color: var(--cor-azul);
+  border-bottom: 2px solid var(--cor-cinza-claro);
   padding-bottom: 10px;
 }
 
 .cardapio-form {
-  background-color: white;
+  background-color: var(--cor-branco);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -313,7 +314,7 @@ footer p.footer-admin {
 .cardapio-form input {
   width: 95%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--cor-cinza-claro);
   border-radius: 5px;
 }
 
@@ -354,7 +355,7 @@ footer p.footer-admin {
 
 .cardapio-form select {
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--cor-cinza-claro);
   border-radius: 5px;
 }
 
@@ -387,7 +388,7 @@ footer p.footer-admin {
 }
 
 .cardapio-lista {
-  background-color: white;
+  background-color: var(--cor-branco);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -395,7 +396,7 @@ footer p.footer-admin {
 
 .cardapio-lista h3 {
   padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--cor-cinza-claro);
 }
 
 .item-cardapio-admin {
@@ -403,7 +404,7 @@ footer p.footer-admin {
   align-items: center;
   gap: 15px;
   padding: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--cor-cinza-claro);
 }
 
 .item-cardapio-admin:last-child {
@@ -455,7 +456,7 @@ footer p.footer-admin {
 }
 
 .auth-container h2 {
-  color: #3f51b5;
+  color: var(--cor-azul);
   margin-bottom: 2rem;
 }
 
@@ -463,7 +464,7 @@ footer p.footer-admin {
   display: flex;
   flex-direction: column;
   width: 300px;
-  background-color: white;
+  background-color: var(--cor-branco);
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -486,7 +487,7 @@ footer p.footer-admin {
 .auth-container input {
   margin-bottom: 8px;
   padding: 10px;
-  border: 2px solid #3f51b5;
+  border: 2px solid var(--cor-azul);
   border-radius: 5px;
   font-size: 1rem;
 }
@@ -506,8 +507,8 @@ footer p.footer-admin {
 .auth-container button[type="submit"] {
   /* composes: btn; */
   cursor: pointer;
-  background-color: #3f51b5;
-  color: white;
+  background-color: var(--cor-azul);
+  color: var(--cor-branco);
   font-weight: 500;
   margin-top: 1rem;
   border-radius: 5px;
@@ -520,7 +521,7 @@ footer p.footer-admin {
 .auth-container button[type="submit"]:hover {
   /* composes: btn; */
   background-color: #8999f1;
-  color: white;
+  color: var(--cor-branco);
 }
 
 /* =================================== */
@@ -556,13 +557,13 @@ footer p.footer-admin {
   margin-right: 8px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #fff;
+  border-top-color: var(--cor-cinza-claro);
   animation: spin 1s ease-in-out infinite;
 }
 
 .auth-container p.toggle-auth {
   margin-top: 1rem;
-  color: #3f51b5;
+  color: var(--cor-azul);
   cursor: pointer;
   text-decoration: underline;
 }
@@ -577,7 +578,7 @@ footer p.footer-admin {
 .titulo-relatorio {
   text-align: center;
   margin-bottom: 30px;
-  color: #3f51b5;
+  color: var(--cor-azul);
   font-size: 2rem;
 }
 
@@ -586,7 +587,7 @@ footer p.footer-admin {
   margin-top: 40px;
   margin-bottom: 20px;
   color: #555;
-  border-bottom: 2px solid #ccc;
+  border-bottom: 2px solid var(--cor-cinza-claro);
   padding-bottom: 10px;
   font-size: 1.5rem;
 }
@@ -595,7 +596,7 @@ footer p.footer-admin {
   margin: 20px auto;
   max-width: 1000px;
   padding: 20px;
-  background-color: white;
+  background-color: var(--cor-branco);
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -610,7 +611,7 @@ footer p.footer-admin {
 .controles-relatorio select {
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--cor-cinza-claro);
   font-size: 1rem;
   margin-left: 10px;
   width: 200px;
@@ -635,7 +636,7 @@ footer p.footer-admin {
 
 .metrica h4 {
   margin: 0 0 10px 0;
-  color: #3f51b5;
+  color: var(--cor-azul);
   font-weight: 600;
   font-size: 1rem;
 }
@@ -660,7 +661,7 @@ footer p.footer-admin {
 }
 
 .pedido-card-relatorio {
-  background-color: white;
+  background-color: var(--cor-branco);
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -693,7 +694,7 @@ footer p.footer-admin {
 .controles-pedidos select {
   padding: 8px;
   border-radius: 5px;
-  border: 2px solid #3f51b5;
+  border: 2px solid var(--cor-azul);
   font-size: 1rem;
   cursor: pointer;
   margin-left: 5px;
@@ -706,7 +707,7 @@ footer p.footer-admin {
 
 .botao-atualizar:hover {
   background-color: #fc7f76;
-  color: white;
+  color: var(--cor-branco);
 }
 
 /* Conteúdo principal */
@@ -799,13 +800,13 @@ footer p.footer-admin {
 
 .painel-configuracoes h2 {
   text-align: center;
-  color: #3f51b5;
-  border-bottom: 2px solid #eee;
+  color: var(--cor-azul);
+  border-bottom: 2px solid var(--cor-cinza-claro);
   padding-bottom: 1rem;
 }
 
 .config-card {
-  background-color: white;
+  background-color: var(--cor-branco);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -819,7 +820,7 @@ footer p.footer-admin {
 
 .config-card p {
   margin-bottom: 30px;
-  color: #333;
+  color: var(--cor-cinza-medio);
 }
 
 .config-card button {
@@ -837,9 +838,14 @@ footer p.footer-admin {
   gap: 1rem;
 }
 
+.status-toggle-container span {
+  font-weight: bold;
+}
+
 .status-toggle-container button {
   display: flex;
   align-items: center;
+  margin-top: 0px;
 }
 /* Fim Ativa/Desativa Loja */
 
@@ -883,8 +889,8 @@ footer p.footer-admin {
   /** Título Cardápio **/
   .painel-cardapio h2 {
     text-align: center;
-    color: #3f51b5;
-    border-bottom: 2px solid #eee;
+    color: var(--cor-azul);
+    border-bottom: 2px solid var(--cor-cinza-claro);
     padding-bottom: 10px;
   }
 
@@ -950,9 +956,7 @@ footer p.footer-admin {
     font-size: 0.9rem;
   }
 
-  .config-card button {
-    margin-left: 0px;
-    margin: 0px;
+  .config-card form button {
     width: 100%;
   }
 }
@@ -1034,6 +1038,12 @@ footer p.footer-admin {
     padding: 10px;
   }
 
+  .schedule-form-grid {
+    grid-template-columns: 0.7fr 0.7fr 1fr 1fr !important;
+    text-align: center;
+    align-items: center;
+  }
+
   .status-toggle-container button {
     display: flex;
     align-items: center;
@@ -1058,6 +1068,40 @@ footer p.footer-admin {
   .item-cardapio-admin h4 {
     max-width: 120px;
   }
+  /** painel Configurações **/
+  .painel-configuracoes {
+    padding: 15px;
+  }
+
+  .schedule-form-grid {
+    grid-template-columns: 0.5fr 0.6fr 1.2fr 1.3fr !important;
+    text-align: center;
+    align-items: center;
+  }
+
+  .schedule-row span {
+    font-size: 0.8rem;
+    text-align: left;
+  }
+
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 0.7fr 0.7fr 0.7fr 0.7fr !important;
+    gap: 6px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--cor-cinza-claro);
+    align-items: center;
+    justify-content: end;
+    /* text-align: start; */
+  }
+}
+
+@media (max-width: 375px) {
+  .schedule-form-grid {
+    grid-template-columns: 0.5fr 0.6fr 1.2fr 1.2fr !important;
+    text-align: center;
+    align-items: center;
+  }
 }
 
 .schedule-form-grid {
@@ -1066,7 +1110,7 @@ footer p.footer-admin {
   gap: 10px;
   font-weight: bold;
   padding-bottom: 5px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--cor-cinza-claro);
   margin-top: 15px;
 }
 
@@ -1076,7 +1120,7 @@ footer p.footer-admin {
   gap: 10px;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px dashed #eee;
+  border-bottom: 1px dashed var(--cor-cinza-claro);
 }
 
 .schedule-row:last-of-type {
@@ -1085,7 +1129,7 @@ footer p.footer-admin {
 
 .schedule-row input[type="time"] {
   padding: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--cor-cinza-claro);
   border-radius: 4px;
   font-size: 0.9rem;
 }
