@@ -887,7 +887,6 @@ footer p.footer-admin {
 
 /* ============================================== */
 /* MENU HAMBÚRGUER (MOBILE FIRST)                 */
-/* Adicione este bloco no final do seu arquivo App.css */
 /* ============================================== */
 
 /* 1. Ocultar a navegação padrão (desktop) por padrão */
@@ -907,30 +906,6 @@ footer p.footer-admin {
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-}
-
-.hamburger-icon span {
-  display: block;
-  width: 100%;
-  height: 3px;
-  background: var(--cor-vermelho-hover); /* Cor das linhas */
-  border-radius: 5px;
-  transition: all 0.3s ease-in-out;
-  transform-origin: left center;
-}
-
-/* Animação para o 'X' */
-.hamburger-icon.open span:nth-child(1) {
-  transform: rotate(45deg);
-  width: 35px;
-}
-.hamburger-icon.open span:nth-child(2) {
-  opacity: 0;
-  transform: translateX(10px);
-}
-.hamburger-icon.open span:nth-child(3) {
-  transform: rotate(-45deg);
-  width: 35px;
 }
 
 /* 3. Menu Lateral (Sidebar): Padrão (oculto em telas grandes) */
@@ -990,6 +965,7 @@ footer p.footer-admin {
   /* Mostrar o ícone do hambúrguer */
   .hamburger-icon {
     display: flex;
+    color: var(--cor-vermelho);
   }
 
   /* Esconder a navegação desktop */
@@ -1018,8 +994,13 @@ footer p.footer-admin {
     display: none;
   }
 }
+/* ============================================== */
+/* FIM MENU HAMBÚRGUER (MOBILE FIRST)             */
+/* ============================================== */
 
-/** @media queries **/
+/* ============================================== */
+/** @media queries                               **/
+/* ============================================== */
 
 @media (max-width: 480px) {
   .controles-pedidos {

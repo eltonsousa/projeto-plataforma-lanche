@@ -2,7 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 // --- Import de ìcones
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineCheck,
+  AiOutlineMenu,
+  AiOutlineClose,
+} from "react-icons/ai";
 import {
   MdOutlinePlaylistAdd,
   MdOutlineAddPhotoAlternate,
@@ -507,14 +513,17 @@ function App() {
         <h1>Painel do Administrador</h1>
         <p>Olá, {usuarioLogado}!</p>
 
-        {/* 1. ÍCONE DO HAMBÚRGUER (Visível apenas no mobile) */}
+        {/* 1. ÍCONE DO HAMBÚRGUER (Visível apenas no mobile) className="hamburger-icon" */}
         <div
-          className={`hamburger-icon ${isMenuOpen ? "open" : ""}`}
+          className="hamburger-icon" // Uma nova classe para estilizar, se necessário
           onClick={toggleMenu}
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          {/* Se o menu estiver aberto, mostra o ícone de fechar (X); senão, mostra o ícone de menu */}
+          {isMenuOpen ? (
+            <AiOutlineClose size={30} />
+          ) : (
+            <AiOutlineMenu size={30} />
+          )}
         </div>
 
         {/* 2. MENU LATERAL (Visível apenas no mobile) */}
