@@ -84,6 +84,17 @@ function App() {
   const [isScheduleSaving, setIsScheduleSaving] = useState(false); // Estado de carregamento do formulário de horário
   const [scheduleSaveSuccess, setScheduleSaveSuccess] = useState(false); // Estado de sucesso (feedback visual)
 
+  // ESTADO E FUNÇÕES DO MENU HAMBÚRGUER (ADICIONE ESTE TRECHO)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Esta função garante que o menu feche ao mudar de página
+  const changePage = (page) => {
+    setCurrentPage(page);
+    setIsMenuOpen(false);
+  };
+  // FIM ESTADO E FUNÇÕES DO MENU HAMBÚRGUER
+
   const [isImageUploading, setIsImageUploading] = useState(false);
 
   // adicionais
@@ -495,14 +506,48 @@ function App() {
       <header>
         <h1>Painel do Administrador</h1>
         <p>Olá, {usuarioLogado}!</p>
-        <nav className="nav-menu">
-          <button onClick={() => setCurrentPage("pedidos")}>Pedidos</button>
-          {/* 🟢 Botão de Relatórios adicionado */}
-          <button onClick={() => setCurrentPage("relatorios")}>
-            Relatórios
-          </button>
-          <button onClick={() => setCurrentPage("cardapio")}>Cardápio</button>
-          <button onClick={() => setCurrentPage("configuracoes")}>
+
+        {/* 1. ÍCONE DO HAMBÚRGUER (Visível apenas no mobile) */}
+        <div
+          className={`hamburger-icon ${isMenuOpen ? "open" : ""}`}
+          onClick={toggleMenu}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        {/* 2. MENU LATERAL (Visível apenas no mobile) */}
+        <nav className={`menu-sidebar ${isMenuOpen ? "open" : ""}`}>
+          <ul>
+            <li>
+              <button onClick={() => changePage("pedidos")}>Pedidos</button>
+            </li>
+            <li>
+              <button onClick={() => changePage("relatorios")}>
+                Relatórios
+              </button>
+            </li>
+            <li>
+              <button onClick={() => changePage("cardapio")}>Cardápio</button>
+            </li>
+            <li>
+              <button onClick={() => changePage("configuracoes")}>
+                Configurações
+              </button>
+            </li>
+            <li>
+              <button onClick={handleLogout}>Sair</button>
+            </li>
+          </ul>
+        </nav>
+
+        {/* 3. NAVEGAÇÃO DESKTOP (Usaremos a classe 'desktop-only-nav' para escondê-la no mobile) */}
+        <nav className="nav-menu desktop-only-nav">
+          <button onClick={() => changePage("pedidos")}>Pedidos</button>
+          <button onClick={() => changePage("relatorios")}>Relatórios</button>
+          <button onClick={() => changePage("cardapio")}>Cardápio</button>
+          <button onClick={() => changePage("configuracoes")}>
             Configurações
           </button>
           <button onClick={handleLogout}>Sair</button>
