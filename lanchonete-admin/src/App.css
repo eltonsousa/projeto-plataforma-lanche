@@ -1233,9 +1233,25 @@ footer p.footer-admin {
     padding: 5px 0;
   }
 
-  .schedule-row input[type="time"] {
+  /* .schedule-row input[type="time"] {
     padding: 3px;
     font-size: 0.85rem;
+  }
+ */
+  /* 🚨 ESTILIZAÇÃO CRÍTICA PARA INPUTS DE HORA 🚨 */
+  .schedule-row input[type="time"] {
+    /* Remove qualquer preenchimento nativo que o sistema mobile possa adicionar */
+    padding: 4px 2px;
+    /* Diminui a altura */
+    height: 30px;
+    /* Garante que o tamanho da fonte seja pequeno */
+    font-size: 0.8rem;
+    /* Remove o fundo branco padrão que pode ocupar espaço */
+    background-color: transparent;
+    /* Define a largura máxima para que o grid funcione */
+    width: 100%;
+    /* Importante: força o box-model a incluir padding e borda no width */
+    box-sizing: border-box;
   }
 
   .status-toggle-container button {
