@@ -26,6 +26,9 @@ import { MdOutlineArrowBackIosNew } from "react-icons/md";
 import { CiDeliveryTruck } from "react-icons/ci";
 // ---- Import icones ---- //
 
+// URL base da API
+// const API_URL = "http://localhost:3001/api"; // Comentado/Removido, pois a variável não era utilizada.
+
 // ----------------------------------------------------
 // 🟢 NOVAS CONFIGURAÇÕES DE PIZZA (Para fins de demonstração)
 //    O ideal é que isso seja carregado de uma rota /api/pizzas-config
@@ -322,6 +325,48 @@ function App() {
     return precoFinal;
   }, []);
 
+  // 🟢 NOVO: Função para calcular o total da pizza (base + adicionais)
+  const calcularTotalPizzaComAdicionais = useCallback(
+    (precoBaseSabores, adicionais) => {
+      const precoAdicionais = Object.values(adicionais).reduce(
+        (total, ad) => total + ad.preco * ad.quantidade,
+        0
+      );
+      return precoBaseSabores + precoAdicionais;
+    },
+    []
+  );
+
+  // Efeito para recalcular o preco_final sempre que os sabores, tamanho ou adicionais mudarem
+  useEffect(() => {
+    // 1. Calcula o preço base (tamanho + sabor mais caro)
+    const precoBaseSabores = calcularPrecoPizza(
+      pizzaConfig.tamanho,
+      pizzaConfig.sabores
+    );
+
+    // 2. Calcula o total com adicionais
+    const novoPrecoFinal = calcularTotalPizzaComAdicionais(
+      precoBaseSabores,
+      adicionaisSelecionados
+    );
+
+    // 3. Atualiza o estado
+    // CRÍTICO: Usamos um `setPizzaConfig` com o valor direto, não a função de callback,
+    // pois `precoBaseSabores` e `novoPrecoFinal` já foram calculados fora.
+    setPizzaConfig((prev) => ({
+      ...prev,
+      preco_base: precoBaseSabores,
+      preco_final: novoPrecoFinal,
+    }));
+  }, [
+    pizzaConfig.tamanho,
+    pizzaConfig.sabores,
+    adicionaisSelecionados,
+    calcularPrecoPizza,
+    calcularTotalPizzaComAdicionais,
+  ]);
+
   // 1. Inicia o modal de pizza
   const handleOpenPizzaModal = () => {
     setPizzaConfig({
@@ -331,23 +376,21 @@ function App() {
       preco_final: 0,
     });
     setProdutoSelecionado(null);
+    setAdicionaisSelecionados({}); // <--- Reseta adicionais
+    setObservacao(""); // <--- Reseta observação
     setIsPizzaModalVisible(true);
   };
 
-  // 2. Manipula a escolha do tamanho
+  // 2. Manipula a escolha do tamanho (Função mantida, mas agora o useEffect faz o cálculo final)
   const handleSelectTamanho = (tamanho) => {
-    const novoPrecoBase = tamanho.base_preco;
-    const novoPrecoFinal = calcularPrecoPizza(tamanho, pizzaConfig.sabores);
-
     setPizzaConfig((prev) => ({
       ...prev,
       tamanho: tamanho,
-      preco_base: novoPrecoBase,
-      preco_final: novoPrecoFinal,
+      // preco_base e preco_final serão ajustados pelo useEffect
     }));
   };
 
-  // 3. Manipula a escolha/desescolha do sabor
+  // 3. Manipula a escolha/desescolha do sabor (Função mantida, mas agora o useEffect faz o cálculo final)
   const handleSelectSabor = (saborSelecionado) => {
     setPizzaConfig((prev) => {
       if (!prev.tamanho) return prev;
@@ -370,17 +413,15 @@ function App() {
         }
       }
 
-      const novoPrecoFinal = calcularPrecoPizza(prev.tamanho, novosSabores);
-
       return {
         ...prev,
         sabores: novosSabores,
-        preco_final: novoPrecoFinal,
+        // preco_final será ajustado pelo useEffect
       };
     });
   };
 
-  // 4. Adiciona a pizza montada ao carrinho
+  // 4. Adiciona a pizza montada ao carrinho (Inalterada, pois usa o estado final)
   const handleAddPizzaToCart = () => {
     if (!pizzaConfig.tamanho) {
       alert("Por favor, escolha um tamanho.");
@@ -394,18 +435,31 @@ function App() {
     const nomeItem = `Pizza ${pizzaConfig.tamanho.nome}`;
     const detalhesSabores = pizzaConfig.sabores.map((s) => s.nome).join(" / ");
 
+    // Pega os adicionais e a observação do estado global
+    const adicionaisParaCarrinho = Object.values(adicionaisSelecionados);
+
+    // Concatena os sabores com a observação do usuário
+    let finalObservation = `Sabores: ${detalhesSabores}`;
+    if (observacao.trim()) {
+      finalObservation += ` | Obs: ${observacao.trim()}`;
+    }
+
     const pizzaItem = {
       id: `pizza-${Date.now()}`,
       nome: nomeItem,
       categoria: "Pizzas",
-      preco: pizzaConfig.preco_final,
+      preco: pizzaConfig.preco_final, // Usa o preço final com adicionais
       quantidade: 1,
-      observacao: `Sabores: ${detalhesSabores}`,
-      adicionais: [],
+      observacao: finalObservation, // Inclui sabores + observação do usuário (se houver)
+      adicionais: adicionaisParaCarrinho, // Inclui os adicionais
     };
 
     setCarrinho((prev) => [...prev, pizzaItem]);
     setIsPizzaModalVisible(false);
+
+    // CRITICAL: Reset general states after adding the item
+    setAdicionaisSelecionados({});
+    setObservacao("");
   };
 
   // ----------------------------------------------------
@@ -701,6 +755,11 @@ function App() {
     return <div className="error">Erro ao carregar cardápio: {error}</div>;
 
   const totalItensCarrinho = carrinho.reduce((t, i) => t + i.quantidade, 0);
+
+  // 🟢 NOVO: Busca o item base de Pizza para extrair a lista de adicionais
+  const basePizzaItem = itensCardapio.find(
+    (item) => item.categoria === "Pizzas"
+  );
 
   return (
     <div className="App">
@@ -1049,6 +1108,49 @@ function App() {
                 </div>
               </>
             )}
+
+            {/* 🟢 NOVO: ADICIONAIS PARA PIZZA (Usando o basePizzaItem para lista) */}
+            {basePizzaItem &&
+              basePizzaItem.adicionais &&
+              basePizzaItem.adicionais.length > 0 && (
+                <div className="adicionais-modal">
+                  <h3>Adicionais (Opcional):</h3>
+                  {basePizzaItem.adicionais.map((ad, index) => (
+                    <div key={index} className="adicional-item">
+                      <span>
+                        {ad.nome} (+{formatPrice(ad.preco)})
+                      </span>
+                      <div className="adicional-quantidade">
+                        <button
+                          className="btn btn-vermelho btn-circle"
+                          onClick={() => diminuirAdicional(ad)}
+                        >
+                          <AiOutlineMinus size={16} />
+                        </button>
+                        <span>
+                          {adicionaisSelecionados[ad.nome]?.quantidade || 0}
+                        </span>
+                        <button
+                          className="btn btn-verde btn-circle"
+                          onClick={() => aumentarAdicional(ad)}
+                        >
+                          <AiOutlinePlus size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            {/* 🟢 NOVO: OBSERVAÇÕES PARA PIZZA */}
+            <div className="observacoes">
+              <h3>Observações:</h3>
+              <textarea
+                placeholder="Ex: Sem cebola, massa crocante..."
+                value={observacao}
+                onChange={(e) => setObservacao(e.target.value)}
+              />
+            </div>
 
             {/* Botões de Ação */}
             <div className="modal-actions">
