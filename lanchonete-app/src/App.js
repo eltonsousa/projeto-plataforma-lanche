@@ -26,20 +26,25 @@ import { MdOutlineArrowBackIosNew } from "react-icons/md";
 import { CiDeliveryTruck } from "react-icons/ci";
 // ---- Import icones ---- //
 
-/* Código antigo não usar!!! */
-// 🟢 MODO DE DESENVOLVIMENTO/MANUTENÇÃO UTILIZANDO .ENV.LOCAL
-// Se TRUE, a loja SEMPRE estará aberta, ignorando o horário.
-// Mude para FALSE ao fazer o deploy para produção.
-// LÊ DO ARQUIVO .env.local: (REACT_APP_FORCE_OPEN_DEV = true)
-// const IS_DEV_OVERRIDE_ACTIVE = process.env.REACT_APP_FORCE_OPEN_DEV === "true";
+// ----------------------------------------------------
+// 🟢 NOVAS CONFIGURAÇÕES DE PIZZA (Para fins de demonstração)
+//    O ideal é que isso seja carregado de uma rota /api/pizzas-config
+// ----------------------------------------------------
+const PIZZA_TAMANHOS = [
+  { nome: "Média", base_preco: 40.0, sigla: "M" },
+  { nome: "Grande", base_preco: 55.0, sigla: "G" },
+  { nome: "Família", base_preco: 70.0, sigla: "F" },
+];
 
-// 🟢 DEBUG CRÍTICO: Verifique o valor lido no console
-// console.log("Variável lida do .env:", process.env.REACT_APP_FORCE_OPEN_DEV);
-// console.log(
-//   "Status de Sobrescrita Ativo (TRUE esperado):",
-//   IS_DEV_OVERRIDE_ACTIVE
-// );
-/* Código antigo não usar!!! */
+const PIZZA_SABORES = [
+  { nome: "Mussarela", valor_referencia: 0.0, categoria: "Padrão" },
+  { nome: "Calabresa", valor_referencia: 0.0, categoria: "Padrão" },
+  { nome: "4 Queijos", valor_referencia: 5.0, categoria: "Especial" },
+  { nome: "Portuguesa", valor_referencia: 5.0, categoria: "Especial" },
+  { nome: "Frango c/ Catupiry", valor_referencia: 7.5, categoria: "Premium" },
+  { nome: "Camarão", valor_referencia: 10.0, categoria: "Premium" },
+];
+// ----------------------------------------------------
 
 // ----------------------------------------------------
 // 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO (DINÂMICAS)
@@ -262,17 +267,13 @@ const CartIcon = ({ count, onClick, isStoreOpen }) => (
 
 function App() {
   const sessionId = getSessionId();
-
   const isStoreOpen = useOperatingStatus();
-
-  // 🟢 REFERÊNCIA para o elemento de categorias (para o hook)
   const categoriaNavRef = useDraggableScroll();
   const [carrinho, setCarrinho] = useState([]);
   const [mostraCheckout, setMostraCheckout] = useState(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState(false);
   const [ultimoPedido, setUltimoPedido] = useState(null);
   const [itensCardapio, setItensCardapio] = useState([]);
-  // ❌ REMOVIDO: [loading, setLoading] para usar apenas cardapioLoading
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
@@ -280,11 +281,156 @@ function App() {
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState("Sanduíches");
 
+  // ----------------------------------------------------
+  // 🟢 NOVOS ESTADOS PARA O FLUXO DE PIZZA (INSERIR AQUI)
+  // ----------------------------------------------------
+  const [isPizzaModalVisible, setIsPizzaModalVisible] = useState(false);
+  const [pizzaConfig, setPizzaConfig] = useState({
+    tamanho: null,
+    sabores: [], // Máximo 2 objetos de sabor
+    preco_base: 0,
+    preco_final: 0,
+  });
+  // ----------------------------------------------------
+
   // Observação
   const [observacao, setObservacao] = useState("");
 
   // Adicionais com quantidade
   const [adicionaisSelecionados, setAdicionaisSelecionados] = useState({});
+
+  // ----------------------------------------------------
+  // 🟢 INÍCIO DAS FUNÇÕES DE PIZZA (MOVIDAS PARA DENTRO)
+  // ----------------------------------------------------
+
+  // Função para calcular o preço final da pizza (com a regra do sabor mais caro)
+  // 🟢 CORREÇÃO: Esta função estava duplicada no escopo global (com useCallback), causando erro.
+  const calcularPrecoPizza = useCallback((tamanho, sabores) => {
+    if (!tamanho) return 0;
+
+    let precoFinal = tamanho.base_preco;
+
+    if (sabores.length === 0) {
+      return precoFinal;
+    }
+
+    const valorAdicionalMaximo = sabores.reduce((max, sabor) => {
+      return Math.max(max, sabor.valor_referencia);
+    }, 0);
+
+    precoFinal += valorAdicionalMaximo;
+    return precoFinal;
+  }, []);
+
+  // 1. Inicia o modal de pizza
+  const handleOpenPizzaModal = () => {
+    setPizzaConfig({
+      tamanho: null,
+      sabores: [],
+      preco_base: 0,
+      preco_final: 0,
+    });
+    setProdutoSelecionado(null);
+    setIsPizzaModalVisible(true);
+  };
+
+  // 2. Manipula a escolha do tamanho
+  const handleSelectTamanho = (tamanho) => {
+    const novoPrecoBase = tamanho.base_preco;
+    const novoPrecoFinal = calcularPrecoPizza(tamanho, pizzaConfig.sabores);
+
+    setPizzaConfig((prev) => ({
+      ...prev,
+      tamanho: tamanho,
+      preco_base: novoPrecoBase,
+      preco_final: novoPrecoFinal,
+    }));
+  };
+
+  // 3. Manipula a escolha/desescolha do sabor
+  const handleSelectSabor = (saborSelecionado) => {
+    setPizzaConfig((prev) => {
+      if (!prev.tamanho) return prev;
+
+      const isSelected = prev.sabores.some(
+        (s) => s.nome === saborSelecionado.nome
+      );
+      let novosSabores;
+
+      if (isSelected) {
+        novosSabores = prev.sabores.filter(
+          (s) => s.nome !== saborSelecionado.nome
+        );
+      } else {
+        if (prev.sabores.length < 2) {
+          novosSabores = [...prev.sabores, saborSelecionado];
+        } else {
+          alert("Você pode escolher no máximo 2 sabores (Meia/Meia).");
+          return prev;
+        }
+      }
+
+      const novoPrecoFinal = calcularPrecoPizza(prev.tamanho, novosSabores);
+
+      return {
+        ...prev,
+        sabores: novosSabores,
+        preco_final: novoPrecoFinal,
+      };
+    });
+  };
+
+  // 4. Adiciona a pizza montada ao carrinho
+  const handleAddPizzaToCart = () => {
+    if (!pizzaConfig.tamanho) {
+      alert("Por favor, escolha um tamanho.");
+      return;
+    }
+    if (pizzaConfig.sabores.length === 0) {
+      alert("Por favor, escolha pelo menos 1 sabor.");
+      return;
+    }
+
+    const nomeItem = `Pizza ${pizzaConfig.tamanho.nome}`;
+    const detalhesSabores = pizzaConfig.sabores.map((s) => s.nome).join(" / ");
+
+    const pizzaItem = {
+      id: `pizza-${Date.now()}`,
+      nome: nomeItem,
+      categoria: "Pizzas",
+      preco: pizzaConfig.preco_final,
+      quantidade: 1,
+      observacao: `Sabores: ${detalhesSabores}`,
+      adicionais: [],
+    };
+
+    setCarrinho((prev) => [...prev, pizzaItem]);
+    setIsPizzaModalVisible(false);
+  };
+
+  // ----------------------------------------------------
+  // 🟢 FUNÇÃO MODIFICADA: GATILHO PARA ABRIR FLUXO DE PIZZA
+  // 🟢 CORREÇÃO: Movida para dentro do componente `App` para ter acesso aos setters de estado.
+  // ----------------------------------------------------
+  const handleAddItemToCart = (item) => {
+    // Se for categoria Pizzas, ABRE O MODAL ESPECIAL
+    if (item.categoria === "Pizzas") {
+      handleOpenPizzaModal();
+      return;
+    }
+
+    // SENÃO, abre o modal de detalhes original (seu fluxo padrão)
+    if (isStoreOpen) {
+      setProdutoSelecionado(item);
+      setQuantidadeProduto(1);
+      setAdicionaisSelecionados({});
+      setObservacao("");
+    }
+  };
+
+  // ----------------------------------------------------
+  // 🟢 FIM DAS FUNÇÕES DE PIZZA
+  // ----------------------------------------------------
 
   // Funções
   const aumentarAdicional = (adicional) => {
@@ -315,40 +461,27 @@ function App() {
     });
   };
 
+  // 🛑 CORREÇÃO PRINCIPAL: Substituição da lógica incorreta/duplicada
   const adicionarAoCarrinho = (produto) => {
-    const itemExistente = carrinho.find((c) => c.id === produto.id);
+    // Cria um array de adicionais limpo para o objeto do carrinho
+    const adicionaisParaCarrinho = Object.values(adicionaisSelecionados);
 
-    if (itemExistente) {
-      // Se o item já existir, apenas soma a quantidade
-      setCarrinho(
-        carrinho.map((c) =>
-          c.id === produto.id
-            ? {
-                ...c,
-                quantidade: c.quantidade + produto.quantidade,
-                adicionais: [
-                  ...(c.adicionais || []),
-                  ...Object.values(adicionaisSelecionados),
-                ],
-                observacao: observacao
-                  ? `${c.observacao || ""} ${observacao}`
-                  : c.observacao,
-              }
-            : c
-        )
-      );
-    } else {
-      // Se for novo item, adiciona normalmente com a quantidade escolhida
-      setCarrinho([
-        ...carrinho,
-        {
-          ...produto,
-          quantidade: produto.quantidade,
-          adicionais: Object.values(adicionaisSelecionados),
-          observacao,
-        },
-      ]);
-    }
+    // Adiciona o item como novo, garantindo um ID único no carrinho,
+    // o que é essencial para diferenciar itens com as mesmas bases,
+    // mas com adicionais ou observações diferentes.
+    setCarrinho((prevCarrinho) => [
+      ...prevCarrinho,
+      {
+        ...produto, // Base item data (id original, nome, preco base, categoria)
+        // Sobrescreve/adiciona as propriedades do carrinho.
+        // Isso resolve o erro 'no-dupe-keys' ao garantir que 'adicionais' e 'observacao'
+        // só são definidos explicitamente aqui, após o spread, e não são copiados duplicadamente.
+        id: `${produto.id}-${Date.now()}`, // CRÍTICO: Usa um ID único para o item no carrinho
+        quantidade: quantidadeProduto, // CORREÇÃO: Usa a quantidade do estado (quantidadeProduto)
+        adicionais: adicionaisParaCarrinho, // Adiciona os adicionais selecionados
+        observacao, // Adiciona a observação do usuário
+      },
+    ]);
 
     // Limpa campos e fecha modal
     setAdicionaisSelecionados({});
@@ -628,16 +761,7 @@ function App() {
                 <div
                   key={item.id}
                   // 🔴 ATUALIZADO: Só permite abrir o modal se a loja estiver aberta
-                  onClick={
-                    isStoreOpen
-                      ? () => {
-                          setProdutoSelecionado(item);
-                          setQuantidadeProduto(1);
-                          setAdicionaisSelecionados({});
-                          setObservacao("");
-                        }
-                      : null
-                  }
+                  onClick={isStoreOpen ? () => handleAddItemToCart(item) : null}
                   style={{
                     cursor: isStoreOpen ? "pointer" : "not-allowed", // 🔴 Muda o cursor
                     opacity: isStoreOpen ? 1 : 0.6, // 🔴 Efeito visual de desabilitado
@@ -671,7 +795,9 @@ function App() {
                           item.preco * item.quantidade +
                             (item.adicionais
                               ? item.adicionais.reduce(
-                                  (acc, ad) => acc + ad.preco * item.quantidade,
+                                  (acc, ad) =>
+                                    acc +
+                                    ad.preco * ad.quantidade * item.quantidade,
                                   0
                                 )
                               : 0)
@@ -841,6 +967,115 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* ---------------------------------------------------- */}
+      {/* 🟢 NOVO MODAL DE MONTAGEM DE PIZZA */}
+      {/* ---------------------------------------------------- */}
+      {isPizzaModalVisible && (
+        <div className="modal-overlay overlay">
+          <div
+            className="modal-content modal-pizza"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3>Monte sua Pizza 🍕</h3>
+
+            <div className="pizza-resumo">
+              {/* Exibe o resumo dinâmico no topo */}
+              <p>
+                **Tamanho:**{" "}
+                {pizzaConfig.tamanho ? pizzaConfig.tamanho.nome : "Aguardando"}
+              </p>
+              <p>
+                **Sabores ({pizzaConfig.sabores.length}/2):**
+                {pizzaConfig.sabores.length > 0
+                  ? pizzaConfig.sabores.map((s) => s.nome).join(" / ")
+                  : "Escolha seu(s) sabor(es)"}
+              </p>
+              <p className="preco-final">
+                **Total:** {formatPrice(pizzaConfig.preco_final)}
+              </p>
+            </div>
+
+            {/* Passo 1: Escolha do Tamanho */}
+            <h4>1. Escolha o Tamanho:</h4>
+            <div className="pizza-opcoes-tamanho">
+              {PIZZA_TAMANHOS.map((tamanho) => (
+                <button
+                  key={tamanho.sigla}
+                  onClick={() => handleSelectTamanho(tamanho)}
+                  className={
+                    pizzaConfig.tamanho?.sigla === tamanho.sigla
+                      ? "selected"
+                      : ""
+                  }
+                >
+                  {tamanho.nome} ({formatPrice(tamanho.base_preco)})
+                </button>
+              ))}
+            </div>
+
+            {/* Passo 2: Escolha dos Sabores */}
+            {pizzaConfig.tamanho && (
+              <>
+                <h4>2. Escolha os Sabores (Máx. 2):</h4>
+                <p className="info-meia-meia">
+                  *O preço é ajustado pelo sabor de maior valor.
+                </p>
+                <div className="pizza-opcoes-sabores">
+                  {PIZZA_SABORES.map((sabor) => {
+                    const isSelected = pizzaConfig.sabores.some(
+                      (s) => s.nome === sabor.nome
+                    );
+                    const isBlocked =
+                      pizzaConfig.sabores.length === 2 && !isSelected;
+                    const valorAdicional =
+                      sabor.valor_referencia > 0
+                        ? `(+${formatPrice(sabor.valor_referencia)})`
+                        : "(Padrão)";
+
+                    return (
+                      <button
+                        key={sabor.nome}
+                        onClick={() => handleSelectSabor(sabor)}
+                        disabled={isBlocked}
+                        className={
+                          isSelected ? "selected" : isBlocked ? "blocked" : ""
+                        }
+                      >
+                        {sabor.nome} {valorAdicional}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* Botões de Ação */}
+            <div className="modal-actions">
+              <button
+                onClick={() => setIsPizzaModalVisible(false)}
+                className="cancel-button"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddPizzaToCart}
+                disabled={
+                  !pizzaConfig.tamanho || pizzaConfig.sabores.length === 0
+                }
+                className="add-to-cart-button"
+              >
+                Adicionar ao Carrinho ({formatPrice(pizzaConfig.preco_final)})
+              </button>
+            </div>
+            <AiOutlineClose
+              className="modal-close-icon"
+              onClick={() => setIsPizzaModalVisible(false)}
+            />
+          </div>
+        </div>
+      )}
+      {/* ---------------------------------------------------- */}
 
       {/* CHECKOUT */}
       {mostraCheckout && (
