@@ -198,7 +198,7 @@ footer p {
 }
 
 .pizza-resumo {
-  background-color: #f0f0f0;
+  background-color: #fff3cb;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -207,6 +207,17 @@ footer p {
 }
 
 .pizza-resumo p {
+  border-bottom: 1px dashed var(--cor-cinza-medio);
+  padding-bottom: 10px;
+}
+
+.pizza-resumo p:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pizza-resumo p span {
+  font-weight: bold;
   margin: 5px 0;
 }
 
@@ -263,4 +274,20 @@ footer p {
   margin-top: -10px;
   margin-bottom: 15px;
 }
+
+.cancel-button {
+  margin-right: 1rem;
+}
 /* Estilos para o Modal de Pizza */
+
+@media (max-width: 450px) {
+  .cancel-button {
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .add-to-cart-button {
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+}

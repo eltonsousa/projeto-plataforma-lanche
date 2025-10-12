@@ -1041,17 +1041,17 @@ function App() {
             <div className="pizza-resumo">
               {/* Exibe o resumo dinâmico no topo */}
               <p>
-                **Tamanho:**{" "}
+                <span>Tamanho:</span>{" "}
                 {pizzaConfig.tamanho ? pizzaConfig.tamanho.nome : "Aguardando"}
               </p>
               <p>
-                **Sabores ({pizzaConfig.sabores.length}/2):**
+                <span>Sabores ({pizzaConfig.sabores.length}/2):</span>
                 {pizzaConfig.sabores.length > 0
                   ? pizzaConfig.sabores.map((s) => s.nome).join(" / ")
                   : "Escolha seu(s) sabor(es)"}
               </p>
               <p className="preco-final">
-                **Total:** {formatPrice(pizzaConfig.preco_final)}
+                Total: {formatPrice(pizzaConfig.preco_final)}
               </p>
             </div>
 
@@ -1067,6 +1067,7 @@ function App() {
                       ? "selected"
                       : ""
                   }
+                  btn
                 >
                   {tamanho.nome} ({formatPrice(tamanho.base_preco)})
                 </button>
@@ -1156,7 +1157,7 @@ function App() {
             <div className="modal-actions">
               <button
                 onClick={() => setIsPizzaModalVisible(false)}
-                className="cancel-button"
+                className="cancel-button btn btn-vermelho"
               >
                 Cancelar
               </button>
@@ -1165,7 +1166,7 @@ function App() {
                 disabled={
                   !pizzaConfig.tamanho || pizzaConfig.sabores.length === 0
                 }
-                className="add-to-cart-button"
+                className="add-to-cart-button btn btn-azul"
               >
                 Adicionar ao Carrinho ({formatPrice(pizzaConfig.preco_final)})
               </button>
