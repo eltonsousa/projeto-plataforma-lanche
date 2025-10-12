@@ -1,4 +1,35 @@
 /* status-indicator.css */
+:root {
+  /* 🎨 Paleta de Cores */
+  /* Cor predominante (identidade iFood) */
+  --cor-principal: #ea1d2c; /* Vermelho iFood */
+  --cor-principal-hover: #c41624; /* Vermelho escuro p/ hover */
+
+  /* Suporte e Destaques */
+  --cor-secundaria: #ff9f43; /* Laranja claro para chamar atenção */
+  --cor-secundaria-hover: #e0861e;
+
+  /* Confirmação / Sucesso */
+  --cor-verde: #27ae60; /* Verde vibrante */
+  --cor-verde-hover: #1e874b;
+
+  /* Erros / Alertas */
+  --cor-vermelho: #dc3545; /* Vermelho de alerta (mais neutro) */
+
+  /* Links / Informações */
+  --cor-azul: #3498db; /* Azul moderno */
+  --cor-azul-hover: #217dbb;
+
+  --cor-cinza-claro: #f4f4f4;
+  --cor-cinza-medio: #666;
+  --cor-cinza-medio-hover: #333;
+  --cor-branco: #fff;
+
+  /* 🌑 Sombras */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
 
 @keyframes pulse {
   0% {
@@ -19,7 +50,7 @@
   animation: pulse 2s infinite;
   padding: 3px 6px;
   border-radius: 3px;
-  color: white;
+  color: var(--cor-branco);
   font-weight: bold;
   font-size: 0.7rem;
   /* text-align: center; */
@@ -38,7 +69,7 @@
 
 /* Cores dinâmicas definidas por classes */
 .status-indicator.aberta {
-  background-color: #4caf50; /* Verde */
+  background-color: var(--cor-verde); /* Verde */
 }
 
 .status-indicator.fechada {
@@ -48,4 +79,49 @@
 .status-indicator-schedule {
   font-size: 10px;
   opacity: 0.8;
+}
+
+/* Modal com horário de funcionamento */
+.modal-schedule {
+  max-width: 400px;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: var(--cor-branco);
+  box-shadow: var(--shadow-lg);
+  text-align: left;
+  /* Para garantir que não se sobreponha a outros modais */
+  z-index: 1000;
+}
+
+.modal-schedule h2 {
+  color: var(--cor-cinza-medio-hover);
+  border-bottom: 1px solid var(--cor-cinza-claro);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.schedule-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 1em;
+}
+
+.schedule-item strong {
+  color: var(--cor-cinza-medio);
+}
+
+.info-schedule {
+  margin-top: 20px;
+  font-size: 0.8em;
+  color: var(--cor-cinza-medio);
+  text-align: center;
+  border-top: 1px dashed var(--cor-cinza-claro);
+  padding-top: 10px;
 }

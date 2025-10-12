@@ -169,11 +169,14 @@ const useOperatingStatus = () => {
     return () => clearInterval(intervalId);
   }, [storeOverride]); // O hook reage a qualquer mudança em storeOverride (incluindo scheduleConfig)
 
-  return isStoreOpen;
+  return {
+    isStoreOpen: isStoreOpen, // O status booleano
+    storeOverride: storeOverride, // 🟢 Retorna as configurações lidas do servidor (inclui scheduleConfig)
+  };
 };
 
 // 4. COMPONENTE INDICADOR DE STATUS (O FLAG)
-const StatusIndicator = ({ isStoreOpen }) => {
+const StatusIndicator = ({ isStoreOpen, onClick }) => {
   const text = isStoreOpen ? "Aberto" : "Fechado";
 
   // Usa BsShopWindow para ambos os estados
@@ -183,9 +186,64 @@ const StatusIndicator = ({ isStoreOpen }) => {
   const statusClass = isStoreOpen ? "aberta" : "fechada";
 
   return (
-    <div className={`status-indicator ${statusClass}`}>
+    <div
+      className={`status-indicator ${statusClass}`}
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+    >
       <IconComponent size={12} />
       <span>{text}</span>
+    </div>
+  );
+};
+
+// 5. NOVO COMPONENTE: Modal de Horários
+const ScheduleModal = ({ scheduleConfig, onClose }) => {
+  // 🟢 CORREÇÃO 1: Usar scheduleConfig (a prop) para a verificação.
+  if (!scheduleConfig || scheduleConfig.isFetching) return null;
+
+  const defaultScheduleNames = [
+    "Domingo",
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado",
+  ];
+
+  // 🟢 CORREÇÃO 2: Acessar o array de horários via scheduleConfig.scheduleConfig
+  const sortedSchedule = [...scheduleConfig.scheduleConfig].sort(
+    (a, b) => a.day - b.day
+  );
+
+  return (
+    <div className="modal-overlay overlay" onClick={onClose}>
+      <div
+        className="modal-content modal-schedule"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <AiOutlineClose className="modal-close-icon" onClick={onClose} />
+
+        <h2>Horário de Funcionamento</h2>
+        <div className="schedule-list">
+          {sortedSchedule.map((dayConfig) => (
+            <div key={dayConfig.day} className="schedule-item">
+              <strong>{defaultScheduleNames[dayConfig.day]}:</strong>
+              <span>
+                {dayConfig.isActive
+                  ? `${dayConfig.start}h às ${dayConfig.end}h`
+                  : "Fechado"}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <p className="info-schedule">
+          *Os horários são configurados pelo administrador. Verifique o status
+          atual da loja.
+        </p>
+      </div>
     </div>
   );
 };
@@ -270,10 +328,12 @@ const CartIcon = ({ count, onClick, isStoreOpen }) => (
 
 function App() {
   const sessionId = getSessionId();
-  const isStoreOpen = useOperatingStatus();
+  const { isStoreOpen, storeOverride } = useOperatingStatus();
   const categoriaNavRef = useDraggableScroll();
   const [carrinho, setCarrinho] = useState([]);
   const [mostraCheckout, setMostraCheckout] = useState(false);
+  // 🟢 NOVO ESTADO: Controla a visibilidade do Modal de Horário
+  const [isScheduleModalVisible, setIsScheduleModalVisible] = useState(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState(false);
   const [ultimoPedido, setUltimoPedido] = useState(null);
   const [itensCardapio, setItensCardapio] = useState([]);
@@ -764,7 +824,21 @@ function App() {
   return (
     <div className="App">
       {/* 🔴 NOVO: O FLAG de status no canto da tela */}
-      <StatusIndicator isStoreOpen={isStoreOpen} />
+      <StatusIndicator
+        isStoreOpen={isStoreOpen}
+        // 🟢 PASSA A FUNÇÃO PARA ABRIR O MODAL
+        onClick={() => setIsScheduleModalVisible(true)}
+      />
+
+      {/* 🟢 NOVO MODAL DE HORÁRIOS */}
+      {isScheduleModalVisible && (
+        // 🟢 PASSA A CONFIGURAÇÃO DE HORÁRIO LIDA DO ADMIN
+        <ScheduleModal
+          scheduleConfig={storeOverride}
+          onClose={() => setIsScheduleModalVisible(false)}
+        />
+      )}
+
       <header>
         <h1>Manú Lanches</h1>
         <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
