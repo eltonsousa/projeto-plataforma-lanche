@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
+import { formatPrice } from "./utils/format";
 
 // --- Import de ìcones
 import {
@@ -859,7 +860,7 @@ function App() {
               <div className="metrica">
                 <h4>Faturamento Total:</h4>
                 <p className="valor faturamento">
-                  R$ {resumoRelatorio.faturamento}
+                  {formatPrice(resumoRelatorio.faturamento)}
                 </p>
               </div>
             </div>
@@ -887,7 +888,7 @@ function App() {
                   Data: {new Date(pedido.data).toLocaleDateString("pt-BR")} às{" "}
                   {new Date(pedido.data).toLocaleTimeString("pt-BR")}
                 </p>
-                <p>Total: R$ {pedido.total}</p>
+                <p>Total: {formatPrice(pedido.total)}</p>
               </div>
             ))}
           </div>
