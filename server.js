@@ -320,6 +320,77 @@ app.delete("/api/cardapio/:id", async (req, res) => {
 });
 
 // ---------------------------------------------
+// CATEGORIAS DE CARDÁPIO
+// ---------------------------------------------
+app.get("/api/categorias", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("categorias_cardapio")
+      .select("*")
+      .order("ordem", { ascending: true });
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (err) {
+    console.error("Erro GET /api/categorias:", err);
+    res.status(500).json({ message: "Erro ao carregar categorias." });
+  }
+});
+
+app.post("/api/categorias", async (req, res) => {
+  try {
+    const novaCategoria = req.body;
+    delete novaCategoria.id;
+    const { data, error } = await supabase
+      .from("categorias_cardapio")
+      .insert([novaCategoria])
+      .select();
+    if (error) throw error;
+    res.status(201).json(data[0]);
+  } catch (err) {
+    console.error("Erro POST /api/categorias:", err);
+    res.status(500).json({ message: "Erro ao criar categoria." });
+  }
+});
+
+app.put("/api/categorias/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const categoria = req.body;
+  delete categoria.id;
+
+  try {
+    const { data, error } = await supabase
+      .from("categorias_cardapio")
+      .update(categoria)
+      .eq("id", id)
+      .select();
+    if (error) throw error;
+
+    if (!data || data.length === 0)
+      return res.status(404).json({ message: "Categoria não encontrada." });
+
+    res.status(200).json(data[0]);
+  } catch (err) {
+    console.error("Erro PUT /api/categorias:", err);
+    res.status(500).json({ message: "Erro ao atualizar categoria." });
+  }
+});
+
+app.delete("/api/categorias/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const { error } = await supabase
+      .from("categorias_cardapio")
+      .delete()
+      .eq("id", id);
+    if (error) throw error;
+    res.status(204).send();
+  } catch (err) {
+    console.error("Erro DELETE /api/categorias:", err);
+    res.status(500).json({ message: "Erro ao excluir categoria." });
+  }
+});
+
+// ---------------------------------------------
 // PEDIDOS (Resumo + Status envia WhatsApp)
 // ---------------------------------------------
 app.post("/api/pedidos", async (req, res) => {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Categorias from "./Categorias";
 import "./App.css";
 import { formatPrice } from "./utils/format";
 
@@ -544,6 +545,11 @@ function App() {
             <li>
               <button onClick={() => changePage("configuracoes")}>
                 Configurações
+              </button>
+            </li>
+            <li>
+              <button onClick={() => changePage("categorias")}>
+                Categorias
               </button>
             </li>
             <li>
@@ -1113,6 +1119,7 @@ function App() {
           </div>
         </main>
       )}
+      {currentPage === "categorias" && <Categorias />}
       <footer>
         <p className="footer-admin">
           &copy; 2025 Manú Lanches. Todos os direitos reservados.

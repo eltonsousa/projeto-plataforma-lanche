@@ -343,6 +343,7 @@ function App() {
   const [quantidadeProduto, setQuantidadeProduto] = useState(1);
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState("Sanduíches");
+  const [categorias, setCategorias] = useState([]);
 
   // ----------------------------------------------------
   // 🟢 NOVOS ESTADOS PARA O FLUXO DE PIZZA (INSERIR AQUI)
@@ -660,22 +661,49 @@ function App() {
     }
   }, []); // Dependências vazias, já que não usa estados externos
 
-  // 🟢 NOVO: Função para obter ícone baseado na categoria
-  const getCategoryIcon = (category) => {
-    switch (category) {
-      case "Sanduíches":
-        return "🍔"; // Hambúrguer
-      case "Bebidas":
-        return "🥤"; // Copo de bebida
-      case "Fritas":
-        return "🍟"; // Batata Frita
-      case "Comidas":
-        return "🍝"; // Macarrão/Prato
-      case "Pizzas":
-        return "🍕";
-      default:
-        return "";
+  // 🟢 NOVA FUNÇÃO: Carrega categorias dinamicamente
+  const fetchCategorias = useCallback(async () => {
+    try {
+      const res = await fetch("/api/categorias");
+      if (!res.ok) throw new Error("Erro ao carregar categorias");
+      const data = await res.json();
+      setCategorias(data);
+
+      // Se for a primeira vez, define a primeira categoria como selecionada
+      if (data.length > 0 && !categoriaSelecionada) {
+        setCategoriaSelecionada(data[0].nome);
+      }
+    } catch (err) {
+      console.error("Erro ao buscar categorias:", err);
     }
+  }, [categoriaSelecionada]);
+
+  // 🟢 NOVO: Função para obter ícone baseado na categoria
+  // const getCategoryIcon = (category) => {
+  //   switch (category) {
+  //     case "Sanduíches":
+  //       return "🍔"; // Hambúrguer
+  //     case "Bebidas":
+  //       return "🥤"; // Copo de bebida
+  //     case "Fritas":
+  //       return "🍟"; // Batata Frita
+  //     case "Comidas":
+  //       return "🍝"; // Macarrão/Prato
+  //     case "Pizzas":
+  //       return "🍕";
+  //     default:
+  //       return "";
+  //   }
+  // };
+
+  const getCategoryIcon = (category) => {
+    const nome = category.toLowerCase();
+    if (nome.includes("pizza")) return "🍕";
+    if (nome.includes("lanche") || nome.includes("sandu")) return "🍔";
+    if (nome.includes("bebida") || nome.includes("refri")) return "🥤";
+    if (nome.includes("frita")) return "🍟";
+    if (nome.includes("comida") || nome.includes("prato")) return "🍝";
+    return "📦";
   };
 
   // --- EFEITOS ---
@@ -683,6 +711,7 @@ function App() {
     // primeira carga com spinner
     fetchCardapio(true);
     loadCarrinhoFromSupabase();
+    fetchCategorias();
 
     // 🟢 NOVO: Tenta carregar o telefone do Local Storage
     const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
@@ -693,7 +722,7 @@ function App() {
     // atualizações periódicas em segundo plano (sem spinner)
     const intervalId = setInterval(() => fetchCardapio(false), 10000);
     return () => clearInterval(intervalId);
-  }, [fetchCardapio, loadCarrinhoFromSupabase]);
+  }, [fetchCardapio, loadCarrinhoFromSupabase, fetchCategorias]);
 
   // Efeito para persistir carrinho no Supabase
   // ✅ MODIFICADO: Condição agora verifica cardapioLoading
@@ -858,31 +887,32 @@ function App() {
             {/* 🟢 Menu de Categorias */}
             <nav className="cardapio-categorias" ref={categoriaNavRef}>
               {/* Define as categorias e mapeia para botões */}
-              {["Sanduíches", "Bebidas", "Fritas", "Comidas", "Pizzas"].map(
-                (cat) => (
+              {categorias.length > 0 ? (
+                categorias.map((cat) => (
                   <button
-                    key={cat}
+                    key={cat.id}
                     className={
-                      categoriaSelecionada === cat ? "categoria-ativa" : ""
+                      categoriaSelecionada === cat.nome ? "categoria-ativa" : ""
                     }
-                    // 🟢 ATUALIZAÇÃO: Adicionamos o evento 'e' para rolar o elemento
                     onClick={(e) => {
-                      setCategoriaSelecionada(cat);
-
-                      // 🟢 CRÍTICO: Rola o botão clicado para a esquerda (start) do contêiner
+                      setCategoriaSelecionada(cat.nome);
                       e.currentTarget.scrollIntoView({
-                        behavior: "smooth", // Efeito de rolagem suave
-                        inline: "center", // Rola para o início do contêiner
-                        block: "nearest", // Garante que o elemento esteja visível na vertical
+                        behavior: "smooth",
+                        inline: "center",
+                        block: "nearest",
                       });
                     }}
                   >
                     <span className="categoria-icon">
-                      {getCategoryIcon(cat)}
+                      {getCategoryIcon(cat.nome)}
                     </span>
-                    {cat}
+                    {cat.nome}
                   </button>
-                )
+                ))
+              ) : (
+                <p style={{ padding: "10px", opacity: 0.7 }}>
+                  Carregando categorias...
+                </p>
               )}
             </nav>
             {/* 🟢 FIM: Menu de Categorias */}
