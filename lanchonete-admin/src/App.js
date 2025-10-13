@@ -566,6 +566,7 @@ function App() {
           <button onClick={() => changePage("configuracoes")}>
             Configurações
           </button>
+          <button onClick={() => changePage("categorias")}>Categorias</button>
           <button onClick={handleLogout}>Sair</button>
         </nav>
       </header>
