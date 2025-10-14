@@ -139,6 +139,14 @@
 }
 
 @media (max-width: 400px) {
+  .cardapio {
+    padding: 1rem;
+  }
+
+  .cardapio-item {
+    margin-bottom: 1rem;
+  }
+
   .cardapio-item p {
     max-width: 150px;
   }
