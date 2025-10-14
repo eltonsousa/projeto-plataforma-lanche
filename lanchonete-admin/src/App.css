@@ -929,6 +929,7 @@ footer p.footer-admin {
 /* Posição final: na tela (aberto) */
 .menu-sidebar.open {
   transform: translateX(0);
+  padding: 1rem 0;
 }
 
 .menu-sidebar ul {
