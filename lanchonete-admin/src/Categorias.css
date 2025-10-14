@@ -51,19 +51,29 @@
 .btn-add-categoria {
   margin-top: 0 !important;
 }
+
 .lista-categorias {
+  list-style: none;
   padding: 0;
+  margin-top: 15px;
 }
 
 .lista-categorias li {
-  /* Usa Flexbox para alinhar os elementos horizontalmente */
   display: flex;
-  /* Coloca o espaço restante entre o nome e as ações */
   justify-content: space-between;
-  /* Centraliza os itens verticalmente */
   align-items: center;
-  padding: 10px; /* Adiciona algum espaço interno para visualização */
-  border-bottom: 1px solid #eee; /* Linha divisória sutil */
+  background: var(--cor-cinza-medio);
+  color: var(--cor-branco);
+  padding: 10px 15px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.lista-categorias li:active {
+  cursor: grabbing;
+  transform: scale(1.02);
 }
 
 /* Garante que os botões dentro de .acoes fiquem em linha */
@@ -89,5 +99,13 @@
   .form-categorias {
     justify-content: center;
     gap: 1rem;
+  }
+  .acoes {
+    display: flex;
+    gap: 6px;
+  }
+
+  .lista-categorias li span {
+    font-size: 0.95rem;
   }
 }
