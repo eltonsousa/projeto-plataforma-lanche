@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+
 import { formatPrice } from "./utils/format";
 import { BsCart3 } from "react-icons/bs";
 
