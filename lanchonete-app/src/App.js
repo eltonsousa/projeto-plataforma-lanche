@@ -754,18 +754,21 @@ function App() {
   };
 
   const calcularTotal = () =>
-    carrinho.reduce(
-      (total, item) =>
-        total +
-        parseFloat(item.preco) * parseInt(item.quantidade) +
-        (item.adicionais
-          ? item.adicionais.reduce(
-              (acc, ad) => acc + ad.preco * ad.quantidade * item.quantidade,
-              0
-            )
-          : 0),
-      0
-    );
+    carrinho.reduce((total, item) => {
+      // Se o item já tem o preço final (pizza), não somar adicionais novamente
+      const totalItem =
+        item.categoria === "Pizzas"
+          ? item.preco * item.quantidade
+          : item.preco * item.quantidade +
+            (item.adicionais
+              ? item.adicionais.reduce(
+                  (acc, ad) => acc + ad.preco * ad.quantidade * item.quantidade,
+                  0
+                )
+              : 0);
+
+      return total + totalItem;
+    }, 0);
 
   const handleToggleCarrinho = () => {
     // 🔴 ATUALIZADO: Só abre o carrinho se a loja estiver aberta
@@ -955,15 +958,20 @@ function App() {
                       <span>{item.nome}</span>
                       <span>
                         {formatPrice(
-                          item.preco * item.quantidade +
-                            (item.adicionais
-                              ? item.adicionais.reduce(
-                                  (acc, ad) =>
-                                    acc +
-                                    ad.preco * ad.quantidade * item.quantidade,
-                                  0
-                                )
-                              : 0)
+                          // Se for Pizza (preço já inclui adicionais), não some os adicionais novamente
+                          item.categoria === "Pizzas"
+                            ? item.preco * item.quantidade
+                            : item.preco * item.quantidade +
+                                (item.adicionais
+                                  ? item.adicionais.reduce(
+                                      (acc, ad) =>
+                                        acc +
+                                        ad.preco *
+                                          ad.quantidade *
+                                          item.quantidade,
+                                      0
+                                    )
+                                  : 0)
                         )}
                       </span>
                     </div>
