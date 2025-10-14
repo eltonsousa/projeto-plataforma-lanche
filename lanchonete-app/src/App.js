@@ -670,13 +670,11 @@ function App() {
       setCategorias(data);
 
       // Se for a primeira vez, define a primeira categoria como selecionada
-      if (data.length > 0 && !categoriaSelecionada) {
-        setCategoriaSelecionada(data[0].nome);
-      }
+      setCategoriaSelecionada((prev) => (prev ? prev : data[0]?.nome || ""));
     } catch (err) {
       console.error("Erro ao buscar categorias:", err);
     }
-  }, [categoriaSelecionada]);
+  }, []); // <-- 🔴 sem dependências
 
   // 🟢 NOVO: Função para obter ícone baseado na categoria
   // const getCategoryIcon = (category) => {
