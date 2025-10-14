@@ -704,6 +704,39 @@ function App() {
     return "📦";
   };
 
+  // --- Helpers para scroll e agrupamento ---
+
+  // Gera um id seguro para usar em `id` de sections (remove espaços/caracteres)
+  const slugify = (text) =>
+    text
+      .toString()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "") // remove acentos
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+
+  // Rola suavemente até a section da categoria e marca como selecionada
+  const scrollToCategoria = (nome) => {
+    const id = slugify(nome);
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      // marca visualmente (opcional: mantém botão ativo)
+      setCategoriaSelecionada(nome);
+    }
+  };
+
+  // Agrupa o cardápio por categoria (memoizado)
+  const cardapioAgrupado = React.useMemo(() => {
+    // preserva a ordem das categorias vindas do backend
+    return categorias.map((cat) => ({
+      nome: cat.nome,
+      id: slugify(cat.nome),
+      itens: itensCardapio.filter((it) => it.categoria === cat.nome),
+    }));
+  }, [categorias, itensCardapio]);
+
   // --- EFEITOS ---
   useEffect(() => {
     // primeira carga com spinner
@@ -889,66 +922,76 @@ function App() {
       {/* LISTA DE PRODUTOS */}
       {!mostraCheckout && !pedidoFinalizado && (
         <>
-          <main className="cardapio">
-            {/* 🟢 Menu de Categorias */}
-            <nav className="cardapio-categorias" ref={categoriaNavRef}>
-              {categorias.length > 0 ? (
-                // 🟢 Memoiza os botões de categorias para evitar re-renderização desnecessária
-                categorias.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button" // 🧠 Evita comportamento de submit em alguns contextos
-                    className={
-                      categoriaSelecionada === cat.nome ? "categoria-ativa" : ""
-                    }
-                    onClick={(e) => {
-                      e.preventDefault(); // 🛑 Garante que não ocorra refresh/reload da página
-                      setCategoriaSelecionada(cat.nome);
-
-                      // Rolagem suave horizontal até o botão selecionado
-                      e.currentTarget.scrollIntoView({
-                        behavior: "smooth",
-                        inline: "center",
-                        block: "nearest",
-                      });
-                    }}
-                  >
-                    <span className="categoria-icon">
-                      {getCategoryIcon(cat.nome)}
-                    </span>
-                    {cat.nome}
-                  </button>
-                ))
-              ) : (
-                <p style={{ padding: "10px", opacity: 0.7 }}>
-                  Carregando categorias...
-                </p>
-              )}
-            </nav>
-            {/* 🟢 FIM: Menu de Categorias */}
-
-            {/* 🟢 LISTA DE ITENS FILTRADOS */}
-            {cardapioFiltrado.length > 0 ? (
-              cardapioFiltrado.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={isStoreOpen ? () => handleAddItemToCart(item) : null}
-                  style={{
-                    cursor: isStoreOpen ? "pointer" : "not-allowed",
-                    opacity: isStoreOpen ? 1 : 0.6,
-                    display: "flex",
-                    justifyContent: "center",
-                    width: "100%",
+          {/* 🟢 MENU DE CATEGORIAS */}
+          <nav className="cardapio-categorias" ref={categoriaNavRef}>
+            {categorias && categorias.length > 0 ? (
+              categorias.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={
+                    categoriaSelecionada === cat.nome ? "categoria-ativa" : ""
+                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToCategoria(cat.nome);
+                    e.currentTarget.scrollIntoView({
+                      behavior: "smooth",
+                      inline: "center",
+                      block: "nearest",
+                    });
                   }}
                 >
-                  <CardapioItem item={item} onAdicionar={adicionarAoCarrinho} />
-                </div>
+                  <span className="categoria-icon">
+                    {getCategoryIcon(cat.nome)}
+                  </span>
+                  {cat.nome}
+                </button>
               ))
             ) : (
-              <p className="sem-itens-cardapio">
-                Nenhum item encontrado na categoria {categoriaSelecionada}.
+              <p style={{ padding: "10px", opacity: 0.7 }}>
+                Carregando categorias...
               </p>
             )}
+          </nav>
+          {/* 🟢 FIM MENU DE CATEGORIAS */}
+          <main className="cardapio">
+            {cardapioAgrupado.map((grupo) => (
+              <section
+                key={grupo.id}
+                id={grupo.id}
+                className="categoria-section"
+              >
+                <h2 className="categoria-titulo">{grupo.nome}</h2>
+
+                {grupo.itens.length > 0 ? (
+                  grupo.itens.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={
+                        isStoreOpen ? () => handleAddItemToCart(item) : null
+                      }
+                      style={{
+                        cursor: isStoreOpen ? "pointer" : "not-allowed",
+                        opacity: isStoreOpen ? 1 : 0.6,
+                        display: "flex",
+                        justifyContent: "center",
+                        width: "100%",
+                      }}
+                    >
+                      <CardapioItem
+                        item={item}
+                        onAdicionar={adicionarAoCarrinho}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <p className="sem-itens-cardapio">
+                    Nenhum item encontrado na categoria {grupo.nome}.
+                  </p>
+                )}
+              </section>
+            ))}
           </main>
 
           {/* CARRINHO */}
