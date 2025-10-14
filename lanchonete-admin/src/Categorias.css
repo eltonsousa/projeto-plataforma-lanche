@@ -1,0 +1,93 @@
+:root {
+  /* 🎨 Paleta de Cores */
+  --cor-azul: #3f51b5;
+  --cor-azul-hover: #5366cf;
+
+  --cor-laranja: #ff6347;
+  --cor-laranja-hover: #e5533d;
+  --cor-verde: #4caf50;
+  --cor-verde-hover: #43a047;
+  --cor-vermelho: #f44336;
+  --cor-vermelho-hover: #d32f2f;
+  --cor-cinza-claro: #f0f2f5;
+  --cor-cinza-medio: #666;
+  --cor-cinza-medio-hover: #333;
+  --cor-branco: #fff;
+
+  /* 🌑 Sombras */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.painel-categorias {
+  padding: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+.painel-categorias h2 {
+  text-align: center;
+  color: var(--cor-azul);
+  border-bottom: 2px solid var(--cor-cinza-claro);
+  padding-bottom: 1rem;
+}
+
+.form-categorias {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.form-categorias input {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--cor-cinza-medio);
+}
+
+.btn-add-categoria {
+  margin-top: 0 !important;
+}
+.lista-categorias {
+  padding: 0;
+}
+
+.lista-categorias li {
+  /* Usa Flexbox para alinhar os elementos horizontalmente */
+  display: flex;
+  /* Coloca o espaço restante entre o nome e as ações */
+  justify-content: space-between;
+  /* Centraliza os itens verticalmente */
+  align-items: center;
+  padding: 10px; /* Adiciona algum espaço interno para visualização */
+  border-bottom: 1px solid #eee; /* Linha divisória sutil */
+}
+
+/* Garante que os botões dentro de .acoes fiquem em linha */
+.lista-categorias li .acoes {
+  display: flex;
+  gap: 5px; /* Adiciona um pequeno espaço entre os botões */
+}
+
+/* Adiciona um espaçamento à direita do nome para não ficar colado se não houver espaço */
+.lista-categorias li span {
+  margin-right: 15px;
+  font-weight: bold; /* Opcional: para destacar o nome */
+}
+
+.btn-editar-categoria,
+.btn-remover-categoria {
+  margin-top: 0 !important;
+  gap: 4px;
+}
+
+/**  Mobile  **/
+@media (max-width: 400px) {
+  .form-categorias {
+    justify-content: center;
+    gap: 1rem;
+  }
+}

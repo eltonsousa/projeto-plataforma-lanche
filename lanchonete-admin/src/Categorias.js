@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from "react-icons/ai";
+import "./Categorias.css";
 
 function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -60,59 +61,61 @@ function Categorias() {
     <div className="painel-categorias">
       <h2>Gerenciar Categorias</h2>
 
-      <form onSubmit={adicionarCategoria} className="form-categorias">
-        <input
-          type="text"
-          placeholder="Nova categoria..."
-          value={novaCategoria}
-          onChange={(e) => setNovaCategoria(e.target.value)}
-        />
-        <button className="btn btn-verde" type="submit">
-          Adicionar
-        </button>
-      </form>
+      <div className="config-card">
+        <form onSubmit={adicionarCategoria} className="form-categorias">
+          <input
+            type="text"
+            placeholder="Nova categoria..."
+            value={novaCategoria}
+            onChange={(e) => setNovaCategoria(e.target.value)}
+          />
+          <button className="btn-add-categoria btn btn-verde" type="submit">
+            Adicionar
+          </button>
+        </form>
 
-      <ul className="lista-categorias">
-        {categorias.map((cat) => (
-          <li key={cat.id}>
-            {editando === cat.id ? (
-              <>
-                <input
-                  value={valorEditado}
-                  onChange={(e) => setValorEditado(e.target.value)}
-                />
-                <button
-                  className="btn btn-verde"
-                  onClick={() => salvarEdicao(cat.id)}
-                >
-                  <AiOutlineCheck />
-                </button>
-              </>
-            ) : (
-              <>
-                <span>{cat.nome}</span>
-                <div className="acoes">
+        <ul className="lista-categorias">
+          {categorias.map((cat) => (
+            <li key={cat.id}>
+              {editando === cat.id ? (
+                <>
+                  <input
+                    value={valorEditado}
+                    onChange={(e) => setValorEditado(e.target.value)}
+                  />
                   <button
-                    className="btn btn-azul"
-                    onClick={() => {
-                      setEditando(cat.id);
-                      setValorEditado(cat.nome);
-                    }}
+                    className="btn btn-verde"
+                    onClick={() => salvarEdicao(cat.id)}
                   >
-                    <AiOutlineEdit />
+                    <AiOutlineCheck />
                   </button>
-                  <button
-                    className="btn btn-vermelho"
-                    onClick={() => excluirCategoria(cat.id)}
-                  >
-                    <AiOutlineDelete />
-                  </button>
-                </div>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+                </>
+              ) : (
+                <>
+                  <span>{cat.nome}</span>
+                  <div className="acoes">
+                    <button
+                      className="btn-editar-categoria btn btn-azul"
+                      onClick={() => {
+                        setEditando(cat.id);
+                        setValorEditado(cat.nome);
+                      }}
+                    >
+                      <AiOutlineEdit />
+                    </button>
+                    <button
+                      className="btn-remover-categoria btn btn-vermelho"
+                      onClick={() => excluirCategoria(cat.id)}
+                    >
+                      <AiOutlineDelete />
+                    </button>
+                  </div>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Categorias from "./Categorias";
 import "./App.css";
+
 import { formatPrice } from "./utils/format";
 
 // --- Import de ìcones
