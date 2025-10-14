@@ -87,7 +87,7 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: var(--cor-cinza-claro);
   margin: 0;
   padding: 0;
@@ -1189,6 +1189,10 @@ footer p.footer-admin {
     box-sizing: border-box;
   }
 
+  .lista-pedidos {
+    padding: 0 20px 20px 20px;
+  }
+
   .status-botoes {
     flex-direction: column;
     /* empilha botões de status */
@@ -1207,6 +1211,18 @@ footer p.footer-admin {
   }
 
   /* ---------- Página Relatórios ---------- */
+  .painel-relatorios {
+    margin: 0 0 20px 0;
+  }
+  .titulo-relatorio {
+    margin: 20px 0 20px 0;
+    font-size: 1.5rem;
+  }
+
+  .subtitulo-relatorio {
+    font-size: 1.5rem;
+  }
+
   .resumo-financeiro {
     flex-direction: column;
     gap: 10px;
@@ -1249,6 +1265,15 @@ footer p.footer-admin {
 
   .config-card {
     padding: 15px;
+  }
+
+  .painel-cardapio h2 {
+    padding-bottom: 0px;
+  }
+
+  .painel-configuracoes h2 {
+    margin: 20px 0;
+    padding-bottom: 0;
   }
 
   .schedule-form-grid {

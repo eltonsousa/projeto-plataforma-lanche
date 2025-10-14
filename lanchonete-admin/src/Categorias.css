@@ -62,7 +62,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--cor-cinza-medio);
+  background: #d9d9d9;
   color: var(--cor-branco);
   padding: 10px 15px;
   border-radius: 12px;
@@ -86,6 +86,7 @@
 .lista-categorias li span {
   margin-right: 15px;
   font-weight: bold; /* Opcional: para destacar o nome */
+  color: var(--cor-azul-hover);
 }
 
 .btn-editar-categoria,
@@ -96,10 +97,15 @@
 
 /**  Mobile  **/
 @media (max-width: 400px) {
-  .form-categorias {
-    justify-content: center;
-    gap: 1rem;
+  .painel-categorias {
+    padding-top: 65px;
   }
+
+  .painel-categorias h2 {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
   .acoes {
     display: flex;
     gap: 6px;

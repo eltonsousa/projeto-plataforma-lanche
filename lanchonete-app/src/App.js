@@ -874,6 +874,11 @@ function App() {
       <header>
         <h1>Manú Lanches</h1>
         <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"
+        ></link>
+
         {carrinho.length > 0 && !mostraCheckout && !pedidoFinalizado && (
           <CartIcon
             count={totalItensCarrinho}
