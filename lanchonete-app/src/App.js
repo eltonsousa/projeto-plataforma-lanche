@@ -892,16 +892,20 @@ function App() {
           <main className="cardapio">
             {/* 🟢 Menu de Categorias */}
             <nav className="cardapio-categorias" ref={categoriaNavRef}>
-              {/* Define as categorias e mapeia para botões */}
               {categorias.length > 0 ? (
+                // 🟢 Memoiza os botões de categorias para evitar re-renderização desnecessária
                 categorias.map((cat) => (
                   <button
                     key={cat.id}
+                    type="button" // 🧠 Evita comportamento de submit em alguns contextos
                     className={
                       categoriaSelecionada === cat.nome ? "categoria-ativa" : ""
                     }
                     onClick={(e) => {
+                      e.preventDefault(); // 🛑 Garante que não ocorra refresh/reload da página
                       setCategoriaSelecionada(cat.nome);
+
+                      // Rolagem suave horizontal até o botão selecionado
                       e.currentTarget.scrollIntoView({
                         behavior: "smooth",
                         inline: "center",
@@ -923,17 +927,15 @@ function App() {
             </nav>
             {/* 🟢 FIM: Menu de Categorias */}
 
-            {/* 🟢 LISTA DE ITENS FILTRADOS (Agora sem a verificação cardapioLoading redundante) */}
+            {/* 🟢 LISTA DE ITENS FILTRADOS */}
             {cardapioFiltrado.length > 0 ? (
-              // Mapeia a lista FILTRADA
               cardapioFiltrado.map((item) => (
                 <div
                   key={item.id}
-                  // 🔴 ATUALIZADO: Só permite abrir o modal se a loja estiver aberta
                   onClick={isStoreOpen ? () => handleAddItemToCart(item) : null}
                   style={{
-                    cursor: isStoreOpen ? "pointer" : "not-allowed", // 🔴 Muda o cursor
-                    opacity: isStoreOpen ? 1 : 0.6, // 🔴 Efeito visual de desabilitado
+                    cursor: isStoreOpen ? "pointer" : "not-allowed",
+                    opacity: isStoreOpen ? 1 : 0.6,
                     display: "flex",
                     justifyContent: "center",
                     width: "100%",
@@ -943,7 +945,6 @@ function App() {
                 </div>
               ))
             ) : (
-              // Mensagem quando não há itens na categoria
               <p className="sem-itens-cardapio">
                 Nenhum item encontrado na categoria {categoriaSelecionada}.
               </p>
