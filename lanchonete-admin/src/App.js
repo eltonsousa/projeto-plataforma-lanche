@@ -1064,7 +1064,7 @@ function App() {
                   style={{ maxWidth: "200px", marginTop: "10px" }}
                 />
               )}
-
+              <h4>Escolha a categoria:</h4>
               <select
                 name="categoria"
                 value={itemForm.categoria}
