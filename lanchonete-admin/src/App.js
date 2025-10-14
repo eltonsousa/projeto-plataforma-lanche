@@ -71,6 +71,7 @@ function App() {
     imagem: "",
     categoria: "Sanduíches",
   });
+  const [categorias, setCategorias] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isFormEmphasized, setIsFormEmphasized] = useState(false); // 🟢 ADICIONE ESTA LINHA
   const formRef = useRef(null); // 🟢 NOVO: Referência para o formulário
@@ -456,13 +457,26 @@ function App() {
       setUsuarioLogado(storedUser);
     }
 
+    // 🔹 função interna que busca categorias
+    const fetchCategorias = async () => {
+      try {
+        const res = await fetch("/api/categorias");
+        if (!res.ok) throw new Error("Erro ao buscar categorias");
+        const data = await res.json();
+        setCategorias(data);
+      } catch (err) {
+        console.error("Erro ao carregar categorias:", err);
+      }
+    };
+
     if (isLoggedIn) {
       if (currentPage === "pedidos" || currentPage === "relatorios") {
-        // Chama a busca apenas quando a página ou os filtros mudam
         fetchRelatorio(filtroPeriodo, filtroStatus);
         fetchStoreStatus();
       } else if (currentPage === "cardapio") {
+        // 🟢 carrega cardápio e categorias juntos
         fetchCardapio();
+        fetchCategorias();
       }
     }
   }, [isLoggedIn, currentPage, filtroPeriodo, filtroStatus]);
@@ -1067,18 +1081,25 @@ function App() {
               <h4>Escolha a categoria:</h4>
               <select
                 name="categoria"
-                value={itemForm.categoria}
-                onChange={handleItemFormChange}
                 required
+                value={itemForm.categoria || ""}
+                onChange={(e) =>
+                  setItemForm({ ...itemForm, categoria: e.target.value })
+                }
               >
                 <option value="" disabled>
                   Selecione a Categoria
                 </option>
-                <option value="Sanduíches">Sanduíches</option>
-                <option value="Bebidas">Bebidas</option>
-                <option value="Fritas">Fritas</option>
-                <option value="Comidas">Comidas</option>
-                <option value="Pizzas">Pizzas</option>
+
+                {categorias.length > 0 ? (
+                  categorias.map((cat) => (
+                    <option key={cat.id} value={cat.nome}>
+                      {cat.nome}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>Carregando categorias...</option>
+                )}
               </select>
 
               <button
