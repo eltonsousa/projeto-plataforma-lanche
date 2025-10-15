@@ -58,8 +58,20 @@
   font-size: 0.85rem;
   color: var(--cor-cinza-medio);
   margin: 6px 0 0;
-  max-width: 500px; /* 🟢 controla o texto */
+  max-width: 500px;
+
+  /* 🟢 Controle visual */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* número de linhas visíveis */
+  line-clamp: 2; /* 🟢 padrão moderno */
   overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3em;
+  height: 2.6em; /* 1.3em * 2 linhas */
+
+  /* Evita quebra de layout */
+  word-break: break-word;
 }
 
 .preco {
