@@ -4,14 +4,15 @@
 /* CARDÁPIO (CONTAINER GERAL)     */
 /* =============================== */
 .cardapio {
+  margin-top: 200px !important;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* 🟢 garante que todos os filhos usem a largura total */
+  align-items: stretch;
   gap: 20px;
-  padding: 20px;
+  padding: 20px 20px 60px 20px;
   box-sizing: border-box;
 }
 
@@ -128,6 +129,10 @@
 }
 
 @media (max-width: 450px) {
+  .cardapio {
+    margin-top: 148px !important;
+  }
+
   .cardapio-item {
     width: 100%; /* 🟢 ocupa 100% da tela no mobile */
   }
