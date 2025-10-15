@@ -339,6 +339,9 @@ function App() {
   const [itensCardapio, setItensCardapio] = useState([]);
   const [error, setError] = useState(null);
   const [mostraCarrinho, setMostraCarrinho] = useState(false);
+  const fecharCarrinho = () => {
+    setMostraCarrinho(false);
+  };
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [quantidadeProduto, setQuantidadeProduto] = useState(1);
   const [categoriaSelecionada, setCategoriaSelecionada] =
@@ -996,76 +999,83 @@ function App() {
 
           {/* CARRINHO */}
           {carrinho.length > 0 && mostraCarrinho && (
-            <aside className="carrinho-container">
-              <h2>Seu Carrinho</h2>
-              <div className="carrinho-itens">
-                {carrinho.map((item) => (
-                  <div key={item.id} className="carrinho-item">
-                    <div className="item-info-carrinho">
-                      <span>{item.nome}</span>
-                      <span>
-                        {formatPrice(
-                          // Se for Pizza (preço já inclui adicionais), não some os adicionais novamente
-                          item.categoria === "Pizzas"
-                            ? item.preco * item.quantidade
-                            : item.preco * item.quantidade +
-                                (item.adicionais
-                                  ? item.adicionais.reduce(
-                                      (acc, ad) =>
-                                        acc +
-                                        ad.preco *
-                                          ad.quantidade *
-                                          item.quantidade,
-                                      0
-                                    )
-                                  : 0)
-                        )}
-                      </span>
-                    </div>
-                    <div className="carrinho-botoes">
-                      <div className="quantidade-botoes-carrinho">
+            <div className="overlay">
+              <aside className="carrinho-container">
+                <AiOutlineClose
+                  className="carrinho-close-icon"
+                  onClick={fecharCarrinho}
+                  style={{ cursor: "pointer" }}
+                />
+                <h2>Seu Carrinho</h2>
+                <div className="carrinho-itens">
+                  {carrinho.map((item) => (
+                    <div key={item.id} className="carrinho-item">
+                      <div className="item-info-carrinho">
+                        <span>{item.nome}</span>
+                        <span>
+                          {formatPrice(
+                            // Se for Pizza (preço já inclui adicionais), não some os adicionais novamente
+                            item.categoria === "Pizzas"
+                              ? item.preco * item.quantidade
+                              : item.preco * item.quantidade +
+                                  (item.adicionais
+                                    ? item.adicionais.reduce(
+                                        (acc, ad) =>
+                                          acc +
+                                          ad.preco *
+                                            ad.quantidade *
+                                            item.quantidade,
+                                        0
+                                      )
+                                    : 0)
+                          )}
+                        </span>
+                      </div>
+                      <div className="carrinho-botoes">
+                        <div className="quantidade-botoes-carrinho">
+                          <button
+                            className="btn btn-vermelho btn-circle"
+                            onClick={() => diminuirQuantidade(item.id)}
+                          >
+                            <AiOutlineMinus size={20} />
+                          </button>
+                          <span>{item.quantidade}</span>
+                          <button
+                            className="btn btn-verde btn-circle"
+                            onClick={() => aumentarQuantidade(item.id)}
+                          >
+                            <AiOutlinePlus size={20} />
+                          </button>
+                        </div>
                         <button
                           className="btn btn-vermelho btn-circle"
-                          onClick={() => diminuirQuantidade(item.id)}
+                          onClick={() => removerDoCarrinho(item.id)}
                         >
-                          <AiOutlineMinus size={20} />
-                        </button>
-                        <span>{item.quantidade}</span>
-                        <button
-                          className="btn btn-verde btn-circle"
-                          onClick={() => aumentarQuantidade(item.id)}
-                        >
-                          <AiOutlinePlus size={20} />
+                          <AiOutlineDelete size={20} />
                         </button>
                       </div>
-                      <button
-                        className="btn btn-vermelho btn-circle"
-                        onClick={() => removerDoCarrinho(item.id)}
-                      >
-                        <AiOutlineDelete size={20} />
-                      </button>
                     </div>
-                  </div>
-                ))}
-              </div>
-              <div className="carrinho-total">
-                <h3>Total: {formatPrice(calcularTotal())}</h3>
-                <button
-                  className="btn btn-azul"
-                  onClick={handleFinalizarPedido}
-                  disabled={!isStoreOpen} // 🔴 DESABILITA o botão Finalizar Pedido
-                  style={{ opacity: isStoreOpen ? 1 : 0.5 }}
-                >
-                  Finalizar Pedido
-                </button>
-                {/* 🔴 FEEDBACK VISUAL: Mensagem de loja fechada perto do botão principal */}
-                {!isStoreOpen && (
-                  <p style={{ color: "red", marginTop: "10px" }}>
-                    Fechado para pedidos. Horário: 18:00h às 23:40h
-                  </p>
-                )}
-              </div>
-            </aside>
+                  ))}
+                </div>
+                <div className="carrinho-total">
+                  <h3>Total: {formatPrice(calcularTotal())}</h3>
+                  <button
+                    className="btn btn-azul"
+                    onClick={handleFinalizarPedido}
+                    disabled={!isStoreOpen} // 🔴 DESABILITA o botão Finalizar Pedido
+                    style={{ opacity: isStoreOpen ? 1 : 0.5 }}
+                  >
+                    Finalizar Pedido
+                  </button>
+                  {/* 🔴 FEEDBACK VISUAL: Mensagem de loja fechada perto do botão principal */}
+                  {!isStoreOpen && (
+                    <p style={{ color: "red", marginTop: "10px" }}>
+                      Fechado para pedidos. Horário: 18:00h às 23:40h
+                    </p>
+                  )}
+                </div>
+              </aside>
+            </div>
           )}
         </>
       )}
