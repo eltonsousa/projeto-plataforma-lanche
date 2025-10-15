@@ -1,5 +1,7 @@
+/* Cardapio.css  */
+
 /* =============================== */
-/* Cardápio                        */
+/* CARDÁPIO (CONTAINER GERAL)     */
 /* =============================== */
 .cardapio {
   width: 100%;
@@ -7,22 +9,26 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch; /* 🟢 garante que todos os filhos usem a largura total */
   gap: 20px;
   padding: 20px;
   box-sizing: border-box;
 }
 
+/* =============================== */
+/* ITEM DO CARDÁPIO (PRODUTO)     */
+/* =============================== */
 .cardapio-item {
   background-color: var(--cor-branco);
   border-radius: 10px;
   box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
-  padding: 15px;
-  width: 95%;
-  max-width: 700px;
-  margin: 0 auto;
+  justify-content: flex-start;
+  padding: 15px 20px;
+  margin-bottom: 1rem;
+  width: 100%; /* 🟢 todos terão a mesma largura */
+  box-sizing: border-box;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -31,33 +37,29 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Imagem do produto */
 .cardapio-item img {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   object-fit: cover;
   border-radius: 8px;
   margin-right: 20px;
   flex-shrink: 0;
 }
 
+/* Informações do produto */
 .cardapio-item h2 {
   font-size: 1.2rem;
-  margin: 10px 0px 0px 0px;
+  margin: 10px 0 0;
   color: var(--cor-cinza-medio-hover);
 }
 
 .cardapio-item p {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--cor-cinza-medio);
-  height: 60px;
-  margin: 10px 30px 0px 0px;
+  margin: 6px 0 0;
+  max-width: 500px; /* 🟢 controla o texto */
   overflow: hidden;
-}
-
-.cardapio-item button.btn-verde {
-  margin-left: auto;
-  flex-shrink: 0;
-  padding: 10px 15px;
 }
 
 .preco {
@@ -68,11 +70,11 @@
   display: block;
 }
 
-/* Adiciona um pouco de margem na lista de cardápio para não encostar na nav */
-.cardapio {
-  /* ... (manter estilos existentes) ... */
-  padding-top: 0;
-  /* Remove o padding-top se houver */
+/* Botão Adicionar */
+.cardapio-item button.btn-verde {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 10px 15px;
 }
 
 /* Estilo para mensagem de Sem Itens */
@@ -84,26 +86,27 @@
 }
 
 /* =============================== */
-/* Responsividade                  */
+/* RESPONSIVIDADE (MOBILE)        */
 /* =============================== */
 @media (max-width: 768px) {
+  .cardapio {
+    padding: 12px;
+    gap: 16px;
+  }
+
   .cardapio-item {
-    padding: 10px;
+    padding: 10px 14px;
   }
 
   .cardapio-item img {
-    width: 100px;
-    height: 100px;
-  }
-
-  .cardapio-item h2 {
-    font-size: 1.2rem;
+    width: 90px;
+    height: 90px;
+    margin-right: 14px;
   }
 
   .cardapio-item p {
     font-size: 0.8rem;
-    overflow: hidden;
-    max-width: 400px;
+    max-width: 320px;
   }
 
   .btn.btn-verde {
@@ -112,53 +115,27 @@
   }
 }
 
-@media (max-width: 480px) {
-  .cardapio-item p {
-    max-width: 200px;
-  }
-}
-
-/* Botão "Adicionar" compacto em telas menores */
 @media (max-width: 450px) {
+  .cardapio-item {
+    width: 100%; /* 🟢 ocupa 100% da tela no mobile */
+  }
+
+  .cardapio-item p {
+    max-width: 180px;
+  }
+
   .cardapio-item button.btn.btn-verde {
     width: 44px;
     height: 44px;
-    padding: 0;
     border-radius: 50%;
+    font-size: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0;
   }
 
   .cardapio-item button.btn.btn-verde svg {
     width: 20px;
-    /* deixa o ícone maior */
     height: 20px;
-  }
-}
-
-@media (max-width: 400px) {
-  .cardapio {
-    padding: 1rem;
-  }
-
-  .cardapio-item {
-    margin-bottom: 1rem;
-  }
-
-  .cardapio-item p {
-    max-width: 150px;
-  }
-}
-
-@media (max-width: 350px) {
-  .cardapio-item p {
-    max-width: 120px;
-  }
-
-  .cardapio-item button.btn.btn-verde {
-    display: none;
-    /* esconde botão em telas muito pequenas */
   }
 }

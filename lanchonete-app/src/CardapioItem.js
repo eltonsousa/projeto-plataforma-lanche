@@ -9,7 +9,7 @@ function CardapioItem({ item, onAdicionar }) {
   const isPizza = item.categoria === "Pizzas";
 
   return (
-    <div className="cardapio-item">
+    <div className="cardapio-item pizza-only">
       <img src={item.imagem} alt={item.nome} />
       <div className="item-info">
         <h2>{item.nome}</h2>

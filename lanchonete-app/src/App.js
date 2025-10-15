@@ -606,9 +606,9 @@ function App() {
   // 🟢 ESTADO USADO PARA CONTROLE DE CARREGAMENTO
   const [cardapioLoading, setCardapioLoading] = useState(true);
 
-  const cardapioFiltrado = itensCardapio.filter(
-    (item) => item.categoria === categoriaSelecionada
-  );
+  // const cardapioFiltrado = itensCardapio.filter(
+  //   (item) => item.categoria === categoriaSelecionada
+  // );
 
   // 🟢 Estados do checkout
   const [servico, setServico] = useState("");
