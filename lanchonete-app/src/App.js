@@ -723,9 +723,31 @@ function App() {
   const scrollToCategoria = (nome) => {
     const id = slugify(nome);
     const section = document.getElementById(id);
+
     if (section) {
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-      // marca visualmente (opcional: mantém botão ativo)
+      // Detecta alturas reais dinamicamente
+      const headerAltura = document.querySelector("header")?.offsetHeight || 0;
+      const navAltura =
+        document.querySelector(".cardapio-categorias")?.offsetHeight || 0;
+
+      // Detecta se é mobile (pode ajustar breakpoint se quiser)
+      const isMobile = window.innerWidth <= 768;
+
+      // Calcula offset total com base no contexto
+      const offset = isMobile
+        ? headerAltura + navAltura + 20 // Mobile → geralmente precisa de mais folga
+        : headerAltura + navAltura + 10; // Desktop → mais preciso
+
+      // Calcula a posição de destino com o offset
+      const top = section.getBoundingClientRect().top + window.scrollY - offset;
+
+      // Faz a rolagem suave até a categoria
+      window.scrollTo({
+        top,
+        behavior: "smooth",
+      });
+
+      // Marca visualmente a categoria ativa
       setCategoriaSelecionada(nome);
     }
   };
