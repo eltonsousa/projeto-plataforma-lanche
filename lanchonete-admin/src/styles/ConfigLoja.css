@@ -1,0 +1,52 @@
+.config-loja-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.config-loja-container h2 {
+  margin-bottom: 20px;
+  color: var(--cor-principal);
+  text-align: center;
+}
+
+.config-loja-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.config-loja-container label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #444;
+}
+
+.config-loja-container input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.form-config label {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.form-config input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.form-config button {
+  margin-top: 10px;
+}

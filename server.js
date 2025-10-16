@@ -457,6 +457,50 @@ app.delete("/api/categorias/:id", async (req, res) => {
   }
 });
 
+// ===============================================
+// 🟢 CONFIGURAÇÕES DA LOJA (CHAVE PIX / ENDEREÇO / MAPS)
+// ===============================================
+app.get("/api/configuracoes/:loja_id", async (req, res) => {
+  try {
+    const { loja_id } = req.params;
+    const { data, error } = await supabase
+      .from("configuracoes")
+      .select("chave_pix, endereco_loja, link_localizacao")
+      .eq("loja_id", loja_id)
+      .single();
+
+    if (error) throw error;
+    res.json(data || {});
+  } catch (err) {
+    console.error("Erro ao buscar configurações:", err);
+    res.status(500).json({ erro: "Erro ao buscar configurações da loja." });
+  }
+});
+
+// Atualizar configurações
+app.put("/api/configuracoes/:loja_id", async (req, res) => {
+  try {
+    const { loja_id } = req.params;
+    const { chave_pix, endereco_loja, link_localizacao } = req.body;
+
+    const { error } = await supabase.from("configuracoes").upsert(
+      {
+        loja_id,
+        chave_pix,
+        endereco_loja,
+        link_localizacao,
+      },
+      { onConflict: "loja_id" }
+    );
+
+    if (error) throw error;
+    res.json({ sucesso: true });
+  } catch (err) {
+    console.error("Erro ao atualizar configurações:", err);
+    res.status(500).json({ erro: "Erro ao atualizar configurações." });
+  }
+});
+
 // ---------------------------------------------
 // PEDIDOS (Resumo + Status envia WhatsApp)
 // ---------------------------------------------
