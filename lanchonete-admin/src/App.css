@@ -432,6 +432,8 @@ footer p.footer-admin {
   display: flex;
   margin-bottom: 8px;
   text-align: center;
+  gap: 0.3rem;
+  justify-content: center;
   align-items: center;
 }
 
@@ -439,11 +441,13 @@ footer p.footer-admin {
   text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
 }
 
-.item-botoes-admin .btn svg {
+/* .item-botoes-admin .btn svg {
   margin-right: 10px;
-}
+} */
 
 /* Autenticação */
 .auth-container {

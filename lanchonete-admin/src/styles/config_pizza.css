@@ -1,0 +1,102 @@
+/* --- Estilos para PizzaConfig Page --- */
+
+.pizza-config-page {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.pizza-config-page h2 {
+  color: var(--cor-azul); /* Assumindo que você tem uma variável de cor */
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.pizza-config-page .description {
+  margin-bottom: 30px;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.pizza-sections {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.pizza-section {
+  flex: 1;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.pizza-section h3 {
+  color: var(--cor-verde);
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 5px;
+}
+
+.pizza-section .add-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.pizza-section .add-form input,
+.pizza-section .add-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex-grow: 1;
+  min-width: 120px;
+}
+
+.pizza-section .add-form input:nth-child(1) {
+  /* Nome */
+  flex-basis: 30%;
+}
+
+.btn-add-tam,
+.btn-add-sabor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.config-list {
+  list-style: none;
+  padding: 0;
+}
+
+.config-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dotted #eee;
+}
+
+.config-list li span {
+  font-size: 0.9em;
+  color: #333;
+}
+
+.btn-save-config {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1em;
+}
+
+/* Responsividade (opcional, mas recomendado) */
+@media (max-width: 768px) {
+  .pizza-sections {
+    flex-direction: column;
+  }
+}

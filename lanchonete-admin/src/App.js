@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Categorias from "./Categorias";
 import "./App.css";
+import "./styles/config_pizza.css";
 
 import { formatPrice } from "./utils/format";
 
@@ -56,6 +57,10 @@ const PizzaConfig = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [editingTamanhoId, setEditingTamanhoId] = useState(null);
+  const [editingSaborId, setEditingSaborId] = useState(null);
+  const [currentEditingTamanho, setCurrentEditingTamanho] = useState(null);
+  const [currentEditingSabor, setCurrentEditingSabor] = useState(null);
 
   // Estados para o novo tamanho/sabor a ser adicionado
   const [newTamanho, setNewTamanho] = useState({
@@ -137,6 +142,38 @@ const PizzaConfig = () => {
     setTamanhos(tamanhos.filter((t) => t.id !== id));
   };
 
+  // 🟢 FUNÇÕES DE EDIÇÃO DE TAMANHO
+  const handleEditTamanhoStart = (tamanho) => {
+    setEditingTamanhoId(tamanho.id);
+    setCurrentEditingTamanho(tamanho);
+  };
+
+  const handleEditTamanhoChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentEditingTamanho((prev) => ({
+      ...prev,
+      [name]: name === "base_preco" ? parseFloat(value) : value,
+    }));
+  };
+
+  const handleEditTamanhoSave = () => {
+    if (
+      currentEditingTamanho.nome &&
+      currentEditingTamanho.sigla &&
+      currentEditingTamanho.base_preco >= 0
+    ) {
+      setTamanhos((prevTamanhos) =>
+        prevTamanhos.map((t) =>
+          t.id === editingTamanhoId ? currentEditingTamanho : t
+        )
+      );
+      setEditingTamanhoId(null);
+      setCurrentEditingTamanho(null);
+    } else {
+      alert("Por favor, preencha todos os campos do Tamanho.");
+    }
+  };
+
   // --- Lógica de Sabores ---
 
   const handleAddSabor = (e) => {
@@ -156,6 +193,34 @@ const PizzaConfig = () => {
 
   const handleDeleteSabor = (id) => {
     setSabores(sabores.filter((s) => s.id !== id));
+  };
+
+  // 🟢 FUNÇÕES DE EDIÇÃO DE SABOR
+  const handleEditSaborStart = (sabor) => {
+    setEditingSaborId(sabor.id);
+    setCurrentEditingSabor(sabor);
+  };
+
+  const handleEditSaborChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentEditingSabor((prev) => ({
+      ...prev,
+      [name]: name === "valor_referencia" ? parseFloat(value) : value,
+    }));
+  };
+
+  const handleEditSaborSave = () => {
+    if (currentEditingSabor.nome && currentEditingSabor.categoria) {
+      setSabores((prevSabores) =>
+        prevSabores.map((s) =>
+          s.id === editingSaborId ? currentEditingSabor : s
+        )
+      );
+      setEditingSaborId(null);
+      setCurrentEditingSabor(null);
+    } else {
+      alert("Por favor, preencha todos os campos do Sabor.");
+    }
   };
 
   if (loading) return <main>Carregando configurações de pizza...</main>;
@@ -208,25 +273,77 @@ const PizzaConfig = () => {
               min="0"
               required
             />
-            <button type="submit" className="btn btn-verde">
+            <button type="submit" className="btn btn-verde btn-add-tam">
               <AiOutlinePlus size={20} /> Add Tamanho
             </button>
           </form>
 
           <ul className="config-list">
-            {tamanhos.map((t) => (
-              <li key={t.id}>
-                <span>
-                  {t.nome} ({t.sigla}) - {formatPrice(t.base_preco)}
-                </span>
-                <button
-                  className="btn btn-laranja"
-                  onClick={() => handleDeleteTamanho(t.id)}
-                >
-                  <AiOutlineDelete size={16} />
-                </button>
-              </li>
-            ))}
+            {tamanhos.map((t) => {
+              const isEditing = t.id === editingTamanhoId;
+              return (
+                <li key={t.id}>
+                  {isEditing ? (
+                    // MODO EDIÇÃO
+                    <div className="editing-fields">
+                      <input
+                        type="text"
+                        name="nome"
+                        value={currentEditingTamanho.nome}
+                        onChange={handleEditTamanhoChange}
+                        placeholder="Nome"
+                      />
+                      <input
+                        type="text"
+                        name="sigla"
+                        value={currentEditingTamanho.sigla}
+                        onChange={handleEditTamanhoChange}
+                        placeholder="Sigla"
+                        maxLength={3}
+                      />
+                      <input
+                        type="number"
+                        name="base_preco"
+                        step="0.01"
+                        value={currentEditingTamanho.base_preco}
+                        onChange={handleEditTamanhoChange}
+                        placeholder="Preço Base (R$)"
+                      />
+                    </div>
+                  ) : (
+                    // MODO VISUALIZAÇÃO
+                    <span>
+                      {t.nome} ({t.sigla}) - {formatPrice(t.base_preco)}
+                    </span>
+                  )}
+
+                  <div className="item-botoes-admin">
+                    {isEditing ? (
+                      <button
+                        className="btn btn-verde"
+                        onClick={handleEditTamanhoSave}
+                      >
+                        <AiOutlineCheck size={16} /> Salvar
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-verde"
+                        onClick={() => handleEditTamanhoStart(t)}
+                      >
+                        <AiOutlineEdit size={16} /> Editar
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-laranja"
+                      onClick={() => handleDeleteTamanho(t.id)}
+                      disabled={isEditing} // Desabilita o delete durante a edição
+                    >
+                      <AiOutlineDelete size={16} /> Remover
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
 
@@ -264,26 +381,79 @@ const PizzaConfig = () => {
               min="0"
               required
             />
-            <button type="submit" className="btn btn-verde">
+            <button type="submit" className="btn btn-verde btn-add-sabor">
               <AiOutlinePlus size={20} /> Add Sabor
             </button>
           </form>
 
           <ul className="config-list">
-            {sabores.map((s) => (
-              <li key={s.id}>
-                <span>
-                  {s.nome} ({s.categoria}) - Adicional:{" "}
-                  {formatPrice(s.valor_referencia)}
-                </span>
-                <button
-                  className="btn btn-laranja"
-                  onClick={() => handleDeleteSabor(s.id)}
-                >
-                  <AiOutlineDelete size={16} />
-                </button>
-              </li>
-            ))}
+            {sabores.map((s) => {
+              const isEditing = s.id === editingSaborId;
+              return (
+                <li key={s.id}>
+                  {isEditing ? (
+                    // MODO EDIÇÃO
+                    <div className="editing-fields">
+                      <input
+                        type="text"
+                        name="nome"
+                        value={currentEditingSabor.nome}
+                        onChange={handleEditSaborChange}
+                        placeholder="Nome do Sabor"
+                      />
+                      <select
+                        name="categoria"
+                        value={currentEditingSabor.categoria}
+                        onChange={handleEditSaborChange}
+                      >
+                        <option value="Padrão">Padrão</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Especial">Especial</option>
+                      </select>
+                      <input
+                        type="number"
+                        name="valor_referencia"
+                        step="0.01"
+                        value={currentEditingSabor.valor_referencia}
+                        onChange={handleEditSaborChange}
+                        placeholder="Valor Ref. (R$)"
+                      />
+                    </div>
+                  ) : (
+                    // MODO VISUALIZAÇÃO
+                    <span>
+                      {s.nome} ({s.categoria}) - Adicional:{" "}
+                      {formatPrice(s.valor_referencia)}
+                    </span>
+                  )}
+
+                  <div className="item-botoes-admin">
+                    {isEditing ? (
+                      <button
+                        className="btn btn-verde"
+                        onClick={handleEditSaborSave}
+                      >
+                        <AiOutlineCheck size={16} /> Salvar
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-verde"
+                        onClick={() => handleEditSaborStart(s)}
+                      >
+                        <AiOutlineEdit size={16} /> Editar
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-laranja"
+                      onClick={() => handleDeleteSabor(s.id)}
+                      disabled={isEditing} // Desabilita o delete durante a edição
+                    >
+                      <AiOutlineDelete size={16} /> Remover
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
       </div>
