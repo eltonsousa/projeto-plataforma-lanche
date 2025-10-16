@@ -8,36 +8,52 @@ function ConfigLoja() {
     link_localizacao: "",
   });
   const [salvando, setSalvando] = useState(false);
-  const lojaId = "loja_padrao"; // Pode ser dinâmico futuramente
+  const [mensagem, setMensagem] = useState("");
 
+  // 🟢 Carregar configurações atuais do Supabase
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const res = await fetch(`/api/configuracoes/${lojaId}`);
+        const res = await fetch("/api/configuracoes");
+        if (!res.ok) throw new Error("Falha ao buscar configurações.");
         const data = await res.json();
-        setConfig(data);
+
+        if (data) {
+          setConfig({
+            chave_pix: data.chave_pix || "",
+            endereco_loja: data.endereco_loja || "",
+            link_localizacao: data.link_localizacao || "",
+          });
+        }
       } catch (err) {
         console.error("Erro ao carregar configurações:", err);
+        setMensagem("❌ Erro ao carregar configurações.");
       }
     };
     fetchConfig();
   }, []);
 
+  // 🟢 Salvar alterações no Supabase
   const salvarConfig = async (e) => {
     e.preventDefault();
     setSalvando(true);
+    setMensagem("");
+
     try {
-      await fetch(`/api/configuracoes/${lojaId}`, {
+      const res = await fetch("/api/configuracoes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
       });
-      alert("Configurações salvas com sucesso!");
+
+      if (!res.ok) throw new Error("Falha ao salvar alterações.");
+      setMensagem("✅ Configurações salvas com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar configurações:", err);
-      alert("Erro ao salvar configurações.");
+      setMensagem("❌ Erro ao salvar configurações.");
     } finally {
       setSalvando(false);
+      setTimeout(() => setMensagem(""), 4000);
     }
   };
 
@@ -88,6 +104,17 @@ function ConfigLoja() {
           {salvando ? "Salvando..." : "Salvar Alterações"}
         </button>
       </form>
+
+      {mensagem && (
+        <p
+          style={{
+            color: mensagem.includes("Erro") ? "#e74c3c" : "#27ae60",
+            marginTop: "10px",
+          }}
+        >
+          {mensagem}
+        </p>
+      )}
     </div>
   );
 }

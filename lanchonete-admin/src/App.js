@@ -1032,6 +1032,11 @@ function App() {
               </button>
             </li>
             <li>
+              <button onClick={() => changePage("configloja")}>
+                Configuração da Loja
+              </button>
+            </li>
+            <li>
               <button onClick={handleLogout}>Sair</button>
             </li>
           </ul>
@@ -1048,6 +1053,9 @@ function App() {
           <button onClick={() => changePage("categorias")}>Categorias</button>
           <button onClick={() => changePage("pizzaconfig")}>
             Configurações Pizza
+          </button>
+          <button onClick={() => changePage("configloja")}>
+            Configuração da Loja
           </button>
           <button onClick={handleLogout}>Sair</button>
         </nav>
@@ -1698,6 +1706,7 @@ function App() {
       )}
       {currentPage === "categorias" && <Categorias />}
       {currentPage === "pizzaconfig" && <PizzaConfig />}
+      {currentPage === "configloja" && <ConfigLoja />}
       <footer>
         <p className="footer-admin">
           &copy; 2025 Manú Lanches. Todos os direitos reservados.

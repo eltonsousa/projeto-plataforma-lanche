@@ -231,6 +231,48 @@ app.post("/api/usuarios/login", async (req, res) => {
   }
 });
 
+// ===============================
+// 💳 ROTAS DE CONFIGURAÇÕES (PIX, ENDEREÇO, LOCALIZAÇÃO)
+// ===============================
+app.get("/api/configuracoes", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("configuracoes_loja")
+      .select("chave_pix, endereco_loja, link_localizacao")
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error("Erro ao buscar configurações:", err.message);
+    res.status(500).json({ error: "Erro ao buscar configurações" });
+  }
+});
+
+app.put("/api/configuracoes", async (req, res) => {
+  const { chave_pix, endereco_loja, link_localizacao } = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from("configuracoes_loja")
+      .update({
+        chave_pix,
+        endereco_loja,
+        link_localizacao,
+      })
+      .eq("id", 1) // 🟢 Atualiza o registro principal
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ message: "Configurações atualizadas com sucesso!", data });
+  } catch (err) {
+    console.error("Erro ao atualizar configurações:", err.message);
+    res.status(500).json({ error: "Erro ao atualizar configurações" });
+  }
+});
+
 // ---------------------------------------------
 // CARDÁPIO
 // ---------------------------------------------
@@ -464,7 +506,7 @@ app.get("/api/configuracoes/:loja_id", async (req, res) => {
   try {
     const { loja_id } = req.params;
     const { data, error } = await supabase
-      .from("configuracoes")
+      .from("configuracoes_loja")
       .select("chave_pix, endereco_loja, link_localizacao")
       .eq("loja_id", loja_id)
       .single();
@@ -483,7 +525,7 @@ app.put("/api/configuracoes/:loja_id", async (req, res) => {
     const { loja_id } = req.params;
     const { chave_pix, endereco_loja, link_localizacao } = req.body;
 
-    const { error } = await supabase.from("configuracoes").upsert(
+    const { error } = await supabase.from("configuracoes_loja").upsert(
       {
         loja_id,
         chave_pix,
@@ -574,9 +616,30 @@ app.post("/api/pedidos", async (req, res) => {
       mensagemResumo += `\n*💰 Total:* ${totalPedido}`;
       mensagemResumo += `\n*🚚 Serviço:* ${pedido.tipo_servico}`;
 
+      // 🟢 Busca a configuração da loja no Supabase (CHAVE PIX e LOCALIZAÇÃO)
+      const { data: configLoja, error: configError } = await supabase
+        .from("configuracoes_loja")
+        .select("chave_pix, endereco_loja, link_localizacao")
+        .eq("loja_id", lojaId)
+        .single();
+
+      if (configError || !configLoja) {
+        console.error("Erro ao buscar configuração da loja:", configError);
+      }
+
+      // Valores padrão se não houver dados no Supabase
+      const chavePix =
+        configLoja?.chave_pix ||
+        process.env.CHAVE_PIX ||
+        "Chave não configurada";
+      const enderecoLoja =
+        configLoja?.endereco_loja || "Endereço não configurado";
+      const linkLocalizacao =
+        configLoja?.link_localizacao || process.env.LOCALIZACAO_LOJA || "";
+
       // Lógica tipo pagamento
       if (pedido.forma_pagamento?.toLowerCase() === "pix") {
-        mensagemResumo += `\n*💰 Pagamento:* PIX\n*Chave PIX:* ${process.env.CHAVE_PIX}`;
+        mensagemResumo += `\n*💰 Pagamento:* PIX\n*Chave PIX:* ${chavePix}`;
       } else if (pedido.forma_pagamento?.toLowerCase() === "dinheiro") {
         mensagemResumo += `\n*💵 Pagamento:* Dinheiro`;
         if (pedido.troco)
@@ -587,7 +650,7 @@ app.post("/api/pedidos", async (req, res) => {
 
       // Lógica tipo de entrega
       if (pedido.tipo_servico.toLowerCase() === "retirada") {
-        mensagemResumo += `\n*📍 Retirada:* Av. Exemplo, 123 - Novo Israel\n\n*📍 Nossa Localização:*\n${process.env.LOCALIZACAO_LOJA}`;
+        mensagemResumo += `\n*📍 Retirada:* Av. Exemplo, 123 - Novo Israel\n\n*📍 Nossa Localização:*\n${linkLocalizacao}`;
       } else {
         mensagemResumo += `\n*📍 Entrega:* ${
           pedido.cliente.endereco || "Endereço informado pelo cliente"
