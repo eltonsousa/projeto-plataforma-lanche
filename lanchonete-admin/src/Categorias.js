@@ -134,7 +134,7 @@ function Categorias() {
                           <span>{cat.nome}</span>
                           <div className="acoes">
                             <button
-                              className="btn-editar-categoria btn btn-azul"
+                              className="btn-editar-categoria btn btn-circle btn-azul"
                               onClick={() => {
                                 setEditando(cat.id);
                                 setValorEditado(cat.nome);
@@ -143,7 +143,7 @@ function Categorias() {
                               <AiOutlineEdit />
                             </button>
                             <button
-                              className="btn-remover-categoria btn btn-vermelho"
+                              className="btn-remover-categoria btn btn-circle btn-vermelho"
                               onClick={() => excluirCategoria(cat.id)}
                             >
                               <AiOutlineDelete />
