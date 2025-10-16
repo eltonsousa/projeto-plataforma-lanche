@@ -987,7 +987,7 @@ function App() {
             </li>
             <li>
               <button onClick={() => changePage("configuracoes")}>
-                Configurações
+                Horário de Funcionamento
               </button>
             </li>
             <li>
@@ -997,7 +997,7 @@ function App() {
             </li>
             <li>
               <button onClick={() => changePage("pizzaconfig")}>
-                🍕 Config. Pizza
+                Configurações Pizza
               </button>
             </li>
             <li>
@@ -1012,11 +1012,11 @@ function App() {
           <button onClick={() => changePage("relatorios")}>Relatórios</button>
           <button onClick={() => changePage("cardapio")}>Cardápio</button>
           <button onClick={() => changePage("configuracoes")}>
-            Configurações
+            Horário de Funcionamento
           </button>
           <button onClick={() => changePage("categorias")}>Categorias</button>
           <button onClick={() => changePage("pizzaconfig")}>
-            🍕 Config. Pizza
+            Configurações Pizza
           </button>
           <button onClick={handleLogout}>Sair</button>
         </nav>

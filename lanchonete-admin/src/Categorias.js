@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineCheck,
+  AiOutlinePlus,
+} from "react-icons/ai";
+
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import "./Categorias.css";
 
@@ -92,7 +98,7 @@ function Categorias() {
           onChange={(e) => setNovaCategoria(e.target.value)}
         />
         <button className="btn-add-categoria btn btn-verde" type="submit">
-          Adicionar
+          <AiOutlinePlus size={20} /> Adicionar
         </button>
       </form>
 
@@ -134,7 +140,7 @@ function Categorias() {
                           <span>{cat.nome}</span>
                           <div className="acoes">
                             <button
-                              className="btn-editar-categoria btn btn-circle btn-azul"
+                              className="btn-editar-categoria btn btn-circle btn-verde"
                               onClick={() => {
                                 setEditando(cat.id);
                                 setValorEditado(cat.nome);
