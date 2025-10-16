@@ -320,6 +320,73 @@ app.delete("/api/cardapio/:id", async (req, res) => {
 });
 
 // ---------------------------------------------
+// CONFIGURAÇÕES DE PIZZA
+// ---------------------------------------------
+// GET: Carrega as configurações de pizza
+app.get("/api/pizzas-config", async (req, res) => {
+  try {
+    // Tenta buscar o único registro (ID 1) para configurações de pizza
+    const { data, error } = await supabase
+      .from("pizza_config")
+      .select("tamanhos, sabores")
+      .eq("id", 1) // ID 1 é o registro principal de configurações
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      // PGRST116 = not found
+      throw error;
+    }
+
+    // Se o registro não for encontrado ou houver erro, retorna estrutura vazia
+    if (!data) {
+      return res.status(200).json({ tamanhos: [], sabores: [] });
+    }
+
+    // Retorna os dados (tamanhos e sabores)
+    res.status(200).json(data);
+  } catch (err) {
+    console.error("Erro GET /api/pizzas-config:", err);
+    res
+      .status(500)
+      .json({ message: "Erro ao carregar configurações de pizza." });
+  }
+});
+
+// PUT: Salva as configurações de pizza (usado pelo Admin)
+app.put("/api/pizzas-config", async (req, res) => {
+  const { tamanhos, sabores } = req.body;
+  if (!tamanhos || !sabores) {
+    return res
+      .status(400)
+      .json({ message: "Tamanhos e sabores são obrigatórios." });
+  }
+
+  try {
+    // Tenta inserir ou atualizar o registro de ID 1 usando upsert
+    const { data: updatedData, error: updateError } = await supabase
+      .from("pizza_config")
+      .upsert(
+        { id: 1, tamanhos, sabores }, // Upsert data
+        { onConflict: "id" } // Conflito no ID 1 para atualizar
+      )
+      .select("tamanhos, sabores");
+
+    if (updateError) throw updateError;
+
+    if (!updatedData || updatedData.length === 0) {
+      throw new Error("Falha ao atualizar/inserir configuração de pizza.");
+    }
+
+    res.status(200).json(updatedData[0]);
+  } catch (err) {
+    console.error("Erro PUT /api/pizzas-config:", err);
+    res
+      .status(500)
+      .json({ message: "Erro ao atualizar configuração de pizza." });
+  }
+});
+
+// ---------------------------------------------
 // CATEGORIAS DE CARDÁPIO
 // ---------------------------------------------
 app.get("/api/categorias", async (req, res) => {

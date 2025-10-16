@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Categorias from "./Categorias";
 import "./App.css";
 
@@ -11,6 +11,7 @@ import {
   AiOutlineCheck,
   AiOutlineMenu,
   AiOutlineClose,
+  AiOutlinePlus,
 } from "react-icons/ai";
 import {
   MdOutlinePlaylistAdd,
@@ -47,6 +48,259 @@ const defaultSchedule = [
   { day: 5, name: "Sexta-feira", isActive: true, start: "18:00", end: "23:00" },
   { day: 6, name: "Sábado", isActive: true, start: "18:00", end: "23:00" },
 ];
+
+// 🟢 NOVO COMPONENTE: Gerenciamento de Configurações de Pizza
+const PizzaConfig = () => {
+  const [tamanhos, setTamanhos] = useState([]);
+  const [sabores, setSabores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Estados para o novo tamanho/sabor a ser adicionado
+  const [newTamanho, setNewTamanho] = useState({
+    nome: "",
+    base_preco: 0,
+    sigla: "",
+  });
+  const [newSabor, setNewSabor] = useState({
+    nome: "",
+    valor_referencia: 0,
+    categoria: "Padrão", // Default
+  });
+
+  const fetchPizzaConfig = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/pizzas-config");
+      if (!res.ok) throw new Error("Erro ao carregar configurações de pizza.");
+
+      const data = await res.json();
+      setTamanhos(data.tamanhos || []);
+      setSabores(data.sabores || []);
+    } catch (err) {
+      console.error("Erro ao buscar config de pizza:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPizzaConfig();
+  }, [fetchPizzaConfig]);
+
+  // Função para salvar as configurações
+  const handleSaveConfig = async () => {
+    setIsSaving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/pizzas-config", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tamanhos, sabores }),
+      });
+
+      if (!res.ok) throw new Error("Falha ao salvar as configurações.");
+
+      alert("Configurações de Pizza salvas com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar config de pizza:", err);
+      setError(err.message);
+      alert(`Erro ao salvar: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // --- Lógica de Tamanhos ---
+
+  const handleAddTamanho = (e) => {
+    e.preventDefault();
+    if (newTamanho.nome && newTamanho.sigla && newTamanho.base_preco >= 0) {
+      setTamanhos([
+        ...tamanhos,
+        {
+          ...newTamanho,
+          base_preco: parseFloat(newTamanho.base_preco),
+          id: Date.now(), // ID temporário para edição local
+        },
+      ]);
+      setNewTamanho({ nome: "", base_preco: 0, sigla: "" }); // Reset
+    }
+  };
+
+  const handleDeleteTamanho = (id) => {
+    setTamanhos(tamanhos.filter((t) => t.id !== id));
+  };
+
+  // --- Lógica de Sabores ---
+
+  const handleAddSabor = (e) => {
+    e.preventDefault();
+    if (newSabor.nome && newSabor.categoria) {
+      setSabores([
+        ...sabores,
+        {
+          ...newSabor,
+          valor_referencia: parseFloat(newSabor.valor_referencia || 0),
+          id: Date.now(), // ID temporário para edição local
+        },
+      ]);
+      setNewSabor({ nome: "", valor_referencia: 0, categoria: "Padrão" }); // Reset
+    }
+  };
+
+  const handleDeleteSabor = (id) => {
+    setSabores(sabores.filter((s) => s.id !== id));
+  };
+
+  if (loading) return <main>Carregando configurações de pizza...</main>;
+
+  return (
+    <main className="pizza-config-page">
+      <h2>Gerenciar Pizzas</h2>
+      <p className="description">
+        Defina os tamanhos (preço base) e a lista de sabores (valor de
+        referência para adicionar ao preço base).
+      </p>
+
+      {error && <p className="error-message">Erro: {error}</p>}
+
+      <div className="pizza-sections">
+        {/* --- Seção de Tamanhos --- */}
+        <section className="pizza-section">
+          <h3>Tamanhos e Preços Base</h3>
+          <form onSubmit={handleAddTamanho} className="add-form">
+            <input
+              type="text"
+              placeholder="Nome (ex: Grande)"
+              value={newTamanho.nome}
+              onChange={(e) =>
+                setNewTamanho({ ...newTamanho, nome: e.target.value })
+              }
+              required
+            />
+            <input
+              type="text"
+              placeholder="Sigla (ex: G)"
+              value={newTamanho.sigla}
+              maxLength={3}
+              onChange={(e) =>
+                setNewTamanho({
+                  ...newTamanho,
+                  sigla: e.target.value.toUpperCase(),
+                })
+              }
+              required
+            />
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Preço Base (R$)"
+              value={newTamanho.base_preco}
+              onChange={(e) =>
+                setNewTamanho({ ...newTamanho, base_preco: e.target.value })
+              }
+              min="0"
+              required
+            />
+            <button type="submit" className="btn btn-verde">
+              <AiOutlinePlus size={20} /> Add Tamanho
+            </button>
+          </form>
+
+          <ul className="config-list">
+            {tamanhos.map((t) => (
+              <li key={t.id}>
+                <span>
+                  {t.nome} ({t.sigla}) - {formatPrice(t.base_preco)}
+                </span>
+                <button
+                  className="btn btn-laranja"
+                  onClick={() => handleDeleteTamanho(t.id)}
+                >
+                  <AiOutlineDelete size={16} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* --- Seção de Sabores --- */}
+        <section className="pizza-section">
+          <h3>Sabores e Valores de Referência</h3>
+          <form onSubmit={handleAddSabor} className="add-form">
+            <input
+              type="text"
+              placeholder="Nome do Sabor (ex: Calabresa)"
+              value={newSabor.nome}
+              onChange={(e) =>
+                setNewSabor({ ...newSabor, nome: e.target.value })
+              }
+              required
+            />
+            <select
+              value={newSabor.categoria}
+              onChange={(e) =>
+                setNewSabor({ ...newSabor, categoria: e.target.value })
+              }
+            >
+              <option value="Padrão">Padrão</option>
+              <option value="Premium">Premium</option>
+              <option value="Especial">Especial</option>
+            </select>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Valor Ref. (R$)"
+              value={newSabor.valor_referencia}
+              onChange={(e) =>
+                setNewSabor({ ...newSabor, valor_referencia: e.target.value })
+              }
+              min="0"
+              required
+            />
+            <button type="submit" className="btn btn-verde">
+              <AiOutlinePlus size={20} /> Add Sabor
+            </button>
+          </form>
+
+          <ul className="config-list">
+            {sabores.map((s) => (
+              <li key={s.id}>
+                <span>
+                  {s.nome} ({s.categoria}) - Adicional:{" "}
+                  {formatPrice(s.valor_referencia)}
+                </span>
+                <button
+                  className="btn btn-laranja"
+                  onClick={() => handleDeleteSabor(s.id)}
+                >
+                  <AiOutlineDelete size={16} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <button
+        onClick={handleSaveConfig}
+        className="btn btn-azul btn-save-config"
+        disabled={isSaving}
+      >
+        <AiOutlineCheck size={22} />
+        {isSaving ? "Salvando..." : "Salvar Configurações de Pizza"}
+      </button>
+    </main>
+  );
+};
+
+// ... (fim do componente PizzaConfig)
 
 function App() {
   const [pedidos, setPedidos] = useState([]);
@@ -572,6 +826,11 @@ function App() {
               </button>
             </li>
             <li>
+              <button onClick={() => changePage("pizzaconfig")}>
+                🍕 Config. Pizza
+              </button>
+            </li>
+            <li>
               <button onClick={handleLogout}>Sair</button>
             </li>
           </ul>
@@ -586,6 +845,9 @@ function App() {
             Configurações
           </button>
           <button onClick={() => changePage("categorias")}>Categorias</button>
+          <button onClick={() => changePage("pizzaconfig")}>
+            🍕 Config. Pizza
+          </button>
           <button onClick={handleLogout}>Sair</button>
         </nav>
       </header>
@@ -1147,6 +1409,7 @@ function App() {
         </main>
       )}
       {currentPage === "categorias" && <Categorias />}
+      {currentPage === "pizzaconfig" && <PizzaConfig />}
       <footer>
         <p className="footer-admin">
           &copy; 2025 Manú Lanches. Todos os direitos reservados.

@@ -26,29 +26,6 @@ import { MdOutlineArrowBackIosNew } from "react-icons/md";
 import { CiDeliveryTruck } from "react-icons/ci";
 // ---- Import icones ---- //
 
-// URL base da API
-// const API_URL = "http://localhost:3001/api"; // Comentado/Removido, pois a variável não era utilizada.
-
-// ----------------------------------------------------
-// 🟢 NOVAS CONFIGURAÇÕES DE PIZZA (Para fins de demonstração)
-//    O ideal é que isso seja carregado de uma rota /api/pizzas-config
-// ----------------------------------------------------
-const PIZZA_TAMANHOS = [
-  { nome: "Média", base_preco: 40.0, sigla: "M" },
-  { nome: "Grande", base_preco: 55.0, sigla: "G" },
-  { nome: "Família", base_preco: 70.0, sigla: "F" },
-];
-
-const PIZZA_SABORES = [
-  { nome: "Mussarela", valor_referencia: 0.0, categoria: "Padrão" },
-  { nome: "Calabresa", valor_referencia: 0.0, categoria: "Padrão" },
-  { nome: "4 Queijos", valor_referencia: 5.0, categoria: "Especial" },
-  { nome: "Portuguesa", valor_referencia: 5.0, categoria: "Especial" },
-  { nome: "Frango c/ Catupiry", valor_referencia: 7.5, categoria: "Premium" },
-  { nome: "Camarão", valor_referencia: 10.0, categoria: "Premium" },
-];
-// ----------------------------------------------------
-
 // ----------------------------------------------------
 // 🟢 NOVAS FUNÇÕES E CONFIGURAÇÕES DE HORÁRIO (DINÂMICAS)
 // ----------------------------------------------------
@@ -358,7 +335,32 @@ function App() {
     preco_base: 0,
     preco_final: 0,
   });
+
+  // 🟢 NOVO: Estados para a configuração de Pizza carregada do Admin
+  const [pizzaTamanhos, setPizzaTamanhos] = useState([]);
+  const [pizzaSabores, setPizzaSabores] = useState([]);
+  const [pizzaConfigLoading, setPizzaConfigLoading] = useState(true);
   // ----------------------------------------------------
+
+  // 🟢 NOVA FUNÇÃO: Carrega configurações de Pizza dinamicamente
+  const fetchPizzaConfig = useCallback(async () => {
+    setPizzaConfigLoading(true);
+    try {
+      const res = await fetch("/api/pizzas-config");
+      if (!res.ok) throw new Error("Erro ao carregar configurações de pizza");
+      const data = await res.json();
+
+      // Assume a estrutura: { tamanhos: [], sabores: [] }
+      setPizzaTamanhos(data.tamanhos || []);
+      setPizzaSabores(data.sabores || []);
+    } catch (err) {
+      console.error("Erro ao buscar config de pizza:", err);
+      setPizzaTamanhos([]);
+      setPizzaSabores([]);
+    } finally {
+      setPizzaConfigLoading(false);
+    }
+  }, []); // Sem dependências
 
   // Observação
   const [observacao, setObservacao] = useState("");
@@ -400,6 +402,10 @@ function App() {
     },
     []
   );
+
+  useEffect(() => {
+    fetchPizzaConfig();
+  }, [fetchPizzaConfig]);
 
   // Efeito para recalcular o preco_final sempre que os sabores, tamanho ou adicionais mudarem
   useEffect(() => {
@@ -678,24 +684,6 @@ function App() {
       console.error("Erro ao buscar categorias:", err);
     }
   }, []); // <-- 🔴 sem dependências
-
-  // 🟢 NOVO: Função para obter ícone baseado na categoria
-  // const getCategoryIcon = (category) => {
-  //   switch (category) {
-  //     case "Sanduíches":
-  //       return "🍔"; // Hambúrguer
-  //     case "Bebidas":
-  //       return "🥤"; // Copo de bebida
-  //     case "Fritas":
-  //       return "🍟"; // Batata Frita
-  //     case "Comidas":
-  //       return "🍝"; // Macarrão/Prato
-  //     case "Pizzas":
-  //       return "🍕";
-  //     default:
-  //       return "";
-  //   }
-  // };
 
   const getCategoryIcon = (category) => {
     const nome = category.toLowerCase();
@@ -1229,139 +1217,155 @@ function App() {
           >
             <h3>Monte sua Pizza 🍕</h3>
 
-            <div className="pizza-resumo">
-              {/* Exibe o resumo dinâmico no topo */}
-              <p>
-                <span>Tamanho:</span>{" "}
-                {pizzaConfig.tamanho ? pizzaConfig.tamanho.nome : "Aguardando"}
-              </p>
-              <p>
-                <span>Sabores ({pizzaConfig.sabores.length}/2):</span>
-                {pizzaConfig.sabores.length > 0
-                  ? pizzaConfig.sabores.map((s) => s.nome).join(" / ")
-                  : "Escolha seu(s) sabor(es)"}
-              </p>
-              <p className="preco-final">
-                Total: {formatPrice(pizzaConfig.preco_final)}
-              </p>
-            </div>
-
-            {/* Passo 1: Escolha do Tamanho */}
-            <h4>1. Escolha o Tamanho:</h4>
-            <div className="pizza-opcoes-tamanho">
-              {PIZZA_TAMANHOS.map((tamanho) => (
-                <button
-                  key={tamanho.sigla}
-                  onClick={() => handleSelectTamanho(tamanho)}
-                  className={
-                    pizzaConfig.tamanho?.sigla === tamanho.sigla
-                      ? "selected"
-                      : ""
-                  }
-                  btn
-                >
-                  {tamanho.nome} ({formatPrice(tamanho.base_preco)})
-                </button>
-              ))}
-            </div>
-
-            {/* Passo 2: Escolha dos Sabores */}
-            {pizzaConfig.tamanho && (
+            {/* Exibe mensagem de carregamento se as configs não carregaram */}
+            {pizzaConfigLoading ? (
+              <div className="loading-pizza">Carregando configurações...</div>
+            ) : (
               <>
-                <h4>2. Escolha os Sabores (Máx. 2):</h4>
-                <p className="info-meia-meia">
-                  *O preço é ajustado pelo sabor de maior valor.
-                </p>
-                <div className="pizza-opcoes-sabores">
-                  {PIZZA_SABORES.map((sabor) => {
-                    const isSelected = pizzaConfig.sabores.some(
-                      (s) => s.nome === sabor.nome
-                    );
-                    const isBlocked =
-                      pizzaConfig.sabores.length === 2 && !isSelected;
-                    const valorAdicional =
-                      sabor.valor_referencia > 0
-                        ? `(+${formatPrice(sabor.valor_referencia)})`
-                        : "(Padrão)";
+                <div className="pizza-resumo">
+                  {/* Exibe o resumo dinâmico no topo */}
+                  <p>
+                    <span>Tamanho:</span>{" "}
+                    {pizzaConfig.tamanho
+                      ? pizzaConfig.tamanho.nome
+                      : "Aguardando"}
+                  </p>
+                  <p>
+                    <span>Sabores ({pizzaConfig.sabores.length}/2):</span>
+                    {pizzaConfig.sabores.length > 0
+                      ? pizzaConfig.sabores.map((s) => s.nome).join(" / ")
+                      : "Escolha seu(s) sabor(es)"}
+                  </p>
+                  <p className="preco-final">
+                    Total: {formatPrice(pizzaConfig.preco_final)}
+                  </p>
+                </div>
 
-                    return (
-                      <button
-                        key={sabor.nome}
-                        onClick={() => handleSelectSabor(sabor)}
-                        disabled={isBlocked}
-                        className={
-                          isSelected ? "selected" : isBlocked ? "blocked" : ""
-                        }
-                      >
-                        {sabor.nome} {valorAdicional}
-                      </button>
-                    );
-                  })}
+                {/* Passo 1: Escolha do Tamanho */}
+                <h4>1. Escolha o Tamanho:</h4>
+                <div className="pizza-opcoes-tamanho">
+                  {/* 🚨 CORREÇÃO: Usa o estado DINÂMICO pizzaTamanhos */}
+                  {pizzaTamanhos.map((tamanho) => (
+                    <button
+                      key={tamanho.sigla}
+                      onClick={() => handleSelectTamanho(tamanho)}
+                      className={
+                        pizzaConfig.tamanho?.sigla === tamanho.sigla
+                          ? "selected"
+                          : ""
+                      }
+                      btn
+                    >
+                      {tamanho.nome} ({formatPrice(tamanho.base_preco)})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Passo 2: Escolha dos Sabores */}
+                {pizzaConfig.tamanho && (
+                  <>
+                    <h4>2. Escolha os Sabores (Máx. 2):</h4>
+                    <p className="info-meia-meia">
+                      *O preço é ajustado pelo sabor de maior valor.
+                    </p>
+                    <div className="pizza-opcoes-sabores">
+                      {/* 🚨 CORREÇÃO: Usa o estado DINÂMICO pizzaSabores */}
+                      {pizzaSabores.map((sabor) => {
+                        const isSelected = pizzaConfig.sabores.some(
+                          (s) => s.nome === sabor.nome
+                        );
+                        const isBlocked =
+                          pizzaConfig.sabores.length === 2 && !isSelected;
+                        const valorAdicional =
+                          sabor.valor_referencia > 0
+                            ? `(+${formatPrice(sabor.valor_referencia)})`
+                            : "(Padrão)";
+
+                        return (
+                          <button
+                            key={sabor.nome}
+                            onClick={() => handleSelectSabor(sabor)}
+                            disabled={isBlocked}
+                            className={
+                              isSelected
+                                ? "selected"
+                                : isBlocked
+                                ? "blocked"
+                                : ""
+                            }
+                          >
+                            {sabor.nome} {valorAdicional}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {/* 🟢 ADICIONAIS PARA PIZZA (Mantido, usa basePizzaItem) */}
+                {basePizzaItem &&
+                  basePizzaItem.adicionais &&
+                  basePizzaItem.adicionais.length > 0 && (
+                    <div className="adicionais-modal">
+                      <h3>Adicionais (Opcional):</h3>
+                      {basePizzaItem.adicionais.map((ad, index) => (
+                        <div key={index} className="adicional-item">
+                          <span>
+                            {ad.nome} (+{formatPrice(ad.preco)})
+                          </span>
+                          <div className="adicional-quantidade">
+                            <button
+                              className="btn btn-vermelho btn-circle"
+                              onClick={() => diminuirAdicional(ad)}
+                            >
+                              <AiOutlineMinus size={16} />
+                            </button>
+                            <span>
+                              {adicionaisSelecionados[ad.nome]?.quantidade || 0}
+                            </span>
+                            <button
+                              className="btn btn-verde btn-circle"
+                              onClick={() => aumentarAdicional(ad)}
+                            >
+                              <AiOutlinePlus size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                {/* 🟢 OBSERVAÇÕES PARA PIZZA (Mantido) */}
+                <div className="observacoes">
+                  <h3>Observações:</h3>
+                  <textarea
+                    placeholder="Ex: Sem cebola, massa crocante..."
+                    value={observacao}
+                    onChange={(e) => setObservacao(e.target.value)}
+                  />
+                </div>
+
+                {/* Botões de Ação */}
+                <div className="modal-actions">
+                  <button
+                    onClick={() => setIsPizzaModalVisible(false)}
+                    className="cancel-button btn btn-vermelho"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleAddPizzaToCart}
+                    disabled={
+                      !pizzaConfig.tamanho || pizzaConfig.sabores.length === 0
+                    }
+                    className="add-to-cart-button btn btn-azul"
+                  >
+                    Adicionar ao Carrinho (
+                    {formatPrice(pizzaConfig.preco_final)})
+                  </button>
                 </div>
               </>
             )}
-
-            {/* 🟢 NOVO: ADICIONAIS PARA PIZZA (Usando o basePizzaItem para lista) */}
-            {basePizzaItem &&
-              basePizzaItem.adicionais &&
-              basePizzaItem.adicionais.length > 0 && (
-                <div className="adicionais-modal">
-                  <h3>Adicionais (Opcional):</h3>
-                  {basePizzaItem.adicionais.map((ad, index) => (
-                    <div key={index} className="adicional-item">
-                      <span>
-                        {ad.nome} (+{formatPrice(ad.preco)})
-                      </span>
-                      <div className="adicional-quantidade">
-                        <button
-                          className="btn btn-vermelho btn-circle"
-                          onClick={() => diminuirAdicional(ad)}
-                        >
-                          <AiOutlineMinus size={16} />
-                        </button>
-                        <span>
-                          {adicionaisSelecionados[ad.nome]?.quantidade || 0}
-                        </span>
-                        <button
-                          className="btn btn-verde btn-circle"
-                          onClick={() => aumentarAdicional(ad)}
-                        >
-                          <AiOutlinePlus size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-            {/* 🟢 NOVO: OBSERVAÇÕES PARA PIZZA */}
-            <div className="observacoes">
-              <h3>Observações:</h3>
-              <textarea
-                placeholder="Ex: Sem cebola, massa crocante..."
-                value={observacao}
-                onChange={(e) => setObservacao(e.target.value)}
-              />
-            </div>
-
-            {/* Botões de Ação */}
-            <div className="modal-actions">
-              <button
-                onClick={() => setIsPizzaModalVisible(false)}
-                className="cancel-button btn btn-vermelho"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleAddPizzaToCart}
-                disabled={
-                  !pizzaConfig.tamanho || pizzaConfig.sabores.length === 0
-                }
-                className="add-to-cart-button btn btn-azul"
-              >
-                Adicionar ao Carrinho ({formatPrice(pizzaConfig.preco_final)})
-              </button>
-            </div>
             <AiOutlineClose
               className="modal-close-icon"
               onClick={() => setIsPizzaModalVisible(false)}
