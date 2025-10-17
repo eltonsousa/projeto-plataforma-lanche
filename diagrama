@@ -2,7 +2,9 @@
 ├── lanchonete-admin/
 │   ├── src/
 │   │   ├── App.js
-│   │   └── App.css
+│   │   ├── App.css
+│   │   ├── ConfigLoja.js
+│   │   └── Categorias.js
 │   └── package.json
 ├── lanchonete-app/
 │   ├── src/

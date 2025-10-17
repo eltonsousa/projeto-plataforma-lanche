@@ -236,36 +236,49 @@ app.post("/api/usuarios/login", async (req, res) => {
 // ===============================
 app.get("/api/configuracoes", async (req, res) => {
   try {
-    const { data, error } = await supabase
+    // 🟢 MUDANÇA AQUI: Usamos .limit(1) para buscar no máximo uma linha,
+    // o que retorna um array. Removemos .single() para evitar erro com 0 linhas.
+    const { data: configs, error } = await supabase
       .from("configuracoes_loja")
       .select("chave_pix, endereco_loja, link_localizacao")
-      .single();
+      .limit(1);
 
     if (error) throw error;
-    res.json(data);
+
+    // Se o array estiver vazio (tabela vazia), retorna um objeto vazio {}.
+    if (!configs || configs.length === 0) {
+      return res.json({});
+    }
+
+    // Retorna a primeira (e única) linha encontrada.
+    res.json(configs[0]);
   } catch (err) {
     console.error("Erro ao buscar configurações:", err.message);
+    // Garante que o frontend sempre receba JSON, mesmo em caso de erro 500.
     res.status(500).json({ error: "Erro ao buscar configurações" });
   }
 });
 
+// 🆕 Rota PUT /api/configuracoes - Atualiza configurações gerais
+// Esta rota é chamada pelo ConfigLoja.js para atualizar PIX, Endereço e Link.
 app.put("/api/configuracoes", async (req, res) => {
   const { chave_pix, endereco_loja, link_localizacao } = req.body;
-
   try {
     const { data, error } = await supabase
       .from("configuracoes_loja")
-      .update({
-        chave_pix,
-        endereco_loja,
-        link_localizacao,
-      })
-      .eq("id", 1) // 🟢 Atualiza o registro principal
+      .upsert(
+        {
+          id: 1, // Chave única para o upsert
+          chave_pix,
+          endereco_loja,
+          link_localizacao,
+        },
+        { onConflict: "id" } // 🟢 Se id=1 já existe, atualiza. Se não, insere.
+      )
       .select()
       .single();
 
     if (error) throw error;
-
     res.json({ message: "Configurações atualizadas com sucesso!", data });
   } catch (err) {
     console.error("Erro ao atualizar configurações:", err.message);
