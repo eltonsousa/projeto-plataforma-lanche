@@ -19,12 +19,7 @@ import {
   MdOutlinePlaylistAdd,
   MdOutlineAddPhotoAlternate,
 } from "react-icons/md";
-import {
-  BsToggleOff,
-  BsToggleOn,
-  BsClockFill,
-  BsFillCreditCard2FrontFill,
-} from "react-icons/bs";
+import { BsToggleOff, BsToggleOn, BsClockFill } from "react-icons/bs";
 // --- Import de ìcones
 
 // Estrutura de horário padrão para a semana (0=Domingo, 6=Sábado)
@@ -523,12 +518,6 @@ function App() {
   const [isStoreForcedOpen, setIsStoreForcedOpen] = useState(false); // Status da flag de override
   const [isStatusLoading, setIsStatusLoading] = useState(true); // Carregamento do status inicial
 
-  // 🟢 Estados para PIX e Localização
-  const [chavePix, setChavePix] = useState("");
-  const [enderecoLoja, setEnderecoLoja] = useState("");
-  const [linkLocalizacao, setLinkLocalizacao] = useState("");
-  const [isSavingPix, setIsSavingPix] = useState(false);
-
   // 🟢 NOVOS ESTADOS PARA CONFIGURAÇÕES DE HORÁRIO (ADICIONE AQUI)
   const [scheduleConfig, setScheduleConfig] = useState(defaultSchedule); // Estado principal do horário
   const [isScheduleSaving, setIsScheduleSaving] = useState(false); // Estado de carregamento do formulário de horário
@@ -918,25 +907,6 @@ function App() {
   };
 
   // EFEITOS
-  // 🟢 Carregar configurações PIX e Localização ao iniciar
-  useEffect(() => {
-    const fetchPixConfig = async () => {
-      try {
-        const res = await fetch("/api/admin/configuracoes/pix");
-        const data = await res.json();
-        if (res.ok) {
-          setChavePix(data.chave_pix || "");
-          setEnderecoLoja(data.endereco_loja || "");
-          setLinkLocalizacao(data.link_localizacao || "");
-        }
-      } catch (err) {
-        console.error("Erro ao buscar configurações PIX:", err);
-      }
-    };
-
-    fetchPixConfig();
-  }, []);
-
   useEffect(() => {
     const storedUser = sessionStorage.getItem("usuarioLogado");
     if (storedUser) {
@@ -1237,92 +1207,6 @@ function App() {
               </div>
             )}
           </div>
-
-          {/* ------------------------------------------------------------- */}
-          {/* 🟢 NOVO CARD: CHAVE PIX E LOCALIZAÇÃO */}
-          {/* ------------------------------------------------------------- */}
-          <div className="config-card">
-            <div className="titulo-config-card">
-              <BsFillCreditCard2FrontFill
-                size={22}
-                style={{ marginRight: "10px" }}
-              />
-              <h3>Configurações de Pagamento e Localização</h3>
-            </div>
-            <p>Gerencie a chave PIX e as informações de localização da loja.</p>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setIsSavingPix(true);
-                try {
-                  const res = await fetch("/api/admin/configuracoes/pix", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      chave_pix: chavePix,
-                      endereco_loja: enderecoLoja,
-                      link_localizacao: linkLocalizacao,
-                    }),
-                  });
-
-                  const data = await res.json();
-                  if (!res.ok) throw new Error(data.error || "Erro ao salvar");
-
-                  alert(
-                    "Configurações de pagamento e localização salvas com sucesso!"
-                  );
-                } catch (err) {
-                  alert("Erro: " + err.message);
-                } finally {
-                  setIsSavingPix(false);
-                }
-              }}
-              className="form-config"
-            >
-              <label>
-                <strong>Chave PIX:</strong>
-                <input
-                  type="text"
-                  placeholder="Insira a chave PIX"
-                  value={chavePix}
-                  onChange={(e) => setChavePix(e.target.value)}
-                  required
-                />
-              </label>
-
-              <label>
-                <strong>Endereço da Loja:</strong>
-                <input
-                  type="text"
-                  placeholder="Rua, número, bairro..."
-                  value={enderecoLoja}
-                  onChange={(e) => setEnderecoLoja(e.target.value)}
-                />
-              </label>
-
-              <label>
-                <strong>Link da Localização (Google Maps):</strong>
-                <input
-                  type="url"
-                  placeholder="https://maps.google.com/..."
-                  value={linkLocalizacao}
-                  onChange={(e) => setLinkLocalizacao(e.target.value)}
-                />
-              </label>
-
-              <button
-                type="submit"
-                className={`btn ${isSavingPix ? "btn-laranja" : "btn-verde"}`}
-                disabled={isSavingPix}
-              >
-                {isSavingPix ? "Salvando..." : "Salvar Configurações"}
-              </button>
-            </form>
-          </div>
-          {/* ------------------------------------------------------------- */}
-          {/* 🔴 FIM NOVO CARD: CHAVE PIX E LOCALIZAÇÃO */}
-          {/* ------------------------------------------------------------- */}
 
           {error && (
             <p className="error" style={{ marginTop: "20px" }}>

@@ -313,58 +313,126 @@ app.post("/api/usuarios/login", async (req, res) => {
   }
 });
 
-// ===============================
-// 💳 ROTAS DE CONFIGURAÇÕES (PIX, ENDEREÇO, LOCALIZAÇÃO)
-// ===============================
-app.get("/api/configuracoes", async (req, res) => {
+// ---------------------------------------------
+// CONFIGURAÇÕES GERAIS E STATUS (ROTAS MULTI-TENANT)
+// ---------------------------------------------
+
+// GET: Retorna todas as configurações da loja logada
+app.get("/api/configuracoes", autenticarLoja, async (req, res) => {
+  const lojaId = req.lojaId;
+  const { scope } = req.query; // Pode ser usado para filtrar o que o frontend precisa
+
   try {
-    // 🟢 MUDANÇA AQUI: Usamos .limit(1) para buscar no máximo uma linha,
-    // o que retorna um array. Removemos .single() para evitar erro com 0 linhas.
-    const { data: configs, error } = await supabase
+    const { data: config, error: fetchError } = await supabase
       .from("configuracoes_loja")
-      .select("chave_pix, endereco_loja, link_localizacao")
+      .select("*") // Seleciona todos os campos
+      .eq("loja_id", lojaId)
       .limit(1);
 
-    if (error) throw error;
+    if (fetchError) throw fetchError;
 
-    // Se o array estiver vazio (tabela vazia), retorna um objeto vazio {}.
-    if (!configs || configs.length === 0) {
-      return res.json({});
+    const currentConfig = config[0];
+
+    // Se a loja não tiver nenhuma configuração, retorna um objeto vazio para evitar erros
+    if (!currentConfig) {
+      return res.status(200).json({});
     }
 
-    // Retorna a primeira (e única) linha encontrada.
-    res.json(configs[0]);
+    // Se o escopo for 'status_loja' (usado no painel de horários), retorna apenas o necessário
+    if (scope === "status_loja") {
+      return res.status(200).json({
+        isForcedOpen: currentConfig.is_forced_open,
+        scheduleConfig: currentConfig.schedule_config,
+      });
+    }
+
+    // Caso contrário (chamado por ConfigLoja.js), retorna TUDO em camelCase
+    return res.status(200).json({
+      chave_pix: currentConfig.chave_pix,
+      endereco_loja: currentConfig.endereco_loja,
+      link_localizacao: currentConfig.link_localizacao,
+      isForcedOpen: currentConfig.is_forced_open,
+      scheduleConfig: currentConfig.schedule_config,
+    });
   } catch (err) {
-    console.error("Erro ao buscar configurações:", err.message);
-    // Garante que o frontend sempre receba JSON, mesmo em caso de erro 500.
-    res.status(500).json({ error: "Erro ao buscar configurações" });
+    console.error("Erro GET /api/configuracoes:", err);
+    res.status(500).json({ message: "Erro ao buscar configuração." });
   }
 });
 
-// 🆕 Rota PUT /api/configuracoes - Atualiza configurações gerais
-// Esta rota é chamada pelo ConfigLoja.js para atualizar PIX, Endereço e Link.
-app.put("/api/configuracoes", async (req, res) => {
-  const { chave_pix, endereco_loja, link_localizacao } = req.body;
-  try {
-    const { data, error } = await supabase
-      .from("configuracoes_loja")
-      .upsert(
-        {
-          id: 1, // Chave única para o upsert
-          chave_pix,
-          endereco_loja,
-          link_localizacao,
-        },
-        { onConflict: "id" } // 🟢 Se id=1 já existe, atualiza. Se não, insere.
-      )
-      .select()
-      .single();
+// PUT: Atualiza/Insere qualquer campo de configuração enviado no corpo
+app.put("/api/configuracoes", autenticarLoja, async (req, res) => {
+  const lojaId = req.lojaId;
 
-    if (error) throw error;
-    res.json({ message: "Configurações atualizadas com sucesso!", data });
+  // Extrai todos os campos possíveis do body (incluindo os novos)
+  const {
+    isForcedOpen,
+    scheduleConfig,
+    chave_pix,
+    endereco_loja,
+    link_localizacao,
+  } = req.body;
+
+  // Monta o objeto de dados a ser atualizado/inserido
+  const updateData = {
+    loja_id: lojaId,
+  };
+
+  // Adiciona apenas os campos que foram realmente enviados na requisição
+  if (isForcedOpen !== undefined) {
+    updateData.is_forced_open = isForcedOpen;
+  }
+  if (scheduleConfig !== undefined) {
+    updateData.schedule_config = scheduleConfig;
+  }
+  if (chave_pix !== undefined) {
+    updateData.chave_pix = chave_pix;
+  }
+  if (endereco_loja !== undefined) {
+    updateData.endereco_loja = endereco_loja;
+  }
+  if (link_localizacao !== undefined) {
+    updateData.link_localizacao = link_localizacao;
+  }
+
+  // Garante que há algo para atualizar além do loja_id
+  if (Object.keys(updateData).length <= 1) {
+    return res
+      .status(400)
+      .json({ message: "Nenhum campo válido fornecido para atualização." });
+  }
+
+  try {
+    const { data: updatedData, error: updateError } = await supabase
+      .from("configuracoes_loja")
+      .upsert([updateData], { onConflict: ["loja_id"] })
+      .select("*"); // Retorna todos os campos atualizados
+
+    if (updateError) throw updateError;
+    if (!updatedData || updatedData.length === 0) {
+      throw new Error("Falha ao atualizar/inserir configuração.");
+    }
+
+    // Converte os dados de snake_case para camelCase para o frontend
+    const {
+      chave_pix: returned_pix,
+      endereco_loja: returned_endereco,
+      link_localizacao: returned_link,
+      is_forced_open: returned_open,
+      schedule_config: returned_schedule,
+    } = updatedData[0];
+
+    // Retorna a configuração completa atualizada
+    res.status(200).json({
+      chave_pix: returned_pix,
+      endereco_loja: returned_endereco,
+      link_localizacao: returned_link,
+      isForcedOpen: returned_open,
+      scheduleConfig: returned_schedule,
+    });
   } catch (err) {
-    console.error("Erro ao atualizar configurações:", err.message);
-    res.status(500).json({ error: "Erro ao atualizar configurações" });
+    console.error("Erro PUT /api/configuracoes:", err);
+    res.status(500).json({ message: "Erro ao atualizar configuração." });
   }
 });
 
