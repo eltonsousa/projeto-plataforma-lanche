@@ -711,6 +711,10 @@ app.put("/api/configuracoes/:loja_id", async (req, res) => {
 // ---------------------------------------------
 app.post("/api/pedidos", async (req, res) => {
   try {
+    // 🔑 CORREÇÃO: Define o ID da loja para o lanchonete-app (FRONTEND DO CLIENTE)
+    // O valor 5 é usado como placeholder, pois esta rota é pública.
+    const lojaId = 5;
+
     const { cliente, itens, total, tipo_servico } = req.body;
     const novoPedido = {
       cliente,
@@ -791,14 +795,11 @@ app.post("/api/pedidos", async (req, res) => {
       }
 
       // Valores padrão se não houver dados no Supabase
-      const chavePix =
-        configLoja?.chave_pix ||
-        process.env.CHAVE_PIX ||
-        "Chave não configurada";
+      const chavePix = configLoja?.chave_pix || "Chave PIX não configurada";
       const enderecoLoja =
         configLoja?.endereco_loja || "Endereço não configurado";
       const linkLocalizacao =
-        configLoja?.link_localizacao || process.env.LOCALIZACAO_LOJA || "";
+        configLoja?.link_localizacao || "Link da Localização não configurado.";
 
       // Lógica tipo pagamento
       if (pedido.forma_pagamento?.toLowerCase() === "pix") {
@@ -813,7 +814,7 @@ app.post("/api/pedidos", async (req, res) => {
 
       // Lógica tipo de entrega
       if (pedido.tipo_servico.toLowerCase() === "retirada") {
-        mensagemResumo += `\n*📍 Retirada:* Av. Exemplo, 123 - Novo Israel\n\n*📍 Nossa Localização:*\n${linkLocalizacao}`;
+        mensagemResumo += `\n*📍 Retirada:* ${enderecoLoja}\n\n*📍 Nossa Localização:*\n${linkLocalizacao}`;
       } else {
         mensagemResumo += `\n*📍 Entrega:* ${
           pedido.cliente.endereco || "Endereço informado pelo cliente"
