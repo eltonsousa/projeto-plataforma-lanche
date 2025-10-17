@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken"); // ⬅️ NOVO!
 const { formatPrice } = require("./utils/format");
 
 // Whatsapp
@@ -21,6 +22,52 @@ const path = require("path");
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Chave secreta do .env
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// 🔑 Função Middleware de Autenticação
+const autenticarLoja = (req, res, next) => {
+  // 1. Verificar se o header Authorization existe
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res
+      .status(401)
+      .json({ message: "Acesso negado. Token não fornecido." });
+  }
+
+  // O formato deve ser "Bearer <token>"
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Formato de token inválido (Bearer missing)." });
+  }
+
+  // 2. Verificar e decodificar o token
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // 💡 A MÁGICA MULTI-TENANT: Anexar o loja_id do token ao objeto de requisição
+    // O token PRECISA conter o 'loja_id' quando for criado no login.
+    if (!decoded.loja_id) {
+      return res
+        .status(403)
+        .json({ message: "Token inválido: loja_id ausente." });
+    }
+
+    req.lojaId = decoded.loja_id;
+
+    // 3. Chamar o próximo middleware/função de rota
+    next();
+  } catch (err) {
+    console.error("Erro na verificação do JWT:", err.message);
+    return res.status(403).json({ message: "Token inválido ou expirado." });
+  }
+};
+// 🔑 Fim Função Middleware de Autenticação
 
 // Carregar imagens do Buckets Supabase
 const multer = require("multer");
@@ -169,8 +216,11 @@ app.get("/api/whatsapp-qr", async (req, res) => {
 // AUTENTICAÇÃO (SUPABASE)
 // ---------------------------------------------
 app.post("/api/usuarios/registrar", async (req, res) => {
-  const { nome, senha } = req.body;
-  if (!nome || !senha)
+  // 🔑 Adicionado loja_id
+  const { nome, senha, loja_id } = req.body;
+
+  // ⚠️ loja_id agora é obrigatório para registrar um admin
+  if (!nome || !senha || !loja_id)
     return res.status(400).send({ message: "Nome e senha são obrigatórios." });
 
   try {
@@ -185,7 +235,9 @@ app.post("/api/usuarios/registrar", async (req, res) => {
       return res.status(409).send({ message: "Nome de usuário já existe." });
 
     const senhaHash = await bcrypt.hash(senha, 10);
-    const novoUsuario = { nome, senhaHash };
+
+    // 🔑 O objeto a ser inserido agora inclui o loja_id
+    const novoUsuario = { nome, senhaHash, loja_id };
 
     const { data, error: insertError } = await supabase
       .from("usuarios")
@@ -209,7 +261,8 @@ app.post("/api/usuarios/login", async (req, res) => {
   try {
     const { data: usuarios, error: fetchError } = await supabase
       .from("usuarios")
-      .select("senhaHash")
+      // 🔑 Agora, selecione 'id' e 'loja_id' também
+      .select("id, senhaHash, loja_id")
       .eq("nome", nome)
       .limit(1);
     if (fetchError) throw fetchError;
@@ -219,9 +272,38 @@ app.post("/api/usuarios/login", async (req, res) => {
       return res.status(401).send({ message: "Credenciais inválidas." });
 
     const match = await bcrypt.compare(senha, usuario.senhaHash);
+
     if (match) {
-      console.log(`Usuário ${nome} logado com sucesso.`);
-      return res.status(200).send({ message: "Login bem-sucedido!" });
+      // ✅ LOGIN BEM-SUCEDIDO: Geração do JWT
+
+      // 1. Verificar se o usuário está associado a uma loja
+      if (!usuario.loja_id) {
+        // Isso é importante para evitar erros nas rotas protegidas
+        return res
+          .status(403)
+          .send({ message: "Usuário não associado a uma loja." });
+      }
+
+      // 2. Criar o Payload do Token
+      const payload = {
+        userId: usuario.id,
+        loja_id: usuario.loja_id, // 🔑 O ID da loja é injetado no token
+      };
+
+      // 3. Gerar o Token
+      const JWT_SECRET = process.env.JWT_SECRET; // Garantindo que a chave secreta é acessada
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "8h" }); // Token expira em 8 horas
+
+      console.log(
+        `Usuário ${nome} logado com sucesso (Loja ID: ${usuario.loja_id}).`
+      );
+
+      // 4. Retornar o Token e o loja_id (opcional) ao frontend
+      return res.status(200).send({
+        message: "Login bem-sucedido!",
+        token: token,
+        loja_id: usuario.loja_id, // Informa o frontend qual loja ele gerencia
+      });
     } else {
       return res.status(401).send({ message: "Credenciais inválidas." });
     }

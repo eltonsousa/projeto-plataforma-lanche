@@ -10,12 +10,36 @@ function ConfigLoja() {
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState("");
 
+  // 🔑 Função utilitária para obter o token
+  const getToken = () => {
+    return localStorage.getItem("adminToken");
+  };
+
   // 🟢 Carregar configurações atuais do Supabase
   useEffect(() => {
     const fetchConfig = async () => {
+      const token = getToken();
+      if (!token) {
+        setMensagem("❌ Sessão expirada. Faça login novamente.");
+        return;
+      }
+
       try {
-        const res = await fetch("/api/configuracoes");
-        if (!res.ok) throw new Error("Falha ao buscar configurações.");
+        const res = await fetch("/api/configuracoes", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // 🔑 ANEXA O TOKEN AQUI
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          // Se o servidor retornar 401/403, a sessão está inválida
+          if (res.status === 401 || res.status === 403) {
+            throw new Error("Acesso negado. Token inválido/expirado.");
+          }
+          throw new Error("Falha ao buscar configurações.");
+        }
         const data = await res.json();
 
         if (data) {
@@ -39,18 +63,33 @@ function ConfigLoja() {
     setSalvando(true);
     setMensagem("");
 
+    const token = getToken();
+    if (!token) {
+      setMensagem("❌ Sessão expirada. Faça login novamente.");
+      setSalvando(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/configuracoes", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`, // 🔑 ANEXA O TOKEN AQUI
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(config),
       });
 
-      if (!res.ok) throw new Error("Falha ao salvar alterações.");
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error("Acesso negado. Token inválido/expirado.");
+        }
+        throw new Error("Falha ao salvar alterações.");
+      }
       setMensagem("✅ Configurações salvas com sucesso!");
     } catch (err) {
       console.error("Erro ao salvar configurações:", err);
-      setMensagem("❌ Erro ao salvar configurações.");
+      setMensagem(`❌ Erro ao salvar configurações: ${err.message}`);
     } finally {
       setSalvando(false);
       setTimeout(() => setMensagem(""), 4000);

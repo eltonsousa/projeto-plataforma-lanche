@@ -491,6 +491,10 @@ function App() {
   const [formData, setFormData] = useState({ nome: "", senha: "" });
   const [isAuthLoading, setIsAuthLoading] = useState(false); // 🟢 NOVO ESTADO DE CARREGAMENTO
   const [usuarioLogado, setUsuarioLogado] = useState(null); // 🟢 NOVO ESTADO
+
+  // 🔑 NOVO: Declare o estado para a mensagem de erro
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [mostraSenha, setMostraSenha] = useState(false);
   const [currentPage, setCurrentPage] = useState("pedidos");
   const [itemForm, setItemForm] = useState({
@@ -821,26 +825,44 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsAuthLoading(true); // 🟢 Inicia o carregamento
+    setErrorMessage(""); // 🔑 Limpa o erro anterior antes de começar
+
     try {
       const response = await fetch("/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
+      const data = await response.json(); // 🔑 Ler a resposta (que contém o token)
+
       if (response.ok) {
-        setIsLoggedIn(true);
-        sessionStorage.setItem("isLoggedIn", "true"); // PERSISTE O LOGIN
-        // 🟢 SALVA O NOME DO USUÁRIO NO SESSION STORAGE E NO ESTADO
-        sessionStorage.setItem("usuarioLogado", formData.nome);
-        setUsuarioLogado(formData.nome);
-        setFormData({ nome: "", senha: "" });
-        setCurrentPage("pedidos");
+        // 🔑 NOVO: Armazenar o token e o loja_id no localStorage
+        if (data.token) {
+          localStorage.setItem("adminToken", data.token); // Usamos localStorage
+          localStorage.setItem("lojaId", data.loja_id); // Loja ID para referência futura
+
+          setIsLoggedIn(true);
+          // O sessionStorage não é o mais seguro, mas vamos manter o nome
+          sessionStorage.setItem("usuarioLogado", formData.nome);
+          sessionStorage.setItem("isLoggedIn", "true"); // PERSISTE O LOGIN
+
+          setUsuarioLogado(formData.nome);
+          setFormData({ nome: "", senha: "" });
+          setCurrentPage("pedidos");
+          setErrorMessage(""); // Limpa qualquer erro prévio
+        } else {
+          setErrorMessage("Erro: Token não recebido após login bem-sucedido.");
+        }
       } else {
-        const data = await response.json();
-        alert(data.message);
+        // alert(data.message);
+        setErrorMessage(
+          data.message || "Credenciais inválidas ou erro no servidor."
+        ); // 🔑 Usa setErrorMessage
       }
     } catch (error) {
-      alert("Erro ao fazer login. Verifique o servidor.");
+      // alert("Erro ao fazer login. Verifique o servidor.");
+      setErrorMessage("Erro de conexão. Verifique se o servidor está ativo."); // 🔑 Usa setErrorMessage
     } finally {
       setIsAuthLoading(false); // 🟢 Finaliza o carregamento (sempre)
     }
@@ -849,26 +871,32 @@ function App() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setIsAuthLoading(true); // 🟢 Inicia o carregamento
+    setErrorMessage(""); // 🔑 Limpa o erro anterior
     try {
+      // ⚠️ ATENÇÃO: Se o seu registro NÃO tem o campo loja_id no frontend,
+      // ele falhará. Por enquanto, só vamos corrigir o comportamento pós-registro.
+      const dataToSend = { ...formData, loja_id: 5 }; // 👈 ASSUMINDO LOJA ID FIXO 5 PARA TESTE
       const response = await fetch("/api/usuarios/registrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend), // 👈 Envia o loja_id
       });
-      const data = await response.json();
-      if (response.status === 201) {
-        // 🟢 LINHAS ADICIONADAS
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("usuarioLogado", formData.nome);
-        setUsuarioLogado(formData.nome);
 
+      const data = await response.json();
+
+      if (response.status === 201) {
         alert("Usuário registrado com sucesso! Faça login.");
-        setIsLogin(true);
+        setIsLogin(true); // Redireciona para o login
+        setErrorMessage(""); // Limpa o erro, se houver
       } else {
-        alert(data.message);
+        // alert(data.message);
+        setErrorMessage(
+          data.message || "Erro desconhecido ao registrar usuário."
+        ); // 🔑 Usa setErrorMessage
       }
     } catch (error) {
-      alert("Erro ao registrar. Verifique o servidor.");
+      // alert("Erro ao registrar. Verifique o servidor.");
+      setErrorMessage("Erro de conexão. Não foi possível registrar o usuário."); // 🔑 Usa setErrorMessage
     } finally {
       setIsAuthLoading(false); // 🟢 Finaliza o carregamento (sempre)
     }
@@ -876,7 +904,10 @@ function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    sessionStorage.removeItem("isLoggedIn"); // 📢 Limpa a chave de persistência
+    sessionStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("usuarioLogado"); // Limpar o nome
+    localStorage.removeItem("adminToken"); // 🔑 NOVO: Limpa o token
+    localStorage.removeItem("lojaId"); // 🔑 NOVO: Limpa o loja ID
     setCurrentPage("pedidos");
     alert("Logout realizado com sucesso!");
   };
@@ -966,6 +997,12 @@ function App() {
               {mostraSenha ? "🙈" : "👁️"}
             </button>
           </div>
+
+          {/* 🔑 Insira aqui: */}
+          {errorMessage && (
+            <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
+          )}
+
           <button type="submit" disabled={isAuthLoading}>
             {isAuthLoading ? "Carregando..." : isLogin ? "Entrar" : "Registrar"}
           </button>
