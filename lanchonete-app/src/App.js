@@ -124,6 +124,15 @@ const useOperatingStatus = () => {
     }
   }, []);
 
+  // Temporário para testes
+  useEffect(() => {
+    // ✅ Define lojaId fixo (para testes)
+    if (!localStorage.getItem("lojaId")) {
+      localStorage.setItem("lojaId", 5); // troque 5 pelo ID real da loja (ex: 1)
+    }
+  }, []);
+  // Temporário para testes
+
   // Efeito 1: Busca o status do admin a cada 30 segundos
   useEffect(() => {
     fetchOverrideStatus();
@@ -656,9 +665,17 @@ function App() {
   // mostrar o loading. Assim atualizações periódicas não disparam o spinner.
   const fetchCardapio = useCallback(async (isInitial = false) => {
     if (isInitial) setCardapioLoading(true); // só ativa o loading na primeira vez
+
     try {
-      const response = await fetch("/api/cardapio");
+      const lojaId = localStorage.getItem("lojaId"); // ✅ recupera a loja atual
+      if (!lojaId) {
+        console.warn("⚠️ Nenhum lojaId encontrado no localStorage.");
+        return;
+      }
+
+      const response = await fetch(`/api/cardapio?loja_id=${lojaId}`);
       if (!response.ok) throw new Error("Erro ao buscar o cardápio");
+
       const data = await response.json();
       setItensCardapio(data);
       setError(null);
@@ -668,7 +685,7 @@ function App() {
     } finally {
       if (isInitial) setCardapioLoading(false); // só desativa o loading inicial
     }
-  }, []); // Dependências vazias, já que não usa estados externos
+  }, []);
 
   // 🟢 NOVA FUNÇÃO: Carrega categorias dinamicamente
   const fetchCategorias = useCallback(async () => {

@@ -302,7 +302,8 @@ app.post("/api/usuarios/login", async (req, res) => {
       return res.status(200).send({
         message: "Login bem-sucedido!",
         token: token,
-        loja_id: usuario.loja_id, // Informa o frontend qual loja ele gerencia
+        loja_id: usuario.loja_id,
+        nome: nome, // 🟢 novo campo
       });
     } else {
       return res.status(401).send({ message: "Credenciais inválidas." });
@@ -566,15 +567,18 @@ app.get("/api/pizzas-config", async (req, res) => {
 
     const { data, error } = await supabase
       .from("pizza_config")
-      .select("*")
+      .select("tamanhos, sabores")
       .eq("loja_id", loja_id)
-      .order("id", { ascending: true });
+      .single();
 
     if (error) throw error;
+    if (!data)
+      return res.status(404).json({ message: "Configuração não encontrada." });
 
-    const tamanhos = data.filter((c) => c.tipo === "tamanho");
-    const sabores = data.filter((c) => c.tipo === "sabor");
-    res.status(200).json({ tamanhos, sabores });
+    res.status(200).json({
+      tamanhos: data.tamanhos || [],
+      sabores: data.sabores || [],
+    });
   } catch (err) {
     console.error("Erro GET /api/pizzas-config:", err);
     res.status(500).json({ message: "Erro interno do servidor." });
@@ -585,42 +589,50 @@ app.get("/api/pizzas-config", async (req, res) => {
 // CONFIGURAÇÃO DE PIZZA (MULTI-LOJA)
 // ---------------------------------------------
 app.put("/api/pizzas-config", async (req, res) => {
-  const { tamanhos, sabores, loja_id } = req.body;
-
-  if (!tamanhos || !sabores) {
-    return res
-      .status(400)
-      .json({ message: "Tamanhos e sabores são obrigatórios." });
-  }
-
-  if (!loja_id) {
-    return res
-      .status(400)
-      .json({ message: "⚠️ loja_id é obrigatório para controle multi-loja." });
-  }
-
   try {
-    // 🟢 Atualiza ou insere (upsert) a configuração de pizza da loja específica
-    const { data: updatedData, error: updateError } = await supabase
-      .from("pizza_config")
-      .upsert(
-        { loja_id, tamanhos, sabores }, // agora cada loja tem sua própria config
-        { onConflict: "loja_id" } // garante que o conflito seja por loja_id
-      )
-      .select("tamanhos, sabores, loja_id");
+    const { tamanhos, sabores, loja_id } = req.body;
 
-    if (updateError) throw updateError;
-
-    if (!updatedData || updatedData.length === 0) {
-      throw new Error("Falha ao atualizar/inserir configuração de pizza.");
+    if (!loja_id) {
+      return res.status(400).json({
+        message: "⚠️ loja_id é obrigatório para controle multi-loja.",
+      });
     }
 
-    res.status(200).json(updatedData[0]);
+    if (!Array.isArray(tamanhos) || !Array.isArray(sabores)) {
+      return res.status(400).json({
+        message: "Tamanhos e sabores devem ser arrays válidos.",
+      });
+    }
+
+    // 🔄 Converte para JSON puro antes de enviar ao Supabase
+    const payload = {
+      loja_id,
+      tamanhos: JSON.parse(JSON.stringify(tamanhos)),
+      sabores: JSON.parse(JSON.stringify(sabores)),
+    };
+
+    const { data, error } = await supabase
+      .from("pizza_config")
+      .upsert(payload, { onConflict: "loja_id" })
+      .select("tamanhos, sabores, loja_id")
+      .single();
+
+    if (error) {
+      console.error("Erro Supabase:", error);
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error("Falha ao salvar configuração de pizza.");
+    }
+
+    res.status(200).json({
+      message: "Configuração salva com sucesso!",
+      configuracao: data,
+    });
   } catch (err) {
     console.error("Erro PUT /api/pizzas-config:", err);
-    res
-      .status(500)
-      .json({ message: "Erro ao atualizar configuração de pizza." });
+    res.status(500).json({ message: "Falha ao salvar as configurações." });
   }
 });
 

@@ -105,12 +105,17 @@ const PizzaConfig = () => {
     setIsSaving(true);
     setError(null);
     try {
+      const lojaId =
+        sessionStorage.getItem("lojaId") || localStorage.getItem("lojaId");
+
+      if (!lojaId) {
+        throw new Error("loja_id não encontrado. Faça login novamente.");
+      }
+
       const res = await fetch("/api/pizzas-config", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tamanhos, sabores }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tamanhos, sabores, loja_id: lojaId }),
       });
 
       if (!res.ok) throw new Error("Falha ao salvar as configurações.");
@@ -564,14 +569,18 @@ function App() {
   const fetchRelatorio = async (periodo, status) => {
     setLoading(true);
     try {
-      // Constrói a URL com os filtros de período e status
-      let url = `/api/pedidos/relatorio?periodo=${periodo}`;
+      // 🔹 Garante que o ID da loja foi salvo no login
       const lojaId = localStorage.getItem("lojaId");
+
       if (!lojaId) {
-        console.warn("lojaId não encontrado — relatório não será carregado.");
+        console.warn(
+          "⚠️ loja_id não encontrado — relatório não será carregado."
+        );
         return;
       }
-      url += `&loja_id=${lojaId}`;
+
+      // 🔹 Monta a URL com os filtros aplicáveis
+      let url = `/api/pedidos/relatorio?periodo=${periodo}&loja_id=${lojaId}`;
       if (status && status !== "todos") {
         url += `&status=${status}`;
       }
@@ -580,13 +589,16 @@ function App() {
       if (!response.ok) {
         throw new Error("Erro ao buscar pedidos ou relatório.");
       }
+
       const data = await response.json();
 
+      // 🔹 Atualiza os estados com os dados retornados
       setPedidos(data.pedidos);
       setResumoRelatorio({
         totalPedidos: data.totalPedidos,
         faturamento: data.faturamento,
       });
+
       setError(null);
     } catch (error) {
       console.error("Erro ao buscar relatório:", error);
@@ -847,47 +859,33 @@ function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsAuthLoading(true); // 🟢 Inicia o carregamento
-    setErrorMessage(""); // 🔑 Limpa o erro anterior antes de começar
-
     try {
-      const response = await fetch("/api/usuarios/login", {
+      const res = await fetch("/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json(); // 🔑 Ler a resposta (que contém o token)
+      const data = await res.json();
 
-      if (response.ok) {
-        // 🔑 NOVO: Armazenar o token e o loja_id no localStorage
-        if (data.token) {
-          localStorage.setItem("adminToken", data.token); // Usamos localStorage
-          localStorage.setItem("lojaId", data.loja_id); // Loja ID para referência futura
+      if (!res.ok) throw new Error(data.message || "Erro ao fazer login");
 
-          setIsLoggedIn(true);
-          // O sessionStorage não é o mais seguro, mas vamos manter o nome
-          sessionStorage.setItem("usuarioLogado", formData.nome);
-          sessionStorage.setItem("isLoggedIn", "true"); // PERSISTE O LOGIN
+      // ✅ Salva informações de sessão
+      sessionStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("usuarioNome", data.nome);
 
-          setUsuarioLogado(formData.nome);
-          setFormData({ nome: "", senha: "" });
-          setCurrentPage("pedidos");
-          setErrorMessage(""); // Limpa qualquer erro prévio
-        } else {
-          setErrorMessage("Erro: Token não recebido após login bem-sucedido.");
-        }
+      // ✅ Salva o lojaId para uso em todas as rotas
+      if (data.loja_id) {
+        localStorage.setItem("lojaId", data.loja_id);
+        console.log(`🟢 lojaId salvo no localStorage: ${data.loja_id}`);
       } else {
-        // alert(data.message);
-        setErrorMessage(
-          data.message || "Credenciais inválidas ou erro no servidor."
-        ); // 🔑 Usa setErrorMessage
+        console.warn("⚠️ Nenhum loja_id retornado do backend");
       }
-    } catch (error) {
-      // alert("Erro ao fazer login. Verifique o servidor.");
-      setErrorMessage("Erro de conexão. Verifique se o servidor está ativo."); // 🔑 Usa setErrorMessage
-    } finally {
-      setIsAuthLoading(false); // 🟢 Finaliza o carregamento (sempre)
+
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error("Erro no login:", err);
+      alert(err.message);
     }
   };
 
@@ -926,13 +924,12 @@ function App() {
   };
 
   const handleLogout = () => {
+    sessionStorage.clear();
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("lojaId"); // 🔹 Mantém o padrão do backend
     setIsLoggedIn(false);
-    sessionStorage.removeItem("isLoggedIn");
-    sessionStorage.removeItem("usuarioLogado"); // Limpar o nome
-    localStorage.removeItem("adminToken"); // 🔑 NOVO: Limpa o token
-    localStorage.removeItem("lojaId"); // 🔑 NOVO: Limpa o loja ID
-    setCurrentPage("pedidos");
-    alert("Logout realizado com sucesso!");
+    setUsuarioLogado("");
+    setCurrentPage("login");
   };
 
   // 🟢 NOVA FUNÇÃO PARA ATUALIZAÇÃO MANUAL

@@ -18,11 +18,20 @@ function Categorias() {
   // === Buscar categorias ===
   const fetchCategorias = async () => {
     try {
-      const res = await fetch("/api/categorias");
+      const lojaId = localStorage.getItem("lojaId"); // ✅ Recupera o ID da loja
+      if (!lojaId) {
+        console.warn("⚠️ Nenhum lojaId encontrado no localStorage.");
+        return;
+      }
+
+      const res = await fetch(`/api/categorias?loja_id=${lojaId}`); // ✅ Busca filtrada
+      if (!res.ok) throw new Error("Erro ao carregar categorias");
       const data = await res.json();
-      setCategorias(data);
+
+      setCategorias(Array.isArray(data) ? data : []); // 🔒 Evita erro caso o retorno não seja array
     } catch (err) {
       console.error("Erro ao carregar categorias:", err);
+      setCategorias([]); // 🔒 Garante estado consistente mesmo com erro
     }
   };
 
@@ -34,7 +43,10 @@ function Categorias() {
     await fetch("/api/categorias", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome: novaCategoria }),
+      body: JSON.stringify({
+        nome: novaCategoria,
+        loja_id: localStorage.getItem("lojaId"), // ✅ associa à loja correta
+      }),
     });
 
     setNovaCategoria("");
@@ -45,19 +57,38 @@ function Categorias() {
   const excluirCategoria = async (id) => {
     if (!window.confirm("Deseja excluir esta categoria?")) return;
 
-    await fetch(`/api/categorias/${id}`, { method: "DELETE" });
-    fetchCategorias();
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) {
+      alert("⚠️ Nenhum lojaId encontrado — não foi possível excluir.");
+      return;
+    }
+
+    await fetch(`/api/categorias/${id}?loja_id=${lojaId}`, {
+      method: "DELETE",
+    });
+
+    fetchCategorias(); // Atualiza a lista após exclusão
   };
 
   // === Salvar edição ===
   const salvarEdicao = async (id) => {
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) {
+      alert("⚠️ Nenhum lojaId encontrado — não foi possível salvar.");
+      return;
+    }
+
     await fetch(`/api/categorias/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome: valorEditado }),
+      body: JSON.stringify({
+        nome: valorEditado,
+        loja_id: lojaId, // ✅ garante que a edição pertence à loja correta
+      }),
     });
+
     setEditando(null);
-    fetchCategorias();
+    fetchCategorias(); // Atualiza a lista após edição
   };
 
   // === Reordenar categorias (drag & drop) ===
@@ -72,12 +103,21 @@ function Categorias() {
     setCategorias(reordered);
 
     // Atualiza no banco (ordem = índice)
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) {
+      console.warn("⚠️ Nenhum lojaId encontrado — ordem não será salva.");
+      return;
+    }
+
     for (let i = 0; i < reordered.length; i++) {
       const cat = reordered[i];
       await fetch(`/api/categorias/${cat.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ordem: i + 1 }),
+        body: JSON.stringify({
+          ordem: i + 1,
+          loja_id: lojaId, // ✅ garante que a atualização pertence à loja correta
+        }),
       });
     }
   };
@@ -110,57 +150,69 @@ function Categorias() {
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {categorias.map((cat, index) => (
-                <Draggable
-                  key={cat.id}
-                  draggableId={cat.id.toString()}
-                  index={index}
+              {Array.isArray(categorias) && categorias.length > 0 ? (
+                categorias.map((cat, index) => (
+                  <Draggable
+                    key={cat.id}
+                    draggableId={cat.id.toString()}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <li
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {editando === cat.id ? (
+                          <>
+                            <input
+                              value={valorEditado}
+                              onChange={(e) => setValorEditado(e.target.value)}
+                            />
+                            <button
+                              className="btn btn-verde"
+                              onClick={() => salvarEdicao(cat.id)}
+                            >
+                              <AiOutlineCheck />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span>{cat.nome}</span>
+                            <div className="acoes">
+                              <button
+                                className="btn-editar-categoria btn btn-circle btn-verde"
+                                onClick={() => {
+                                  setEditando(cat.id);
+                                  setValorEditado(cat.nome);
+                                }}
+                              >
+                                <AiOutlineEdit />
+                              </button>
+                              <button
+                                className="btn-remover-categoria btn btn-circle btn-vermelho"
+                                onClick={() => excluirCategoria(cat.id)}
+                              >
+                                <AiOutlineDelete />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </li>
+                    )}
+                  </Draggable>
+                ))
+              ) : (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#777",
+                    marginTop: "20px",
+                  }}
                 >
-                  {(provided) => (
-                    <li
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      {editando === cat.id ? (
-                        <>
-                          <input
-                            value={valorEditado}
-                            onChange={(e) => setValorEditado(e.target.value)}
-                          />
-                          <button
-                            className="btn btn-verde"
-                            onClick={() => salvarEdicao(cat.id)}
-                          >
-                            <AiOutlineCheck />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <span>{cat.nome}</span>
-                          <div className="acoes">
-                            <button
-                              className="btn-editar-categoria btn btn-circle btn-verde"
-                              onClick={() => {
-                                setEditando(cat.id);
-                                setValorEditado(cat.nome);
-                              }}
-                            >
-                              <AiOutlineEdit />
-                            </button>
-                            <button
-                              className="btn-remover-categoria btn btn-circle btn-vermelho"
-                              onClick={() => excluirCategoria(cat.id)}
-                            >
-                              <AiOutlineDelete />
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </li>
-                  )}
-                </Draggable>
-              ))}
+                  Nenhuma categoria cadastrada.
+                </p>
+              )}
               {provided.placeholder}
             </ul>
           )}
