@@ -872,7 +872,7 @@ function App() {
       // ✅ Salva login e loja
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("lojaId", data.loja_id);
-      localStorage.setItem("usuario", data.nome);
+      localStorage.setItem("usuarioNome", data.nome);
 
       setIsLoggedIn(true);
     } catch (err) {
@@ -1020,7 +1020,7 @@ function App() {
     <div className="painel-admin">
       <header>
         <h1>Painel do Administrador</h1>
-        <p>Olá, {usuarioLogado}!</p>
+        <p>Olá! {localStorage.getItem("usuarioNome") || "Usuário"}</p>
         <link
           href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
