@@ -7,153 +7,108 @@ function ConfigLoja() {
     endereco_loja: "",
     link_localizacao: "",
   });
-  const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // 🔑 Função utilitária para obter o token
-  const getToken = () => {
-    return localStorage.getItem("adminToken");
-  };
-
-  // 🟢 Carregar configurações atuais do Supabase
+  // === Buscar configuração da loja ===
   useEffect(() => {
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) {
+      setMensagem("❌ Sessão expirada. Faça login novamente.");
+      setLoading(false);
+      return;
+    }
+
     const fetchConfig = async () => {
-      const token = getToken();
-      if (!token) {
-        setMensagem("❌ Sessão expirada. Faça login novamente.");
-        return;
-      }
-
       try {
-        const res = await fetch("/api/configuracoes", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`, // 🔑 ANEXA O TOKEN AQUI
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          // Se o servidor retornar 401/403, a sessão está inválida
-          if (res.status === 401 || res.status === 403) {
-            throw new Error("Acesso negado. Token inválido/expirado.");
-          }
-          throw new Error("Falha ao buscar configurações.");
-        }
+        const res = await fetch(`/api/configuracoes-loja?loja_id=${lojaId}`);
+        if (!res.ok) throw new Error("Erro ao carregar configuração da loja");
         const data = await res.json();
-
         if (data) {
-          setConfig({
-            chave_pix: data.chave_pix || "",
-            endereco_loja: data.endereco_loja || "",
-            link_localizacao: data.link_localizacao || "",
-          });
+          setConfig(data);
+        } else {
+          setMensagem("Nenhuma configuração encontrada.");
         }
       } catch (err) {
-        console.error("Erro ao carregar configurações:", err);
-        setMensagem("❌ Erro ao carregar configurações.");
+        console.error("Erro ao buscar configuração da loja:", err);
+        setMensagem("Erro ao carregar configurações da loja.");
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchConfig();
   }, []);
 
-  // 🟢 Salvar alterações no Supabase
-  const salvarConfig = async (e) => {
+  // === Atualizar configuração ===
+  const handleSalvar = async (e) => {
     e.preventDefault();
-    setSalvando(true);
-    setMensagem("");
-
-    const token = getToken();
-    if (!token) {
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) {
       setMensagem("❌ Sessão expirada. Faça login novamente.");
-      setSalvando(false);
       return;
     }
 
     try {
-      const res = await fetch("/api/configuracoes", {
+      const res = await fetch("/api/configuracoes-loja", {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`, // 🔑 ANEXA O TOKEN AQUI
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(config),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...config, loja_id: lojaId }),
       });
 
-      if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
-          throw new Error("Acesso negado. Token inválido/expirado.");
-        }
-        throw new Error("Falha ao salvar alterações.");
-      }
+      if (!res.ok) throw new Error("Falha ao salvar configurações.");
       setMensagem("✅ Configurações salvas com sucesso!");
     } catch (err) {
-      console.error("Erro ao salvar configurações:", err);
-      setMensagem(`❌ Erro ao salvar configurações: ${err.message}`);
-    } finally {
-      setSalvando(false);
-      setTimeout(() => setMensagem(""), 4000);
+      console.error("Erro ao salvar configuração:", err);
+      setMensagem("❌ Erro ao salvar configurações.");
     }
   };
 
+  if (loading) return <p>Carregando configurações...</p>;
+
   return (
     <div className="config-loja-container">
-      <h2>Configurações da Loja 🏪</h2>
-      <form onSubmit={salvarConfig}>
+      <h2>⚙️ Configurações da Loja</h2>
+      {mensagem && <p className="mensagem">{mensagem}</p>}
+
+      <form onSubmit={handleSalvar} className="config-form">
         <label>
-          <span>Chave PIX:</span>
+          Chave PIX:
           <input
             type="text"
             value={config.chave_pix}
             onChange={(e) =>
               setConfig({ ...config, chave_pix: e.target.value })
             }
-            placeholder="Ex: 000.111.222-33"
-            required
           />
         </label>
 
         <label>
-          <span>Endereço:</span>
+          Endereço da Loja:
           <input
             type="text"
             value={config.endereco_loja}
             onChange={(e) =>
               setConfig({ ...config, endereco_loja: e.target.value })
             }
-            placeholder="Rua, número, cidade..."
-            required
           />
         </label>
 
         <label>
-          <span>Link da Localização (Google Maps):</span>
+          Link da Localização:
           <input
-            type="url"
+            type="text"
             value={config.link_localizacao}
             onChange={(e) =>
               setConfig({ ...config, link_localizacao: e.target.value })
             }
-            placeholder="https://maps.google.com/?q=-23.55,-46.63"
-            required
           />
         </label>
 
-        <button type="submit" className="btn btn-verde" disabled={salvando}>
-          {salvando ? "Salvando..." : "Salvar Alterações"}
+        <button type="submit" className="btn btn-verde">
+          💾 Salvar Configurações
         </button>
       </form>
-
-      {mensagem && (
-        <p
-          style={{
-            color: mensagem.includes("Erro") ? "#e74c3c" : "#27ae60",
-            marginTop: "10px",
-          }}
-        >
-          {mensagem}
-        </p>
-      )}
     </div>
   );
 }

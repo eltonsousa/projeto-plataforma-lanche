@@ -860,32 +860,24 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/usuarios/login", {
+      const response = await fetch("/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      const data = await response.json();
 
-      const data = await res.json();
+      if (!response.ok) throw new Error(data.message || "Erro no login.");
 
-      if (!res.ok) throw new Error(data.message || "Erro ao fazer login");
-
-      // ✅ Salva informações de sessão
-      sessionStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("usuarioNome", data.nome);
-
-      // ✅ Salva o lojaId para uso em todas as rotas
-      if (data.loja_id) {
-        localStorage.setItem("lojaId", data.loja_id);
-        console.log(`🟢 lojaId salvo no localStorage: ${data.loja_id}`);
-      } else {
-        console.warn("⚠️ Nenhum loja_id retornado do backend");
-      }
+      // ✅ Salva login e loja
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("lojaId", data.loja_id);
+      localStorage.setItem("usuario", data.nome);
 
       setIsLoggedIn(true);
     } catch (err) {
       console.error("Erro no login:", err);
-      alert(err.message);
+      alert("Falha no login. Verifique usuário e senha.");
     }
   };
 

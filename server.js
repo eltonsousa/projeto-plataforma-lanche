@@ -722,43 +722,44 @@ app.delete("/api/categorias/:id", async (req, res) => {
 // ===============================================
 // 🟢 CONFIGURAÇÕES DA LOJA (CHAVE PIX / ENDEREÇO / MAPS)
 // ===============================================
-app.get("/api/configuracoes/:loja_id", async (req, res) => {
+app.get("/api/configuracoes-loja", async (req, res) => {
   try {
-    const { loja_id } = req.params;
+    const loja_id = req.query.loja_id;
+    if (!loja_id)
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+
     const { data, error } = await supabase
       .from("configuracoes_loja")
       .select("chave_pix, endereco_loja, link_localizacao")
       .eq("loja_id", loja_id)
       .single();
 
-    if (error) throw error;
+    if (error && error.code !== "PGRST116") throw error; // ignora not found
+
     res.json(data || {});
   } catch (err) {
-    console.error("Erro ao buscar configurações:", err);
+    console.error("Erro GET /api/configuracoes-loja:", err);
     res.status(500).json({ erro: "Erro ao buscar configurações da loja." });
   }
 });
 
-// Atualizar configurações
-app.put("/api/configuracoes/:loja_id", async (req, res) => {
+app.put("/api/configuracoes-loja", async (req, res) => {
   try {
-    const { loja_id } = req.params;
-    const { chave_pix, endereco_loja, link_localizacao } = req.body;
+    const { loja_id, chave_pix, endereco_loja, link_localizacao } = req.body;
+    if (!loja_id)
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
 
-    const { error } = await supabase.from("configuracoes_loja").upsert(
-      {
-        loja_id,
-        chave_pix,
-        endereco_loja,
-        link_localizacao,
-      },
-      { onConflict: "loja_id" }
-    );
+    const { error } = await supabase
+      .from("configuracoes_loja")
+      .upsert(
+        { loja_id, chave_pix, endereco_loja, link_localizacao },
+        { onConflict: "loja_id" }
+      );
 
     if (error) throw error;
     res.json({ sucesso: true });
   } catch (err) {
-    console.error("Erro ao atualizar configurações:", err);
+    console.error("Erro PUT /api/configuracoes-loja:", err);
     res.status(500).json({ erro: "Erro ao atualizar configurações." });
   }
 });
