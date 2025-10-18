@@ -556,56 +556,58 @@ app.delete("/api/cardapio/:id", async (req, res) => {
 });
 
 // ---------------------------------------------
-// CONFIGURAÇÕES DE PIZZA
+// CONFIGURAÇÃO DE PIZZA (MULTI-LOJA)
 // ---------------------------------------------
-// GET: Carrega as configurações de pizza
 app.get("/api/pizzas-config", async (req, res) => {
   try {
-    // Tenta buscar o único registro (ID 1) para configurações de pizza
+    const loja_id = req.query.loja_id;
+    if (!loja_id)
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+
     const { data, error } = await supabase
       .from("pizza_config")
-      .select("tamanhos, sabores")
-      .eq("id", 1) // ID 1 é o registro principal de configurações
-      .single();
+      .select("*")
+      .eq("loja_id", loja_id)
+      .order("id", { ascending: true });
 
-    if (error && error.code !== "PGRST116") {
-      // PGRST116 = not found
-      throw error;
-    }
+    if (error) throw error;
 
-    // Se o registro não for encontrado ou houver erro, retorna estrutura vazia
-    if (!data) {
-      return res.status(200).json({ tamanhos: [], sabores: [] });
-    }
-
-    // Retorna os dados (tamanhos e sabores)
-    res.status(200).json(data);
+    const tamanhos = data.filter((c) => c.tipo === "tamanho");
+    const sabores = data.filter((c) => c.tipo === "sabor");
+    res.status(200).json({ tamanhos, sabores });
   } catch (err) {
     console.error("Erro GET /api/pizzas-config:", err);
-    res
-      .status(500)
-      .json({ message: "Erro ao carregar configurações de pizza." });
+    res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
 
-// PUT: Salva as configurações de pizza (usado pelo Admin)
+// ---------------------------------------------
+// CONFIGURAÇÃO DE PIZZA (MULTI-LOJA)
+// ---------------------------------------------
 app.put("/api/pizzas-config", async (req, res) => {
-  const { tamanhos, sabores } = req.body;
+  const { tamanhos, sabores, loja_id } = req.body;
+
   if (!tamanhos || !sabores) {
     return res
       .status(400)
       .json({ message: "Tamanhos e sabores são obrigatórios." });
   }
 
+  if (!loja_id) {
+    return res
+      .status(400)
+      .json({ message: "⚠️ loja_id é obrigatório para controle multi-loja." });
+  }
+
   try {
-    // Tenta inserir ou atualizar o registro de ID 1 usando upsert
+    // 🟢 Atualiza ou insere (upsert) a configuração de pizza da loja específica
     const { data: updatedData, error: updateError } = await supabase
       .from("pizza_config")
       .upsert(
-        { id: 1, tamanhos, sabores }, // Upsert data
-        { onConflict: "id" } // Conflito no ID 1 para atualizar
+        { loja_id, tamanhos, sabores }, // agora cada loja tem sua própria config
+        { onConflict: "loja_id" } // garante que o conflito seja por loja_id
       )
-      .select("tamanhos, sabores");
+      .select("tamanhos, sabores, loja_id");
 
     if (updateError) throw updateError;
 
@@ -623,35 +625,47 @@ app.put("/api/pizzas-config", async (req, res) => {
 });
 
 // ---------------------------------------------
-// CATEGORIAS DE CARDÁPIO
+// CATEGORIAS DE CARDÁPIO (MULTI-LOJA)
 // ---------------------------------------------
 app.get("/api/categorias", async (req, res) => {
   try {
+    const loja_id = req.query.loja_id;
+    if (!loja_id) {
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+    }
+
     const { data, error } = await supabase
       .from("categorias_cardapio")
       .select("*")
-      .order("ordem", { ascending: true });
+      .eq("loja_id", loja_id)
+      .order("id", { ascending: true });
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (err) {
     console.error("Erro GET /api/categorias:", err);
-    res.status(500).json({ message: "Erro ao carregar categorias." });
+    res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
 
 app.post("/api/categorias", async (req, res) => {
   try {
-    const novaCategoria = req.body;
-    delete novaCategoria.id;
+    const { nome, loja_id } = req.body;
+    if (!nome || !loja_id)
+      return res
+        .status(400)
+        .json({ message: "⚠️ Campos obrigatórios: nome e loja_id." });
+
     const { data, error } = await supabase
       .from("categorias_cardapio")
-      .insert([novaCategoria])
+      .insert([{ nome, loja_id }])
       .select();
+
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (err) {
     console.error("Erro POST /api/categorias:", err);
-    res.status(500).json({ message: "Erro ao criar categoria." });
+    res.status(500).json({ message: "Erro inesperado do servidor." });
   }
 });
 
@@ -742,9 +756,14 @@ app.put("/api/configuracoes/:loja_id", async (req, res) => {
 // ---------------------------------------------
 app.post("/api/pedidos", async (req, res) => {
   try {
-    // 🔑 CORREÇÃO: Define o ID da loja para o lanchonete-app (FRONTEND DO CLIENTE)
-    // O valor 5 é usado como placeholder, pois esta rota é pública.
-    const lojaId = 5;
+    // 🟢 Define o ID da loja (enviado pelo app do cliente)
+    const lojaId = req.body.loja_id;
+
+    if (!lojaId) {
+      return res.status(400).json({
+        message: "⚠️ loja_id é obrigatório para identificar a loja do pedido.",
+      });
+    }
 
     const { cliente, itens, total, tipo_servico } = req.body;
     const novoPedido = {
@@ -756,6 +775,7 @@ app.post("/api/pedidos", async (req, res) => {
       tipo_servico,
       forma_pagamento: cliente.pagamento || null,
       troco: cliente.troco || null,
+      loja_id: lojaId, // 🟢 adiciona loja_id no pedido
     };
 
     const { data, error } = await supabase
@@ -865,23 +885,33 @@ app.post("/api/pedidos", async (req, res) => {
   }
 });
 
+// ---------------------------------------------
+// PEDIDOS (MULTI-LOJA)
+// ---------------------------------------------
 app.get("/api/pedidos", async (req, res) => {
   try {
-    const { data: pedidos, error } = await supabase
+    const loja_id = req.query.loja_id;
+    if (!loja_id) {
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+    }
+
+    const { data, error } = await supabase
       .from("pedidos_lanche")
       .select("*")
+      .eq("loja_id", loja_id)
       .order("id", { ascending: false });
+
     if (error) throw error;
-    res.status(200).json(pedidos);
+    res.status(200).json(data);
   } catch (err) {
     console.error("Erro GET /api/pedidos:", err);
-    res.status(500).json({ message: "Erro inesperado do servidor." });
+    res.status(500).json({ message: "Erro interno do servidor." });
   }
 });
 
 app.put("/api/pedidos/:id", async (req, res) => {
   const pedidoId = req.params.id;
-  const { status } = req.body;
+  const { status, loja_id } = req.body;
 
   if (!status) {
     return res
@@ -889,11 +919,18 @@ app.put("/api/pedidos/:id", async (req, res) => {
       .json({ message: "Status é obrigatório para atualização." });
   }
 
+  if (!loja_id) {
+    return res
+      .status(400)
+      .json({ message: "⚠️ loja_id é obrigatório para controle multi-loja." });
+  }
+
   try {
     const { data: pedidoAtualizado, error: updateError } = await supabase
       .from("pedidos_lanche")
       .update({ status })
       .eq("id", pedidoId)
+      .eq("loja_id", loja_id) // 🟢 garante que a atualização seja apenas da loja correta
       .select();
 
     if (updateError) throw updateError;
@@ -906,27 +943,26 @@ app.put("/api/pedidos/:id", async (req, res) => {
     console.log("Pedido atualizado:", pedido);
 
     const { telefone_cliente, tipo_servico } = pedido;
-
     let mensagem = "";
+
     if (status.toLowerCase() === "pronto para entrega") {
       if (tipo_servico.toLowerCase() === "entrega") {
-        mensagem = `Boa notícia *${pedido.cliente.nome}*\nseu pedido já está a caminho! 🚚`;
+        mensagem = `Boa notícia *${pedido.cliente.nome}*!\nSeu pedido já está a caminho! 🚚`;
       } else if (tipo_servico.toLowerCase() === "retirada") {
-        mensagem = `Boa notícia *${pedido.cliente.nome}*\nseu pedido já está pronto para retirada! 🚚`;
+        mensagem = `Boa notícia *${pedido.cliente.nome}*!\nSeu pedido já está pronto para retirada! 🏪`;
       }
     }
 
     if (mensagem && telefone_cliente?.trim()) {
-      let telefoneLimpo = pedido.telefone_cliente.replace(/\D/g, "");
+      let telefoneLimpo = telefone_cliente.replace(/\D/g, "");
       if (telefoneLimpo.length === 11 && telefoneLimpo[2] === "9") {
         telefoneLimpo = telefoneLimpo.slice(0, 2) + telefoneLimpo.slice(3);
       }
 
       const numero = `55${telefoneLimpo}@c.us`;
 
-      console.log("Telefone bruto:", telefone_cliente);
-      console.log("Número final que será enviado:", numero);
-      console.log("Mensagem:", mensagem);
+      console.log("📞 Enviando mensagem para:", numero);
+      console.log("📦 Mensagem:", mensagem);
 
       client
         .sendMessage(numero, mensagem)
@@ -971,21 +1007,53 @@ const calcularDataFiltro = (periodo) => {
 };
 
 app.get("/api/pedidos/relatorio", async (req, res) => {
-  const { periodo, status } = req.query;
-  let query = supabase.from("pedidos_lanche").select("*");
+  const { loja_id, periodo = "geral", status = "todos" } = req.query;
 
-  const { dataInicio, dataFim } = calcularDataFiltro(periodo);
-  if (dataInicio && dataFim)
-    query = query
-      .gte("data", dataInicio.toISOString())
-      .lte("data", dataFim.toISOString());
+  if (!loja_id) {
+    return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+  }
 
-  if (status && status !== "todos") query = query.eq("status", status);
+  // 🔹 Função auxiliar para calcular intervalo de datas
+  const calcularDataFiltro = (periodo) => {
+    const agora = new Date();
+    let dataInicio = null;
+    let dataFim = agora;
+
+    if (periodo === "hoje") {
+      dataInicio = new Date();
+      dataInicio.setHours(0, 0, 0, 0);
+    } else if (periodo === "15dias") {
+      dataInicio = new Date();
+      dataInicio.setDate(agora.getDate() - 15);
+    } else if (periodo === "mes") {
+      dataInicio = new Date(agora.getFullYear(), agora.getMonth(), 1);
+    }
+
+    return { dataInicio, dataFim };
+  };
 
   try {
+    let query = supabase
+      .from("pedidos_lanche")
+      .select("*")
+      .eq("loja_id", loja_id); // ✅ filtro multi-loja
+
+    const { dataInicio, dataFim } = calcularDataFiltro(periodo);
+
+    if (dataInicio && dataFim) {
+      query = query
+        .gte("data", dataInicio.toISOString())
+        .lte("data", dataFim.toISOString());
+    }
+
+    if (status && status !== "todos") {
+      query = query.eq("status", status);
+    }
+
     const { data: pedidosFiltrados, error } = await query.order("id", {
       ascending: false,
     });
+
     if (error) throw error;
 
     const totalPedidos = pedidosFiltrados.length;
