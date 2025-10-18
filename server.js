@@ -437,14 +437,21 @@ app.put("/api/configuracoes", autenticarLoja, async (req, res) => {
 });
 
 // ---------------------------------------------
-// CARDÁPIO
+// CARDÁPIO (AGORA SUPORTA MULTI-LOJA)
 // ---------------------------------------------
 app.get("/api/cardapio", async (req, res) => {
   try {
+    const loja_id = req.query.loja_id;
+    if (!loja_id) {
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+    }
+
     const { data: cardapio, error } = await supabase
       .from("cardapio")
       .select("*")
+      .eq("loja_id", loja_id)
       .order("id", { ascending: true });
+
     if (error) throw error;
     res.status(200).json(cardapio);
   } catch (err) {
@@ -456,6 +463,11 @@ app.get("/api/cardapio", async (req, res) => {
 app.post("/api/cardapio", async (req, res) => {
   try {
     const novoItem = req.body;
+
+    if (!novoItem.loja_id) {
+      return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+    }
+
     delete novoItem.id;
 
     // 🔹 Garantir que 'adicionais' seja JSON ou null
@@ -469,8 +481,9 @@ app.post("/api/cardapio", async (req, res) => {
 
     const { data, error } = await supabase
       .from("cardapio")
-      .insert([novoItem])
+      .insert([{ ...novoItem, loja_id: novoItem.loja_id }])
       .select();
+
     if (error) throw error;
 
     res.status(201).json(data[0]);
@@ -483,6 +496,11 @@ app.post("/api/cardapio", async (req, res) => {
 app.put("/api/cardapio/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const itemToUpdate = req.body;
+
+  if (!itemToUpdate.loja_id) {
+    return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+  }
+
   delete itemToUpdate.id;
 
   // 🔹 Garantir que 'adicionais' seja JSON ou null
@@ -499,7 +517,9 @@ app.put("/api/cardapio/:id", async (req, res) => {
       .from("cardapio")
       .update(itemToUpdate)
       .eq("id", id)
+      .eq("loja_id", itemToUpdate.loja_id) // 🔒 garante atualização apenas da loja correta
       .select();
+
     if (error) throw error;
 
     if (!data || data.length === 0)
@@ -514,8 +534,19 @@ app.put("/api/cardapio/:id", async (req, res) => {
 
 app.delete("/api/cardapio/:id", async (req, res) => {
   const id = parseInt(req.params.id);
+  const loja_id = req.query.loja_id;
+
+  if (!loja_id) {
+    return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
+  }
+
   try {
-    const { error } = await supabase.from("cardapio").delete().eq("id", id);
+    const { error } = await supabase
+      .from("cardapio")
+      .delete()
+      .eq("id", id)
+      .eq("loja_id", loja_id); // 🔒 só apaga se for da loja correta
+
     if (error) throw error;
     res.status(204).send();
   } catch (err) {

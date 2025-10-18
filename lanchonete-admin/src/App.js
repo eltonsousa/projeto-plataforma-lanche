@@ -79,7 +79,10 @@ const PizzaConfig = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/pizzas-config");
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) throw new Error("lojaId não encontrado.");
+
+      const res = await fetch(`/api/pizzas-config?loja_id=${lojaId}`);
       if (!res.ok) throw new Error("Erro ao carregar configurações de pizza.");
 
       const data = await res.json();
@@ -563,6 +566,12 @@ function App() {
     try {
       // Constrói a URL com os filtros de período e status
       let url = `/api/pedidos/relatorio?periodo=${periodo}`;
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        console.warn("lojaId não encontrado — relatório não será carregado.");
+        return;
+      }
+      url += `&loja_id=${lojaId}`;
       if (status && status !== "todos") {
         url += `&status=${status}`;
       }
@@ -594,7 +603,10 @@ function App() {
       await fetch(`/api/pedidos/${pedidoId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: novoStatus }), // Adicione esta linha
+        body: JSON.stringify({
+          status: novoStatus,
+          loja_id: localStorage.getItem("lojaId"),
+        }),
       });
 
       // Segunda requisição: envia a mensagem do WhatsApp
@@ -602,7 +614,10 @@ function App() {
         await fetch(`/api/pedidos/${pedidoId}/enviar-whatsapp`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: novoStatus }), // Adicione esta linha
+          body: JSON.stringify({
+            status: novoStatus,
+            loja_id: localStorage.getItem("lojaId"),
+          }),
         });
       }
 
@@ -616,8 +631,15 @@ function App() {
   // FUNÇÕES DE CARDÁPIO (Inalteradas)
   const fetchCardapio = async () => {
     try {
-      const response = await fetch("/api/cardapio");
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        console.error("❌ lojaId não encontrado no localStorage.");
+        return;
+      }
+
+      const response = await fetch(`/api/cardapio?loja_id=${lojaId}`);
       const data = await response.json();
+
       setCardapio(data);
     } catch (error) {
       console.error("Erro ao buscar cardápio:", error);
@@ -639,11 +661,18 @@ function App() {
     const url = isEditing ? `/api/cardapio/${itemForm.id}` : "/api/cardapio";
 
     try {
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        alert("lojaId não encontrado. Faça login novamente.");
+        return;
+      }
+
       // Cria um objeto com os valores corretos (preço já é um número)
       const itemToSave = {
         ...itemForm,
         preco: parseFloat(itemForm.preco),
         adicionais,
+        loja_id: lojaId,
       };
 
       await fetch(url, {
@@ -688,7 +717,13 @@ function App() {
 
   const handleDelete = async (itemId) => {
     try {
-      await fetch(`/api/cardapio/${itemId}`, {
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        alert("lojaId não encontrado. Faça login novamente.");
+        return;
+      }
+
+      await fetch(`/api/cardapio/${itemId}?loja_id=${lojaId}`, {
         method: "DELETE",
       });
       fetchCardapio();
@@ -727,7 +762,10 @@ function App() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         // Envia o payload com o nome do campo do banco de dados
-        body: JSON.stringify({ schedule_config: scheduleConfig }),
+        body: JSON.stringify({
+          loja_id: localStorage.getItem("lojaId"),
+          schedule_config: scheduleConfig,
+        }),
       });
 
       if (!response.ok) throw new Error("Falha ao salvar horários.");
@@ -748,22 +786,15 @@ function App() {
   // 🟢 ATUALIZADA: Busca status forçado E configuração de horário
   const fetchStoreStatus = async () => {
     try {
-      // A rota AGORA retorna { isForcedOpen, scheduleConfig }
-      const response = await fetch("/api/admin/status");
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) throw new Error("lojaId não encontrado.");
+
+      const response = await fetch(`/api/admin/status?loja_id=${lojaId}`);
       if (!response.ok) throw new Error("Erro ao buscar status da loja.");
 
       const data = await response.json();
-
-      // Atualiza o estado local com os valores lidos do servidor
       setIsStoreForcedOpen(data.isForcedOpen);
-
-      // Usa a configuração salva, se existir, senão usa o padrão
-      if (data.scheduleConfig) {
-        setScheduleConfig(data.scheduleConfig);
-      } else {
-        setScheduleConfig(defaultSchedule);
-      }
-
+      setScheduleConfig(data.scheduleConfig || defaultSchedule);
       setError(null);
     } catch (error) {
       console.error("Erro ao buscar status da loja:", error);
@@ -782,7 +813,10 @@ function App() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         // Envia o novo status no corpo com o nome do campo do banco de dados
-        body: JSON.stringify({ is_forced_open: newState }),
+        body: JSON.stringify({
+          loja_id: localStorage.getItem("lojaId"),
+          is_forced_open: newState,
+        }),
       });
 
       if (!response.ok) throw new Error("Falha ao atualizar status da loja.");
@@ -916,12 +950,19 @@ function App() {
     // 🔹 função interna que busca categorias
     const fetchCategorias = async () => {
       try {
-        const res = await fetch("/api/categorias");
-        if (!res.ok) throw new Error("Erro ao buscar categorias");
-        const data = await res.json();
+        const lojaId = localStorage.getItem("lojaId");
+        if (!lojaId) {
+          console.warn(
+            "lojaId não encontrado — categorias não serão carregadas."
+          );
+          return;
+        }
+
+        const response = await fetch(`/api/categorias?loja_id=${lojaId}`);
+        const data = await response.json();
         setCategorias(data);
-      } catch (err) {
-        console.error("Erro ao carregar categorias:", err);
+      } catch (error) {
+        console.error("Erro ao buscar categorias:", error);
       }
     };
 
