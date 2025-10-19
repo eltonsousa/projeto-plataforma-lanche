@@ -873,6 +873,7 @@ function App() {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("lojaId", data.loja_id);
       localStorage.setItem("usuarioNome", data.nome);
+      sessionStorage.setItem("lojaId", data.loja_id);
 
       setIsLoggedIn(true);
     } catch (err) {

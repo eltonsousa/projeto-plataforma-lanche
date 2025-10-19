@@ -1175,18 +1175,20 @@ app.get("/api/admin/status", async (req, res) => {
 // 🟢 NOVA ROTA: Rota genérica para ATUALIZAR QUALQUER CONFIGURAÇÃO
 // -------------------------------------------------------------------
 app.put("/api/admin/configuracoes", async (req, res) => {
-  // O payload pode conter 'is_forced_open' ou 'schedule_config'
-  const updatePayload = req.body;
+  const { loja_id, is_forced_open, schedule_config } = req.body;
 
-  if (Object.keys(updatePayload).length === 0) {
-    return res.status(400).json({ message: "Nenhum campo para atualizar." });
+  if (!loja_id) {
+    return res
+      .status(400)
+      .json({ message: "⚠️ loja_id é obrigatório para controle multi-loja." });
   }
 
   try {
-    // 1. Busca o ID existente
+    // Verifica se já existe configuração para esta loja
     const { data: existingConfig, error: fetchError } = await supabase
       .from("configuracoes")
       .select("id")
+      .eq("loja_id", loja_id)
       .limit(1);
 
     if (fetchError) throw fetchError;
@@ -1194,21 +1196,19 @@ app.put("/api/admin/configuracoes", async (req, res) => {
     let updatedData;
     let updateError;
 
-    // Lógica robusta: INSERE se não existe, ATUALIZA se existe
-    if (existingConfig.length === 0) {
-      // INSERE
+    if (!existingConfig || existingConfig.length === 0) {
+      // 🟢 INSERE nova configuração para essa loja
       ({ data: updatedData, error: updateError } = await supabase
         .from("configuracoes")
-        .insert([updatePayload])
-        .select("is_forced_open, schedule_config"));
+        .insert([{ loja_id, is_forced_open, schedule_config }])
+        .select("is_forced_open, schedule_config, loja_id"));
     } else {
-      // ATUALIZA
-      const configId = existingConfig[0].id;
+      // 🟢 ATUALIZA apenas a loja correspondente
       ({ data: updatedData, error: updateError } = await supabase
         .from("configuracoes")
-        .update(updatePayload)
-        .eq("id", configId)
-        .select("is_forced_open, schedule_config"));
+        .update({ is_forced_open, schedule_config })
+        .eq("loja_id", loja_id)
+        .select("is_forced_open, schedule_config, loja_id"));
     }
 
     if (updateError) throw updateError;
@@ -1216,20 +1216,18 @@ app.put("/api/admin/configuracoes", async (req, res) => {
       throw new Error("Falha ao atualizar/inserir configuração.");
     }
 
-    const { is_forced_open, schedule_config } = updatedData[0];
+    const { is_forced_open: forcedOpen, schedule_config: schedule } =
+      updatedData[0];
 
-    // Retorna a configuração completa atualizada
     res.status(200).json({
-      isForcedOpen: is_forced_open,
-      scheduleConfig: schedule_config,
+      isForcedOpen: forcedOpen,
+      scheduleConfig: schedule,
     });
   } catch (err) {
     console.error("Erro PUT /api/admin/configuracoes:", err);
     res.status(500).json({ message: "Erro ao atualizar configuração." });
   }
 });
-
-// 🔴 Rota PUT /api/admin/status REMOVIDA: A função de atualização foi migrada para a rota PUT /api/admin/configuracoes
 
 // ---------------------------------------------
 // FIM CONFIGURAÇÕES GLOBAIS (STATUS DA LOJA)
