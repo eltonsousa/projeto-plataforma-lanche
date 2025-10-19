@@ -495,6 +495,20 @@ function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(false); // 🟢 NOVO ESTADO DE CARREGAMENTO
   const [usuarioLogado, setUsuarioLogado] = useState(null); // 🟢 NOVO ESTADO
 
+  // ✅ Restaura sessão se o usuário já estiver logado
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const lojaId = localStorage.getItem("lojaId");
+    const usuarioNome = localStorage.getItem("usuarioNome");
+
+    if (loggedIn && lojaId) {
+      setIsLoggedIn(true);
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("lojaId", lojaId);
+      setUsuarioLogado(usuarioNome || "Usuário");
+    }
+  }, []);
+
   // 🔑 NOVO: Declare o estado para a mensagem de erro
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -1021,7 +1035,10 @@ function App() {
     <div className="painel-admin">
       <header>
         <h1>Painel do Administrador</h1>
-        <p>Olá! {localStorage.getItem("usuarioNome") || "Usuário"}</p>
+        <p>
+          Olá,{" "}
+          {usuarioLogado || localStorage.getItem("usuarioNome") || "Usuário"}!
+        </p>
         <link
           href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"
