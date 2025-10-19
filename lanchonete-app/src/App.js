@@ -687,10 +687,18 @@ function App() {
     }
   }, []);
 
-  // 🟢 NOVA FUNÇÃO: Carrega categorias dinamicamente
+  // 🟢 NOVA FUNÇÃO: Carrega categorias dinamicamente (com loja_id)
   const fetchCategorias = useCallback(async () => {
     try {
-      const res = await fetch("/api/categorias");
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        console.warn(
+          "⚠️ lojaId não encontrado. Usando padrão 1 temporariamente."
+        );
+      }
+
+      // 🔹 Busca categorias da loja
+      const res = await fetch(`/api/categorias?loja_id=${lojaId || 1}`);
       if (!res.ok) throw new Error("Erro ao carregar categorias");
       const data = await res.json();
       setCategorias(data);
@@ -700,7 +708,7 @@ function App() {
     } catch (err) {
       console.error("Erro ao buscar categorias:", err);
     }
-  }, []); // <-- 🔴 sem dependências
+  }, []);
 
   const getCategoryIcon = (category) => {
     const nome = category.toLowerCase();
