@@ -886,8 +886,8 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      const data = await response.json();
 
+      const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Erro no login.");
 
       // ✅ Salva login e loja
@@ -896,7 +896,10 @@ function App() {
       localStorage.setItem("usuarioNome", data.nome);
       sessionStorage.setItem("lojaId", data.loja_id);
 
+      // ✅ Define página inicial padrão após login
       setIsLoggedIn(true);
+      setCurrentPage("pedidos"); // 👈 inicia sempre em “Pedidos”
+      localStorage.setItem("currentPage", "pedidos"); // 👈 salva como padrão
     } catch (err) {
       console.error("Erro no login:", err);
       alert("Falha no login. Verifique usuário e senha.");
@@ -938,12 +941,19 @@ function App() {
   };
 
   const handleLogout = () => {
+    // Limpa tudo do armazenamento local e de sessão
     sessionStorage.clear();
     localStorage.removeItem("adminToken");
-    localStorage.removeItem("lojaId"); // 🔹 Mantém o padrão do backend
+    localStorage.removeItem("lojaId");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("usuarioNome");
+    localStorage.removeItem("currentPage");
+
+    // 🧹 Limpa estados locais
     setIsLoggedIn(false);
     setUsuarioLogado("");
     setCurrentPage("login");
+    setFormData({ nome: "", senha: "" }); // 👈 Limpa os campos do formulário
   };
 
   // 🟢 NOVA FUNÇÃO PARA ATUALIZAÇÃO MANUAL
