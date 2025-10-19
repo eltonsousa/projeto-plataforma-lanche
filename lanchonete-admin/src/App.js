@@ -506,6 +506,11 @@ function App() {
       sessionStorage.setItem("isLoggedIn", "true");
       sessionStorage.setItem("lojaId", lojaId);
       setUsuarioLogado(usuarioNome || "Usuário");
+
+      const savedPage = localStorage.getItem("currentPage");
+      if (savedPage) {
+        setCurrentPage(savedPage); // 🟢 Restaura página anterior
+      }
     }
   }, []);
 
@@ -553,7 +558,9 @@ function App() {
   const changePage = (page) => {
     setCurrentPage(page);
     setIsMenuOpen(false);
+    localStorage.setItem("currentPage", page); // 🟢 Salva a página atual
   };
+
   // FIM ESTADO E FUNÇÕES DO MENU HAMBÚRGUER
 
   const [isImageUploading, setIsImageUploading] = useState(false);
