@@ -124,14 +124,14 @@ const useOperatingStatus = () => {
     }
   }, []);
 
-  // Temporário para testes
   useEffect(() => {
-    // ✅ Define lojaId fixo (para testes)
-    if (!localStorage.getItem("lojaId")) {
-      localStorage.setItem("lojaId", 5); // troque 5 pelo ID real da loja (ex: 1)
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) {
+      console.warn(
+        "⚠️ Nenhum lojaId encontrado no localStorage. Faça login no painel admin primeiro."
+      );
     }
   }, []);
-  // Temporário para testes
 
   // Efeito 1: Busca o status do admin a cada 30 segundos
   useEffect(() => {
@@ -777,20 +777,33 @@ function App() {
 
   // --- EFEITOS ---
   useEffect(() => {
-    // primeira carga com spinner
-    fetchCardapio(true);
-    loadCarrinhoFromSupabase();
-    fetchCategorias();
+    let attempts = 0;
+    const maxAttempts = 10; // tenta por até 10 segundos
+    const interval = setInterval(() => {
+      const lojaId = localStorage.getItem("lojaId");
+      if (lojaId) {
+        console.log("✅ lojaId detectado:", lojaId);
 
-    // 🟢 NOVO: Tenta carregar o telefone do Local Storage
-    const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
-    if (telefoneSalvo) {
-      setTelefone(telefoneSalvo);
-    }
+        // Executa a carga normal
+        fetchCardapio(true);
+        loadCarrinhoFromSupabase();
+        fetchCategorias();
 
-    // atualizações periódicas em segundo plano (sem spinner)
-    const intervalId = setInterval(() => fetchCardapio(false), 10000);
-    return () => clearInterval(intervalId);
+        const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
+        if (telefoneSalvo) setTelefone(telefoneSalvo);
+
+        clearInterval(interval); // para de tentar
+      } else {
+        attempts++;
+        console.warn("⏳ Aguardando lojaId...");
+        if (attempts >= maxAttempts) {
+          console.error("❌ lojaId não encontrado após várias tentativas.");
+          clearInterval(interval);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, [fetchCardapio, loadCarrinhoFromSupabase, fetchCategorias]);
 
   // Efeito para persistir carrinho no Supabase
