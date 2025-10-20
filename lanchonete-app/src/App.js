@@ -375,56 +375,6 @@ function App() {
   //   }
   // }, []);
 
-  // =============================================
-  // MULTI-TENANT REAL: Detecta loja pela URL
-  // =============================================
-  useEffect(() => {
-    let lojaId = null;
-
-    // 1️⃣ Verifica se há um parâmetro ?loja=ID
-    const params = new URLSearchParams(window.location.search);
-    const lojaQuery = params.get("loja");
-
-    // 2️⃣ Verifica se há um slug /loja/adminze
-    const pathParts = window.location.pathname.split("/");
-    const lojaSlug = pathParts.includes("loja")
-      ? pathParts[pathParts.indexOf("loja") + 1]
-      : null;
-
-    // 3️⃣ Se houver ?loja=ID → usa diretamente
-    if (lojaQuery) {
-      localStorage.setItem("lojaId", lojaQuery);
-      lojaId = lojaQuery;
-      console.log("🏪 Loja detectada via query:", lojaQuery);
-    }
-
-    // 4️⃣ Se houver slug → chama API para resolver ID
-    else if (lojaSlug) {
-      console.log("🏷️ Loja detectada via slug:", lojaSlug);
-      fetch(`/api/lojas/slug/${lojaSlug}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.id) {
-            localStorage.setItem("lojaId", data.id);
-            console.log("✅ Loja resolvida via slug → ID:", data.id);
-          } else {
-            console.warn("⚠️ Nenhum ID encontrado para o slug:", lojaSlug);
-          }
-        })
-        .catch((err) => console.error("Erro ao buscar loja via slug:", err));
-    }
-
-    // 5️⃣ Se já existe no localStorage → mantém
-    else {
-      lojaId = localStorage.getItem("lojaId");
-      if (lojaId) console.log("✅ Loja recuperada do localStorage:", lojaId);
-      else
-        console.warn(
-          "⚠️ Nenhum lojaId encontrado. Acesse com ?loja=ID ou /loja/slug"
-        );
-    }
-  }, []);
-
   // ----------------------------------------------------
   // 🟢 NOVOS ESTADOS PARA O FLUXO DE PIZZA (INSERIR AQUI)
   // ----------------------------------------------------
@@ -800,6 +750,80 @@ function App() {
       console.error("Erro ao buscar categorias:", err);
     }
   }, []);
+
+  // =============================================
+  // MULTI-TENANT REAL: Detecta loja pela URL e reage dinamicamente
+  // =============================================
+  useEffect(() => {
+    const resolveLoja = async (slugOuId) => {
+      try {
+        const res = await fetch(`/api/lojas/slug/${slugOuId}`);
+        const data = await res.json();
+        if (data?.id) {
+          localStorage.setItem("lojaId", data.id);
+          console.log("✅ Loja resolvida → ID:", data.id);
+
+          // 🟢 Atualiza dados imediatamente, sem reload
+          fetchCardapio(true);
+          fetchCategorias();
+        } else {
+          console.warn("⚠️ Nenhum ID encontrado para:", slugOuId);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar loja:", err);
+      }
+    };
+
+    // Detecta ?loja=ID
+    const params = new URLSearchParams(window.location.search);
+    const lojaQuery = params.get("loja");
+
+    // Detecta /loja/:slug
+    const pathParts = window.location.pathname.split("/");
+    const lojaSlug =
+      pathParts.includes("loja") && pathParts[pathParts.indexOf("loja") + 1]
+        ? pathParts[pathParts.indexOf("loja") + 1]
+        : null;
+
+    if (lojaQuery) {
+      localStorage.setItem("lojaId", lojaQuery);
+      console.log("🏪 Loja via query:", lojaQuery);
+      fetchCardapio(true);
+      fetchCategorias();
+    } else if (lojaSlug) {
+      console.log("🏷️ Loja via slug:", lojaSlug);
+      resolveLoja(lojaSlug);
+    } else {
+      const lojaId = localStorage.getItem("lojaId");
+      if (lojaId) {
+        console.log("✅ Loja existente no localStorage:", lojaId);
+        fetchCardapio(true);
+        fetchCategorias();
+      } else {
+        console.warn(
+          "⚠️ Nenhuma loja detectada. Acesse via /loja/:slug ou ?loja=ID"
+        );
+      }
+    }
+
+    // 🟢 Listener para mudanças de URL (sem F5)
+    const handleLocationChange = () => {
+      const pathParts = window.location.pathname.split("/");
+      if (pathParts[1] === "loja" && pathParts[2]) {
+        const newSlug = pathParts[2];
+        console.log("🔄 Slug alterado para:", newSlug);
+        resolveLoja(newSlug);
+      }
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    window.addEventListener("pushstate", handleLocationChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener("pushstate", handleLocationChange);
+    };
+  }, [fetchCardapio, fetchCategorias]);
 
   const getCategoryIcon = (category) => {
     const nome = category.toLowerCase();
