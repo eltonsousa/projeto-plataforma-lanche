@@ -354,24 +354,74 @@ function App() {
   // =============================================
   // MULTI-TENANT REAL: Detecta loja pela URL
   // =============================================
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   const lojaQuery = params.get("loja");
+
+  //   let lojaId = localStorage.getItem("lojaId");
+
+  //   // 1️⃣ Se tiver ?loja= na URL, usa e salva
+  //   if (lojaQuery) {
+  //     localStorage.setItem("lojaId", lojaQuery);
+  //     lojaId = lojaQuery;
+  //     console.log("🏪 Loja detectada pela URL:", lojaQuery);
+  //   }
+
+  //   // 2️⃣ Se ainda não tiver, tenta manter o que já está salvo
+  //   if (lojaId) {
+  //     console.log("✅ lojaId existente:", lojaId);
+  //   } else {
+  //     console.warn("⚠️ Nenhum lojaId encontrado. Acesse via link com ?loja=ID");
+  //   }
+  // }, []);
+
+  // =============================================
+  // MULTI-TENANT REAL: Detecta loja pela URL
+  // =============================================
   useEffect(() => {
+    let lojaId = null;
+
+    // 1️⃣ Verifica se há um parâmetro ?loja=ID
     const params = new URLSearchParams(window.location.search);
     const lojaQuery = params.get("loja");
 
-    let lojaId = localStorage.getItem("lojaId");
+    // 2️⃣ Verifica se há um slug /loja/adminze
+    const pathParts = window.location.pathname.split("/");
+    const lojaSlug = pathParts.includes("loja")
+      ? pathParts[pathParts.indexOf("loja") + 1]
+      : null;
 
-    // 1️⃣ Se tiver ?loja= na URL, usa e salva
+    // 3️⃣ Se houver ?loja=ID → usa diretamente
     if (lojaQuery) {
       localStorage.setItem("lojaId", lojaQuery);
       lojaId = lojaQuery;
-      console.log("🏪 Loja detectada pela URL:", lojaQuery);
+      console.log("🏪 Loja detectada via query:", lojaQuery);
     }
 
-    // 2️⃣ Se ainda não tiver, tenta manter o que já está salvo
-    if (lojaId) {
-      console.log("✅ lojaId existente:", lojaId);
-    } else {
-      console.warn("⚠️ Nenhum lojaId encontrado. Acesse via link com ?loja=ID");
+    // 4️⃣ Se houver slug → chama API para resolver ID
+    else if (lojaSlug) {
+      console.log("🏷️ Loja detectada via slug:", lojaSlug);
+      fetch(`/api/lojas/slug/${lojaSlug}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.id) {
+            localStorage.setItem("lojaId", data.id);
+            console.log("✅ Loja resolvida via slug → ID:", data.id);
+          } else {
+            console.warn("⚠️ Nenhum ID encontrado para o slug:", lojaSlug);
+          }
+        })
+        .catch((err) => console.error("Erro ao buscar loja via slug:", err));
+    }
+
+    // 5️⃣ Se já existe no localStorage → mantém
+    else {
+      lojaId = localStorage.getItem("lojaId");
+      if (lojaId) console.log("✅ Loja recuperada do localStorage:", lojaId);
+      else
+        console.warn(
+          "⚠️ Nenhum lojaId encontrado. Acesse com ?loja=ID ou /loja/slug"
+        );
     }
   }, []);
 

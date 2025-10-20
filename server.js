@@ -438,6 +438,28 @@ app.put("/api/configuracoes", autenticarLoja, async (req, res) => {
 });
 
 // ---------------------------------------------
+// BUSCAR LOJA PELO SLUG (para o lanchonete-app)
+// ---------------------------------------------
+app.get("/api/lojas/slug/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { data, error } = await supabase
+      .from("lojas")
+      .select("id, nome, slug")
+      .eq("slug", slug)
+      .single();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ message: "Loja não encontrada" });
+
+    res.json(data);
+  } catch (err) {
+    console.error("Erro GET /api/lojas/slug:", err);
+    res.status(500).json({ message: "Erro ao buscar loja pelo slug." });
+  }
+});
+
+// ---------------------------------------------
 // CARDÁPIO (AGORA SUPORTA MULTI-LOJA)
 // ---------------------------------------------
 app.get("/api/cardapio", async (req, res) => {
