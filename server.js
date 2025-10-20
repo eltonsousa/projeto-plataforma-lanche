@@ -1112,32 +1112,48 @@ app.get("/api/pedidos/relatorio", async (req, res) => {
 });
 
 // ---------------------------------------------
-// CARRINHO
+// CARRINHO (ISOLADO POR LOJA)
 // ---------------------------------------------
+
+// 🟢 Salvar ou atualizar carrinho
 app.post("/api/carrinho", async (req, res) => {
-  const { sessionId, itens } = req.body;
+  const { sessionId, itens, loja_id } = req.body;
+
+  if (!sessionId || !loja_id) {
+    return res
+      .status(400)
+      .json({ message: "⚠️ sessionId e loja_id são obrigatórios." });
+  }
 
   try {
+    // Verifica se já existe carrinho para a mesma sessão e loja
     const { data: existingCart, error: fetchError } = await supabase
       .from("carrinhos")
       .select("id")
       .eq("session_id", sessionId)
+      .eq("loja_id", loja_id)
       .limit(1);
+
     if (fetchError) throw fetchError;
 
     let data, error;
+
     if (existingCart.length > 0) {
+      // Atualiza o carrinho existente
       ({ data, error } = await supabase
         .from("carrinhos")
         .update({ itens, atualizado_em: new Date() })
         .eq("session_id", sessionId)
+        .eq("loja_id", loja_id)
         .select());
     } else {
+      // Cria novo carrinho isolado por loja
       ({ data, error } = await supabase
         .from("carrinhos")
-        .insert([{ session_id: sessionId, itens }])
+        .insert([{ session_id: sessionId, loja_id, itens }])
         .select());
     }
+
     if (error) throw error;
 
     res.status(200).json(data[0]);
@@ -1147,14 +1163,25 @@ app.post("/api/carrinho", async (req, res) => {
   }
 });
 
+// 🟢 Obter carrinho da loja atual
 app.get("/api/carrinho/:sessionId", async (req, res) => {
-  const sessionId = req.params.sessionId;
+  const { sessionId } = req.params;
+  const { loja_id } = req.query;
+
+  if (!sessionId || !loja_id) {
+    return res
+      .status(400)
+      .json({ message: "⚠️ sessionId e loja_id são obrigatórios." });
+  }
+
   try {
     const { data: carrinho, error } = await supabase
       .from("carrinhos")
       .select("itens")
       .eq("session_id", sessionId)
+      .eq("loja_id", loja_id)
       .limit(1);
+
     if (error) throw error;
 
     const itens = carrinho.length > 0 ? carrinho[0].itens : [];

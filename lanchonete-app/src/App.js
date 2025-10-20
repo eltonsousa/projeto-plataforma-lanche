@@ -250,6 +250,17 @@ const getSessionId = () => {
   return sessionId;
 };
 
+// 🟢 CARRINHO ISOLADO POR LOJA (LOCALSTORAGE)
+const loadCarrinhoLocal = (lojaId) => {
+  const carrinhoSalvo = localStorage.getItem(`carrinho_${lojaId}`);
+  return carrinhoSalvo ? JSON.parse(carrinhoSalvo) : [];
+};
+
+const saveCarrinhoLocal = (lojaId, carrinhoAtual) => {
+  if (!lojaId) return;
+  localStorage.setItem(`carrinho_${lojaId}`, JSON.stringify(carrinhoAtual));
+};
+
 // 🟢 NOVO HOOK PARA ARRASTAR COM O MOUSE
 const useDraggableScroll = () => {
   const ref = useRef(null);
@@ -675,28 +686,57 @@ function App() {
   const [telefone, setTelefone] = useState(""); // <-- NOVO ESTADO
   const [nomeLoja, setNomeLoja] = useState("");
   // --- FUNÇÕES ASYNC ---
+  // 🟢 CARRINHO MULTI-LOJA (ISOLADO)
   const loadCarrinhoFromSupabase = useCallback(async () => {
+    const lojaId = localStorage.getItem("lojaId");
+    if (!lojaId) return;
+
     try {
-      const response = await fetch(`/api/carrinho/${sessionId}`);
+      // Tenta carregar do Supabase (backend)
+      const response = await fetch(
+        `/api/carrinho/${sessionId}?loja_id=${lojaId}`
+      );
       if (response.ok) {
         const itens = await response.json();
-        if (itens && itens.length > 0) setCarrinho(itens);
+        if (itens && itens.length > 0) {
+          setCarrinho(itens);
+          saveCarrinhoLocal(lojaId, itens); // sincroniza local
+        } else {
+          // fallback para o localStorage se não houver no backend
+          const local = loadCarrinhoLocal(lojaId);
+          if (local.length > 0) setCarrinho(local);
+        }
       }
     } catch (error) {
       console.error("Erro ao carregar carrinho:", error);
+      // fallback local se API falhar
+      const local = loadCarrinhoLocal(lojaId);
+      if (local.length > 0) setCarrinho(local);
     }
   }, [sessionId]);
 
   const saveCarrinhoToSupabase = useCallback(
     async (currentCarrinho) => {
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) return;
+
       try {
         await fetch("/api/carrinho", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId, itens: currentCarrinho }),
+          body: JSON.stringify({
+            sessionId,
+            loja_id: lojaId, // ✅ agora isolado
+            itens: currentCarrinho,
+          }),
         });
+
+        // salva local também (offline friendly)
+        saveCarrinhoLocal(lojaId, currentCarrinho);
       } catch (error) {
         console.error("Erro ao salvar carrinho:", error);
+        // fallback: salva local mesmo se falhar
+        saveCarrinhoLocal(lojaId, currentCarrinho);
       }
     },
     [sessionId]
@@ -763,7 +803,8 @@ function App() {
         if (data?.id) {
           localStorage.setItem("lojaId", data.id);
           console.log("✅ Loja resolvida → ID:", data.id);
-
+          setCarrinho([]); // 🧹 limpa carrinho antigo
+          setCarrinho(loadCarrinhoLocal(data.id)); // 🔹 Carrega o carrinho local da loja nova
           // 🟢 Atualiza o nome da loja no carregamento dinâmico
           setNomeLoja(data.nome || "Carregando loja...");
 
@@ -899,36 +940,55 @@ function App() {
   // =============================================
   useEffect(() => {
     const lojaId = localStorage.getItem("lojaId");
-
     if (!lojaId) {
       console.warn("⚠️ Nenhum lojaId encontrado. Aguarde resolução do slug...");
-      return; // aguarda o outro useEffect resolver o lojaId
+      return;
     }
 
     console.log("✅ Inicializando App com lojaId:", lojaId);
 
-    // 🟢 Primeira carga com spinner
-    fetchCardapio(true);
+    // 🟢 Carrega carrinho específico da loja
     loadCarrinhoFromSupabase();
+    fetchCardapio(true);
     fetchCategorias();
 
     // 🟢 Recupera telefone local (UX)
     const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
-    if (telefoneSalvo) {
-      setTelefone(telefoneSalvo);
-    }
+    if (telefoneSalvo) setTelefone(telefoneSalvo);
 
-    // 🔄 Atualizações automáticas a cada 60 segundos (sem travar UI)
     const interval = setInterval(() => {
       const lojaIdAtual = localStorage.getItem("lojaId");
       if (lojaIdAtual) {
         fetchCardapio(false);
         fetchCategorias();
       }
-    }, 60000); // 1 minuto
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [fetchCardapio, loadCarrinhoFromSupabase, fetchCategorias]);
+
+  // 🟢 NOVO: Detecta mudança de loja e recarrega o carrinho específico
+  useEffect(() => {
+    const handleLojaChange = () => {
+      const lojaIdAtual = localStorage.getItem("lojaId");
+      if (!lojaIdAtual) return;
+
+      console.log(
+        "🔄 Loja alterada, recarregando carrinho isolado:",
+        lojaIdAtual
+      );
+      const carrinhoNovo = loadCarrinhoLocal(lojaIdAtual);
+      setCarrinho(carrinhoNovo);
+    };
+
+    // Ouve mudanças no localStorage (como quando outra aba ou slug muda)
+    window.addEventListener("storage", handleLojaChange);
+
+    // Também executa de imediato na inicialização
+    handleLojaChange();
+
+    return () => window.removeEventListener("storage", handleLojaChange);
+  }, []);
 
   // Efeito para persistir carrinho no Supabase
   // ✅ MODIFICADO: Condição agora verifica cardapioLoading
