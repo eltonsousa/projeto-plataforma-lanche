@@ -673,6 +673,7 @@ function App() {
   const [servico, setServico] = useState("");
   const [pagamento, setPagamento] = useState("");
   const [telefone, setTelefone] = useState(""); // <-- NOVO ESTADO
+  const [nomeLoja, setNomeLoja] = useState("");
   // --- FUNÇÕES ASYNC ---
   const loadCarrinhoFromSupabase = useCallback(async () => {
     try {
@@ -762,6 +763,9 @@ function App() {
         if (data?.id) {
           localStorage.setItem("lojaId", data.id);
           console.log("✅ Loja resolvida → ID:", data.id);
+
+          // 🟢 Atualiza o nome da loja no carregamento dinâmico
+          setNomeLoja(data.nome || "Carregando loja...");
 
           // 🟢 Atualiza dados imediatamente, sem reload
           fetchCardapio(true);
@@ -1041,7 +1045,8 @@ function App() {
     return (
       <div className="loading">
         <div className="spinner"></div>
-        <p>Carregando o cardápio...</p>
+        <h2>🍔 {nomeLoja || "Carregando loja..."}</h2>
+        <p>Preparando o cardápio e categorias...</p>
       </div>
     );
   }
