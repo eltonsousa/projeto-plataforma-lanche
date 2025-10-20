@@ -337,22 +337,43 @@ function App() {
   // =============================================
   // MULTI-TENANT TEMPORÁRIO
   // =============================================
+  // useEffect(() => {
+  //   let lojaId = localStorage.getItem("lojaId");
+
+  //   // Fallback temporário para desenvolvimento multi-tenant
+  //   if (!lojaId) {
+  //     const lojaPadrao = "5"; // 👈 troque pelo ID real da loja em teste
+  //     localStorage.setItem("lojaId", lojaPadrao);
+  //     lojaId = lojaPadrao;
+  //     console.log("⚙️ lojaId temporário aplicado:", lojaPadrao);
+  //   } else {
+  //     console.log("✅ lojaId existente:", lojaId);
+  //   }
+  // }, []);
+
+  // =============================================
+  // MULTI-TENANT REAL: Detecta loja pela URL
+  // =============================================
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const lojaQuery = params.get("loja");
+
     let lojaId = localStorage.getItem("lojaId");
 
-    // Fallback temporário para desenvolvimento multi-tenant
-    if (!lojaId) {
-      const lojaPadrao = "5"; // 👈 troque pelo ID real da loja em teste
-      localStorage.setItem("lojaId", lojaPadrao);
-      lojaId = lojaPadrao;
-      console.log("⚙️ lojaId temporário aplicado:", lojaPadrao);
-    } else {
+    // 1️⃣ Se tiver ?loja= na URL, usa e salva
+    if (lojaQuery) {
+      localStorage.setItem("lojaId", lojaQuery);
+      lojaId = lojaQuery;
+      console.log("🏪 Loja detectada pela URL:", lojaQuery);
+    }
+
+    // 2️⃣ Se ainda não tiver, tenta manter o que já está salvo
+    if (lojaId) {
       console.log("✅ lojaId existente:", lojaId);
+    } else {
+      console.warn("⚠️ Nenhum lojaId encontrado. Acesse via link com ?loja=ID");
     }
   }, []);
-  // =============================================
-  // FIM MULTI-TENANT TEMPORÁRIO
-  // =============================================
 
   // ----------------------------------------------------
   // 🟢 NOVOS ESTADOS PARA O FLUXO DE PIZZA (INSERIR AQUI)
