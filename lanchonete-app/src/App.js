@@ -890,19 +890,40 @@ function App() {
     }));
   }, [categorias, itensCardapio]);
 
-  // --- EFEITOS ---
+  // =============================================
+  // CARREGAMENTO PRINCIPAL DO APP (sincronizado com lojaId)
+  // =============================================
   useEffect(() => {
+    const lojaId = localStorage.getItem("lojaId");
+
+    if (!lojaId) {
+      console.warn("⚠️ Nenhum lojaId encontrado. Aguarde resolução do slug...");
+      return; // aguarda o outro useEffect resolver o lojaId
+    }
+
+    console.log("✅ Inicializando App com lojaId:", lojaId);
+
+    // 🟢 Primeira carga com spinner
     fetchCardapio(true);
     loadCarrinhoFromSupabase();
     fetchCategorias();
 
+    // 🟢 Recupera telefone local (UX)
     const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
     if (telefoneSalvo) {
       setTelefone(telefoneSalvo);
     }
 
-    const intervalId = setInterval(() => fetchCardapio(false), 10000);
-    return () => clearInterval(intervalId);
+    // 🔄 Atualizações automáticas a cada 60 segundos (sem travar UI)
+    const interval = setInterval(() => {
+      const lojaIdAtual = localStorage.getItem("lojaId");
+      if (lojaIdAtual) {
+        fetchCardapio(false);
+        fetchCategorias();
+      }
+    }, 60000); // 1 minuto
+
+    return () => clearInterval(interval);
   }, [fetchCardapio, loadCarrinhoFromSupabase, fetchCategorias]);
 
   // Efeito para persistir carrinho no Supabase
