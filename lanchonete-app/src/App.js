@@ -334,6 +334,26 @@ function App() {
     useState("Sanduíches");
   const [categorias, setCategorias] = useState([]);
 
+  // =============================================
+  // MULTI-TENANT TEMPORÁRIO
+  // =============================================
+  useEffect(() => {
+    let lojaId = localStorage.getItem("lojaId");
+
+    // Fallback temporário para desenvolvimento multi-tenant
+    if (!lojaId) {
+      const lojaPadrao = "5"; // 👈 troque pelo ID real da loja em teste
+      localStorage.setItem("lojaId", lojaPadrao);
+      lojaId = lojaPadrao;
+      console.log("⚙️ lojaId temporário aplicado:", lojaPadrao);
+    } else {
+      console.log("✅ lojaId existente:", lojaId);
+    }
+  }, []);
+  // =============================================
+  // FIM MULTI-TENANT TEMPORÁRIO
+  // =============================================
+
   // ----------------------------------------------------
   // 🟢 NOVOS ESTADOS PARA O FLUXO DE PIZZA (INSERIR AQUI)
   // ----------------------------------------------------
@@ -777,33 +797,17 @@ function App() {
 
   // --- EFEITOS ---
   useEffect(() => {
-    let attempts = 0;
-    const maxAttempts = 10; // tenta por até 10 segundos
-    const interval = setInterval(() => {
-      const lojaId = localStorage.getItem("lojaId");
-      if (lojaId) {
-        console.log("✅ lojaId detectado:", lojaId);
+    fetchCardapio(true);
+    loadCarrinhoFromSupabase();
+    fetchCategorias();
 
-        // Executa a carga normal
-        fetchCardapio(true);
-        loadCarrinhoFromSupabase();
-        fetchCategorias();
+    const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
+    if (telefoneSalvo) {
+      setTelefone(telefoneSalvo);
+    }
 
-        const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
-        if (telefoneSalvo) setTelefone(telefoneSalvo);
-
-        clearInterval(interval); // para de tentar
-      } else {
-        attempts++;
-        console.warn("⏳ Aguardando lojaId...");
-        if (attempts >= maxAttempts) {
-          console.error("❌ lojaId não encontrado após várias tentativas.");
-          clearInterval(interval);
-        }
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
+    const intervalId = setInterval(() => fetchCardapio(false), 10000);
+    return () => clearInterval(intervalId);
   }, [fetchCardapio, loadCarrinhoFromSupabase, fetchCategorias]);
 
   // Efeito para persistir carrinho no Supabase
