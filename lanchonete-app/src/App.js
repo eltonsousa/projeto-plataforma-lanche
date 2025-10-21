@@ -407,22 +407,37 @@ function App() {
   // 🟢 NOVA FUNÇÃO: Carrega configurações de Pizza dinamicamente
   const fetchPizzaConfig = useCallback(async () => {
     setPizzaConfigLoading(true);
-    try {
-      const res = await fetch("/api/pizzas-config");
-      if (!res.ok) throw new Error("Erro ao carregar configurações de pizza");
-      const data = await res.json();
+    const apiUrl = getApiUrl();
+    const lojaId = localStorage.getItem("lojaId");
 
-      // Assume a estrutura: { tamanhos: [], sabores: [] }
-      setPizzaTamanhos(data.tamanhos || []);
-      setPizzaSabores(data.sabores || []);
+    try {
+      // 🧩 1. Garante que o lojaId existe antes da requisição
+      if (!lojaId) {
+        console.warn(
+          "⚠️ Nenhum lojaId encontrado — ignorando busca de pizzas-config."
+        );
+        setPizzaConfig(null);
+        return;
+      }
+
+      // 🧩 2. Faz a requisição corretamente
+      const res = await fetch(`${apiUrl}/api/pizzas-config?loja_id=${lojaId}`);
+      if (!res.ok) throw new Error("Erro ao carregar configurações de pizza");
+
+      const data = await res.json();
+      setPizzaConfig(data);
+
+      // (opcional) se a resposta tiver listas específicas:
+      if (data.tamanhos) setPizzaTamanhos(data.tamanhos);
+      if (data.sabores) setPizzaSabores(data.sabores);
     } catch (err) {
-      console.error("Erro ao buscar config de pizza:", err);
+      console.error("❌ Erro ao buscar config de pizza:", err);
       setPizzaTamanhos([]);
       setPizzaSabores([]);
     } finally {
       setPizzaConfigLoading(false);
     }
-  }, []); // Sem dependências
+  }, []); // ✅ sem dependências
 
   // Observação
   const [observacao, setObservacao] = useState("");
@@ -749,26 +764,43 @@ function App() {
   const fetchCardapio = useCallback(async (isInitial = false) => {
     if (isInitial) setCardapioLoading(true); // só ativa o loading na primeira vez
 
+    const apiUrl = getApiUrl(); // ✅ usa proxy local ou URL do .env
+    const lojaId = localStorage.getItem("lojaId"); // ✅ recupera loja atual
+
     try {
-      const lojaId = localStorage.getItem("lojaId"); // ✅ recupera a loja atual
+      // 🧩 1. Verifica se há loja válida
       if (!lojaId) {
-        console.warn("⚠️ Nenhum lojaId encontrado no localStorage.");
+        console.warn(
+          "⚠️ Nenhum lojaId encontrado no localStorage — cancelando busca de cardápio."
+        );
+        setItensCardapio([]); // limpa o cardápio
         return;
       }
 
-      const response = await fetch(`/api/cardapio?loja_id=${lojaId}`);
+      // 🧩 2. Faz a requisição corretamente (multi-tenant)
+      const response = await fetch(`${apiUrl}/api/cardapio?loja_id=${lojaId}`);
       if (!response.ok) throw new Error("Erro ao buscar o cardápio");
 
+      // 🧩 3. Lê e valida o retorno
       const data = await response.json();
-      setItensCardapio(data);
-      setError(null);
+      if (Array.isArray(data)) {
+        setItensCardapio(data);
+        setError(null);
+        console.log(
+          `🍔 Cardápio carregado para loja_id=${lojaId}: ${data.length} itens`
+        );
+      } else {
+        console.warn("⚠️ O retorno do cardápio não é um array:", data);
+        setItensCardapio([]);
+      }
     } catch (error) {
-      console.error("Erro ao buscar cardápio:", error);
+      console.error("❌ Erro ao buscar cardápio:", error);
+      setItensCardapio([]);
       setError(error.message);
     } finally {
       if (isInitial) setCardapioLoading(false); // só desativa o loading inicial
     }
-  }, []);
+  }, []); // ✅ sem dependências
 
   // 🟢 NOVA FUNÇÃO: Carrega categorias dinamicamente (com loja_id)
   const fetchCategorias = useCallback(async () => {
