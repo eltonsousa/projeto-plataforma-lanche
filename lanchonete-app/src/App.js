@@ -346,6 +346,47 @@ function App() {
     useState("Sanduíches");
   const [categorias, setCategorias] = useState([]);
 
+  // 🎨 Tema dinâmico da loja
+  const [configLoja, setConfigLoja] = useState(null);
+
+  const fetchConfigLoja = useCallback(async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) return;
+
+      const res = await fetch(
+        `${apiUrl}/api/configuracoes-loja?loja_id=${lojaId}`
+      );
+      if (!res.ok) throw new Error("Erro ao buscar configurações da loja.");
+
+      const data = await res.json();
+      setConfigLoja(data);
+
+      // 🧠 Aplica cores dinâmicas
+      document.documentElement.style.setProperty(
+        "--cor-principal",
+        data.cor_principal || "#ff6347"
+      );
+      document.documentElement.style.setProperty(
+        "--cor-secundaria",
+        data.cor_secundaria || "#333"
+      );
+
+      // 🧩 Atualiza favicon
+      if (data.favicon_url) {
+        const favicon =
+          document.querySelector("link[rel='icon']") ||
+          document.createElement("link");
+        favicon.rel = "icon";
+        favicon.href = data.favicon_url + "?v=" + Date.now();
+        document.head.appendChild(favicon);
+      }
+    } catch (error) {
+      console.error("❌ Erro ao buscar config da loja:", error);
+    }
+  }, []);
+
   // =============================================
   // MULTI-TENANT TEMPORÁRIO
   // =============================================
@@ -984,6 +1025,7 @@ function App() {
     loadCarrinhoFromSupabase();
     fetchCardapio(true);
     fetchCategorias();
+    fetchConfigLoja(); // 🎨 aplica o tema (cores e favicon)
 
     // 🟢 Recupera telefone local (UX)
     const telefoneSalvo = localStorage.getItem("lanchonete_telefone");
@@ -998,7 +1040,12 @@ function App() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [fetchCardapio, loadCarrinhoFromSupabase, fetchCategorias]);
+  }, [
+    fetchCardapio,
+    loadCarrinhoFromSupabase,
+    fetchCategorias,
+    fetchConfigLoja,
+  ]);
 
   // 🟢 NOVO: Detecta mudança de loja e recarrega o carrinho específico
   useEffect(() => {
@@ -1177,7 +1224,10 @@ function App() {
       )}
 
       <header>
-        <h1>Manú Lanches</h1>
+        <h1>{configLoja?.nome || "Minha Lanchonete"}</h1>
+        {configLoja?.logo_url && (
+          <img src={configLoja.logo_url} alt="Logo" style={{ height: 40 }} />
+        )}
         <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
         <link
           href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"

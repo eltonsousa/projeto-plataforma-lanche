@@ -752,11 +752,13 @@ app.get("/api/configuracoes-loja", async (req, res) => {
 
     const { data, error } = await supabase
       .from("configuracoes_loja")
-      .select("chave_pix, endereco_loja, link_localizacao")
+      .select(
+        "nome, slug, telefone, chave_pix, endereco_loja, link_localizacao, cor_principal, cor_secundaria, logo_url, favicon_url"
+      )
       .eq("loja_id", loja_id)
       .single();
 
-    if (error && error.code !== "PGRST116") throw error; // ignora not found
+    if (error && error.code !== "PGRST116") throw error; // PGRST116 = not found
 
     res.json(data || {});
   } catch (err) {
@@ -767,19 +769,47 @@ app.get("/api/configuracoes-loja", async (req, res) => {
 
 app.put("/api/configuracoes-loja", async (req, res) => {
   try {
-    const { loja_id, chave_pix, endereco_loja, link_localizacao } = req.body;
+    const {
+      loja_id,
+      nome,
+      slug,
+      telefone,
+      chave_pix,
+      endereco_loja,
+      link_localizacao,
+      cor_principal,
+      cor_secundaria,
+      logo_url,
+      favicon_url,
+    } = req.body;
+
     if (!loja_id)
       return res.status(400).json({ message: "⚠️ loja_id é obrigatório." });
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("configuracoes_loja")
       .upsert(
-        { loja_id, chave_pix, endereco_loja, link_localizacao },
+        {
+          loja_id,
+          nome,
+          slug,
+          telefone,
+          chave_pix,
+          endereco_loja,
+          link_localizacao,
+          cor_principal,
+          cor_secundaria,
+          logo_url,
+          favicon_url,
+        },
         { onConflict: "loja_id" }
-      );
+      )
+      .select("*")
+      .single();
 
     if (error) throw error;
-    res.json({ sucesso: true });
+
+    res.json({ sucesso: true, config: data });
   } catch (err) {
     console.error("Erro PUT /api/configuracoes-loja:", err);
     res.status(500).json({ erro: "Erro ao atualizar configurações." });

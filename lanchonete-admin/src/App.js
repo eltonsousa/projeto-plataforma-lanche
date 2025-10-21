@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Categorias from "./Categorias";
 import ConfigLoja from "./ConfigLoja";
+
 import "./App.css";
 import "./styles/config_pizza.css";
 
