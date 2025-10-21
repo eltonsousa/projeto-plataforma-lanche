@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { getApiUrl } from "./utils/api";
 import CardapioItem from "./CardapioItem";
 import "./App.css";
 import "./styles/cardapio.css";
@@ -1061,7 +1062,9 @@ function App() {
       troco: pagamento === "dinheiro" ? parseFloat(formData.get("troco")) : 0,
     };
 
+    const lojaId = localStorage.getItem("lojaId");
     const dadosDoPedido = {
+      loja_id: lojaId,
       cliente,
       itens: carrinho,
       total: calcularTotal(),
@@ -1070,7 +1073,8 @@ function App() {
     };
 
     try {
-      const response = await fetch("/api/pedidos", {
+      const apiUrl = getApiUrl(); // ✅ usa proxy local ou URL de produção
+      const response = await fetch(`${apiUrl}/api/pedidos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dadosDoPedido),
@@ -1084,10 +1088,12 @@ function App() {
         setMostraCheckout(false);
         setPedidoFinalizado(true);
       } else {
+        const errorText = await response.text();
+        console.error("❌ Erro no checkout:", errorText);
         alert("Erro ao enviar o pedido. Tente novamente.");
       }
     } catch (error) {
-      console.error("Erro na conexão:", error);
+      console.error("❌ Erro na conexão:", error);
       alert("Erro ao se conectar com o servidor.");
     }
   };
