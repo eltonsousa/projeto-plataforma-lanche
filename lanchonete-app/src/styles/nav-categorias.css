@@ -5,7 +5,7 @@
 /* =============================== */
 .cardapio-categorias {
   position: fixed;
-  top: 136px; /* ⬅️ altura do header (ajuste se o seu for maior) */
+  top: 140px; /* ⬅️ altura do header (ajuste se o seu for maior) */
   left: 0;
   width: 100%;
   z-index: 150;
@@ -79,6 +79,6 @@
 
 @media (max-width: 450px) {
   .cardapio-categorias {
-    top: 80px;
+    top: 112px;
   }
 }
