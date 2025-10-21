@@ -1515,7 +1515,6 @@ function App() {
                           ? "selected"
                           : ""
                       }
-                      btn
                     >
                       {tamanho.nome} ({formatPrice(tamanho.base_preco)})
                     </button>
