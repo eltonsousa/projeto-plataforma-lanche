@@ -219,11 +219,7 @@ function ConfigLoja() {
           />
         </label>
         {config.logo_url && (
-          <img
-            src={config.logo_url}
-            alt="Logo da Loja"
-            style={{ height: 50, marginTop: 8 }}
-          />
+          <img className="logo_loja" src={config.logo_url} alt="Logo da Loja" />
         )}
 
         <label>
@@ -236,9 +232,10 @@ function ConfigLoja() {
         </label>
         {config.favicon_url && (
           <img
+            className="favicon_loja"
             src={config.favicon_url}
             alt="Favicon"
-            style={{ height: 24, marginTop: 8 }}
+            style={{ width: 24, height: 24, marginTop: 8 }}
           />
         )}
 

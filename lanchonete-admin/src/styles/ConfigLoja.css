@@ -47,6 +47,18 @@
   font-size: 1rem;
 }
 
+.logo_loja {
+  width: 50px;
+  height: 50px;
+  margin: 8px auto;
+}
+
+.favicon_loja {
+  width: 24px;
+  height: 24px;
+  margin: 8px auto;
+}
+
 .form-config button {
   margin-top: 10px;
 }
