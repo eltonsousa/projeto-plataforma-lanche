@@ -189,7 +189,11 @@ function ConfigLoja() {
               }
             />
           </label>
+        </form>
+      </div>
 
+      <div className="config-card">
+        <form onSubmit={handleSalvar} className="config-form">
           <h3>🎨 Personalização Visual</h3>
 
           <label className="cor_principal">

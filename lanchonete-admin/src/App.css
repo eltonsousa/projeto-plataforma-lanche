@@ -1020,7 +1020,8 @@ footer p.footer-admin {
   .painel-conteudo,
   .painel-relatorios,
   .painel-cardapio,
-  .painel-configuracoes {
+  .painel-configuracoes,
+  .config-loja-container {
     padding-top: 65px;
   }
 
