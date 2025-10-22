@@ -11,6 +11,9 @@ function ConfigLoja() {
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [salvando, setSalvando] = useState(false);
+  const [sucesso, setSucesso] = useState(false);
+
   // === Buscar configuração da loja ===
   useEffect(() => {
     const lojaId = localStorage.getItem("lojaId");
@@ -44,11 +47,16 @@ function ConfigLoja() {
   // === Atualizar configuração ===
   const handleSalvar = async (e) => {
     e.preventDefault();
+
     const lojaId = localStorage.getItem("lojaId");
     if (!lojaId) {
       setMensagem("❌ Sessão expirada. Faça login novamente.");
       return;
     }
+
+    // 🔵 Início do processo de salvamento
+    setSalvando(true);
+    setSucesso(false);
 
     try {
       const res = await fetch("/api/configuracoes-loja", {
@@ -58,10 +66,15 @@ function ConfigLoja() {
       });
 
       if (!res.ok) throw new Error("Falha ao salvar configurações.");
-      setMensagem("✅ Configurações salvas com sucesso!");
+
+      // 🟢 Sucesso
+      setSucesso(true);
+      setTimeout(() => setSucesso(false), 3000); // volta ao estado normal
     } catch (err) {
       console.error("Erro ao salvar configuração:", err);
-      setMensagem("❌ Erro ao salvar configurações.");
+      alert("❌ Erro ao salvar configurações.");
+    } finally {
+      setSalvando(false);
     }
   };
 
@@ -230,8 +243,18 @@ function ConfigLoja() {
           />
         )}
 
-        <button type="submit" className="btn btn-verde">
-          💾 Salvar Configurações
+        <button
+          type="submit"
+          className={`btn ${
+            salvando ? "btn-azul" : sucesso ? "btn-verde" : "btn-vermelho"
+          }`}
+          disabled={salvando}
+        >
+          {salvando
+            ? "⏳ Salvando..."
+            : sucesso
+            ? "✅ Configurações salvas!"
+            : "💾 Salvar Configurações"}
         </button>
       </form>
     </div>
