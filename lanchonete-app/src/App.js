@@ -875,7 +875,8 @@ function App() {
         const res = await fetch(`/api/lojas/slug/${slugOuId}`);
 
         if (res.status === 404) {
-          setSlugError("❌ Loja não encontrada. Verifique o link.");
+          setSlugError("😟Oops! Loja não encontrada. Verifique o link.");
+
           localStorage.removeItem("lojaId"); // limpa loja antiga
           return;
         }
@@ -891,7 +892,7 @@ function App() {
           fetchCardapio(true);
           fetchCategorias();
         } else {
-          setSlugError("❌ Loja não encontrada. Verifique o link.");
+          setSlugError("😟Oops! Loja não encontrada. Verifique o link.");
           localStorage.removeItem("lojaId");
         }
       } catch (err) {
@@ -1216,14 +1217,14 @@ function App() {
   if (slugError) {
     return (
       <div className="erro-loja">
-        <h2>{slugError}</h2>
-        <p>O link acessado parece inválido ou a loja não existe!</p>
-        {/* <a href="/" className="btn btn-verde">
-          🏠 Voltar à página inicial
-        </a> */}
+        <div className="erro-box">
+          <h2>{slugError}</h2>
+          <p>O link acessado parece inválido ou a loja não existe.</p>
+        </div>
       </div>
     );
   }
+
   return (
     <div className="App">
       {/* 🔴 NOVO: O FLAG de status no canto da tela */}

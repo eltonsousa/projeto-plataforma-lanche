@@ -324,18 +324,51 @@ footer p {
   }
 }
 
+/* ======= Tela de erro de loja ======= */
 .erro-loja {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    var(--cor-principal),
+    var(--cor-secundaria)
+  );
+  color: var(--cor-branco);
+  font-family: "Roboto", sans-serif;
+  padding: 20px;
+}
+
+.erro-box {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 40px 60px;
+  border-radius: 12px;
   text-align: center;
-  padding: 100px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.5s ease;
 }
 
-.erro-loja h2 {
-  color: #f44336;
-  font-size: 1.5rem;
+.erro-box h2 {
+  font-size: 1.8rem;
   margin-bottom: 10px;
+  color: var(--cor-branco);
 }
 
-.erro-loja p {
-  color: #555;
-  margin-bottom: 20px;
+.erro-box p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* ✨ Animação suave de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
