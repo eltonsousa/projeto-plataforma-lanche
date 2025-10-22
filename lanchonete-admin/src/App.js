@@ -490,6 +490,21 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return sessionStorage.getItem("isLoggedIn") === "true";
   });
+  useEffect(() => {
+    const lastLogin = sessionStorage.getItem("lastLoginTime");
+    const maxSessionDuration = 1000 * 60 * 30; // 30 minutos
+
+    if (
+      !lastLogin ||
+      Date.now() - parseInt(lastLogin, 10) > maxSessionDuration
+    ) {
+      console.log("⏰ Sessão expirada. É necessário fazer login novamente.");
+      sessionStorage.removeItem("isLoggedIn");
+      sessionStorage.removeItem("lastLoginTime");
+      setIsLoggedIn(false);
+    }
+  }, []);
+
   // ✅ Declaração única (Corrigido o erro de redeclaração)
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ nome: "", senha: "" });
@@ -895,6 +910,10 @@ function App() {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("lojaId", data.loja_id);
       localStorage.setItem("usuarioNome", data.nome);
+
+      // 🔒 Armazena no sessionStorage (dados da sessão)
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("lastLoginTime", Date.now().toString()); // ⏰ Novo: controle da sessão
       sessionStorage.setItem("lojaId", data.loja_id);
 
       // ✅ Define página inicial padrão após login
