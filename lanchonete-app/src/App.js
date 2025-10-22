@@ -865,7 +865,7 @@ function App() {
       console.error("Erro ao buscar categorias:", err);
     }
   }, []);
-
+  const [slugError, setSlugError] = useState(null);
   // =============================================
   // MULTI-TENANT REAL: Detecta loja pela URL e reage dinamicamente
   // =============================================
@@ -873,23 +873,30 @@ function App() {
     const resolveLoja = async (slugOuId) => {
       try {
         const res = await fetch(`/api/lojas/slug/${slugOuId}`);
+
+        if (res.status === 404) {
+          setSlugError("❌ Loja não encontrada. Verifique o link.");
+          localStorage.removeItem("lojaId"); // limpa loja antiga
+          return;
+        }
+
         const data = await res.json();
         if (data?.id) {
+          setSlugError(null); // ✅ limpa erros anteriores
           localStorage.setItem("lojaId", data.id);
           console.log("✅ Loja resolvida → ID:", data.id);
-          setCarrinho([]); // 🧹 limpa carrinho antigo
-          setCarrinho(loadCarrinhoLocal(data.id)); // 🔹 Carrega o carrinho local da loja nova
-          // 🟢 Atualiza o nome da loja no carregamento dinâmico
+          setCarrinho([]);
+          setCarrinho(loadCarrinhoLocal(data.id));
           setNomeLoja(data.nome || "Carregando loja...");
-
-          // 🟢 Atualiza dados imediatamente, sem reload
           fetchCardapio(true);
           fetchCategorias();
         } else {
-          console.warn("⚠️ Nenhum ID encontrado para:", slugOuId);
+          setSlugError("❌ Loja não encontrada. Verifique o link.");
+          localStorage.removeItem("lojaId");
         }
       } catch (err) {
         console.error("Erro ao buscar loja:", err);
+        setSlugError("❌ Erro de conexão com o servidor.");
       }
     };
 
@@ -1205,6 +1212,18 @@ function App() {
     (item) => item.categoria === "Pizzas"
   );
 
+  // 🛑 Verifica se houve erro de slug (loja inexistente ou inválida)
+  if (slugError) {
+    return (
+      <div className="erro-loja">
+        <h2>{slugError}</h2>
+        <p>O link acessado parece inválido ou a loja não existe!</p>
+        {/* <a href="/" className="btn btn-verde">
+          🏠 Voltar à página inicial
+        </a> */}
+      </div>
+    );
+  }
   return (
     <div className="App">
       {/* 🔴 NOVO: O FLAG de status no canto da tela */}

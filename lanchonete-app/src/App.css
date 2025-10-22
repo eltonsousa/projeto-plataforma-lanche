@@ -323,3 +323,19 @@ footer p {
     width: 100%;
   }
 }
+
+.erro-loja {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.erro-loja h2 {
+  color: #f44336;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.erro-loja p {
+  color: #555;
+  margin-bottom: 20px;
+}
