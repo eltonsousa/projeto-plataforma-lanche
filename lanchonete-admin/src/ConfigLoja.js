@@ -111,152 +111,161 @@ function ConfigLoja() {
   return (
     <div className="config-loja-container">
       <h2>⚙️ Configurações da Loja</h2>
-      {mensagem && <p className="mensagem">{mensagem}</p>}
 
-      <form onSubmit={handleSalvar} className="config-form">
-        <h3>Informações da Loja</h3>
+      <div className="config-card">
+        {mensagem && <p className="mensagem">{mensagem}</p>}
 
-        <label>
-          Nome da Loja:
-          <input
-            type="text"
-            value={config.nome}
-            onChange={(e) => setConfig({ ...config, nome: e.target.value })}
-          />
-        </label>
+        <form onSubmit={handleSalvar} className="config-form">
+          <h3>Informações da Loja</h3>
 
-        <label>
-          Slogan / Descrição curta:
-          <input
-            type="text"
-            value={config.slogan || ""}
-            onChange={(e) => setConfig({ ...config, slogan: e.target.value })}
-          />
-        </label>
+          <label>
+            Nome da Loja:
+            <input
+              type="text"
+              value={config.nome}
+              onChange={(e) => setConfig({ ...config, nome: e.target.value })}
+            />
+          </label>
 
-        <label>
-          Slug (URL da loja):
-          <input
-            type="text"
-            value={config.slug}
-            onChange={(e) => setConfig({ ...config, slug: e.target.value })}
-          />
-        </label>
+          <label>
+            Slogan / Descrição curta:
+            <input
+              type="text"
+              value={config.slogan || ""}
+              onChange={(e) => setConfig({ ...config, slogan: e.target.value })}
+            />
+          </label>
 
-        <label>
-          Telefone (WhatsApp):
-          <input
-            type="tel"
-            value={config.telefone}
-            onChange={(e) => setConfig({ ...config, telefone: e.target.value })}
-          />
-        </label>
+          <label>
+            Slug (URL da loja):
+            <input
+              type="text"
+              value={config.slug}
+              onChange={(e) => setConfig({ ...config, slug: e.target.value })}
+            />
+          </label>
 
-        <h3>Endereço e Pagamento</h3>
-        <label>
-          Chave PIX:
-          <input
-            type="text"
-            value={config.chave_pix}
-            onChange={(e) =>
-              setConfig({ ...config, chave_pix: e.target.value })
-            }
-          />
-        </label>
+          <label>
+            Telefone (WhatsApp):
+            <input
+              type="tel"
+              value={config.telefone}
+              onChange={(e) =>
+                setConfig({ ...config, telefone: e.target.value })
+              }
+            />
+          </label>
 
-        <label>
-          Endereço da Loja:
-          <input
-            type="text"
-            value={config.endereco_loja}
-            onChange={(e) =>
-              setConfig({ ...config, endereco_loja: e.target.value })
-            }
-          />
-        </label>
+          <h3>Endereço e Pagamento</h3>
+          <label>
+            Chave PIX:
+            <input
+              type="text"
+              value={config.chave_pix}
+              onChange={(e) =>
+                setConfig({ ...config, chave_pix: e.target.value })
+              }
+            />
+          </label>
 
-        <label>
-          Link da Localização:
-          <input
-            type="text"
-            value={config.link_localizacao}
-            onChange={(e) =>
-              setConfig({ ...config, link_localizacao: e.target.value })
-            }
-          />
-        </label>
+          <label>
+            Endereço da Loja:
+            <input
+              type="text"
+              value={config.endereco_loja}
+              onChange={(e) =>
+                setConfig({ ...config, endereco_loja: e.target.value })
+              }
+            />
+          </label>
 
-        <h3>🎨 Personalização Visual</h3>
+          <label>
+            Link da Localização:
+            <input
+              type="text"
+              value={config.link_localizacao}
+              onChange={(e) =>
+                setConfig({ ...config, link_localizacao: e.target.value })
+              }
+            />
+          </label>
 
-        <label className="cor_principal">
-          Cor Principal:
-          <input
-            type="color"
-            value={config.cor_principal}
-            onChange={(e) =>
-              setConfig({ ...config, cor_principal: e.target.value })
-            }
-          />
-        </label>
+          <h3>🎨 Personalização Visual</h3>
 
-        <label className="cor_secundaria">
-          Cor Secundária:
-          <input
-            type="color"
-            value={config.cor_secundaria}
-            onChange={(e) =>
-              setConfig({ ...config, cor_secundaria: e.target.value })
-            }
-          />
-        </label>
+          <label className="cor_principal">
+            Cor Principal:
+            <input
+              type="color"
+              value={config.cor_principal}
+              onChange={(e) =>
+                setConfig({ ...config, cor_principal: e.target.value })
+              }
+            />
+          </label>
 
-        <label>
-          Logo da Loja:
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleUpload(e, "logo_url")}
-          />
-        </label>
-        {config.logo_url && (
-          <img className="logo_loja" src={config.logo_url} alt="Logo da Loja" />
-        )}
+          <label className="cor_secundaria">
+            Cor Secundária:
+            <input
+              type="color"
+              value={config.cor_secundaria}
+              onChange={(e) =>
+                setConfig({ ...config, cor_secundaria: e.target.value })
+              }
+            />
+          </label>
 
-        <label>
-          Favicon:
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleUpload(e, "favicon_url")}
-          />
-        </label>
-        {config.favicon_url && (
-          <img
-            className="favicon_loja"
-            src={config.favicon_url}
-            alt="Favicon"
-            style={{ width: 24, height: 24, marginTop: 8 }}
-          />
-        )}
-
-        <button
-          type="submit"
-          className={`btn-salva-config-loja btn ${
-            salvando ? "btn-azul" : sucesso ? "btn-verde" : "btn-laranja"
-          }`}
-          disabled={salvando}
-        >
-          {salvando ? (
-            <span className="spinner">
-              <span className="loader"></span> Salvando...
-            </span>
-          ) : sucesso ? (
-            "✅ Configurações salvas!"
-          ) : (
-            "💾 Salvar Configurações"
+          <label>
+            Logo da Loja:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleUpload(e, "logo_url")}
+            />
+          </label>
+          {config.logo_url && (
+            <img
+              className="logo_loja"
+              src={config.logo_url}
+              alt="Logo da Loja"
+            />
           )}
-        </button>
-      </form>
+
+          <label>
+            Favicon:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleUpload(e, "favicon_url")}
+            />
+          </label>
+          {config.favicon_url && (
+            <img
+              className="favicon_loja"
+              src={config.favicon_url}
+              alt="Favicon"
+              style={{ width: 24, height: 24, marginTop: 8 }}
+            />
+          )}
+
+          <button
+            type="submit"
+            className={`btn-salva-config-loja btn ${
+              salvando ? "btn-azul" : sucesso ? "btn-verde" : "btn-laranja"
+            }`}
+            disabled={salvando}
+          >
+            {salvando ? (
+              <span className="spinner">
+                <span className="loader"></span> Salvando...
+              </span>
+            ) : sucesso ? (
+              "✅ Configurações salvas!"
+            ) : (
+              "💾 Salvar Configurações"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

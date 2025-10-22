@@ -1,16 +1,16 @@
 .config-loja-container {
-  max-width: 600px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  box-sizing: border-box;
 }
 
 .config-loja-container h2 {
-  margin-bottom: 20px;
-  color: var(--cor-principal);
   text-align: center;
+  color: var(--cor-azul);
+  border-bottom: 2px solid var(--cor-cinza-claro);
+  padding-bottom: 1rem;
 }
 
 .config-loja-container form {
