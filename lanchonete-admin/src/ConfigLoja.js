@@ -188,7 +188,7 @@ function ConfigLoja() {
 
         <h3>🎨 Personalização Visual</h3>
 
-        <label>
+        <label className="cor_principal">
           Cor Principal:
           <input
             type="color"
@@ -199,7 +199,7 @@ function ConfigLoja() {
           />
         </label>
 
-        <label>
+        <label className="cor_secundaria">
           Cor Secundária:
           <input
             type="color"

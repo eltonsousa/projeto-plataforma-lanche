@@ -59,6 +59,31 @@
   margin: 8px auto;
 }
 
+/* ===== 🎨 Personalização Visual ===== */
+.config-form input[type="color"] {
+  width: 75px; /* aumenta o tamanho do botão */
+  height: 55px; /* altura maior para o seletor */
+  border: none; /* remove borda feia padrão */
+  cursor: pointer; /* indica clicável */
+  border-radius: 8px; /* cantos suaves */
+  background: none; /* remove fundo */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+}
+
+.config-form input[type="color"]:hover {
+  transform: scale(1.1);
+}
+
+.config-form label.cor_principal,
+.cor_secundaria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
 .form-config button {
   margin-top: 10px;
 }
