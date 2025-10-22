@@ -441,21 +441,49 @@ app.put("/api/configuracoes", autenticarLoja, async (req, res) => {
 // BUSCAR LOJA PELO SLUG (para o lanchonete-app)
 // ---------------------------------------------
 app.get("/api/lojas/slug/:slug", async (req, res) => {
+  const { slug } = req.params;
+
   try {
-    const { slug } = req.params;
     const { data, error } = await supabase
-      .from("lojas")
-      .select("id, nome, slug")
+      .from("configuracoes_loja")
+      .select(
+        `
+        loja_id,
+        nome,
+        slug,
+        telefone,
+        logo_url,
+        cor_principal,
+        cor_secundaria,
+        favicon_url,
+        slogan
+        `
+      )
       .eq("slug", slug)
-      .single();
+      .maybeSingle(); // 🔁 substitui .single() → ignora erro se 0 resultados
 
     if (error) throw error;
-    if (!data) return res.status(404).json({ message: "Loja não encontrada" });
+    if (!data)
+      return res
+        .status(404)
+        .json({ message: `Loja '${slug}' não encontrada.` });
 
-    res.json(data);
+    res.json({
+      id: data.loja_id,
+      nome: data.nome,
+      slug: data.slug,
+      telefone: data.telefone,
+      logo_url: data.logo_url,
+      cor_principal: data.cor_principal,
+      cor_secundaria: data.cor_secundaria,
+      favicon_url: data.favicon_url,
+      slogan: data.slogan,
+    });
   } catch (err) {
     console.error("Erro GET /api/lojas/slug:", err);
-    res.status(500).json({ message: "Erro ao buscar loja pelo slug." });
+    res
+      .status(500)
+      .json({ message: "Erro ao buscar loja.", details: err.message });
   }
 });
 
