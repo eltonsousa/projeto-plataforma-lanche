@@ -50,11 +50,10 @@ function ConfigLoja() {
 
     const lojaId = localStorage.getItem("lojaId");
     if (!lojaId) {
-      setMensagem("❌ Sessão expirada. Faça login novamente.");
+      alert("❌ Sessão expirada. Faça login novamente.");
       return;
     }
 
-    // 🔵 Início do processo de salvamento
     setSalvando(true);
     setSucesso(false);
 
@@ -67,9 +66,9 @@ function ConfigLoja() {
 
       if (!res.ok) throw new Error("Falha ao salvar configurações.");
 
-      // 🟢 Sucesso
+      // 🟢 sucesso
       setSucesso(true);
-      setTimeout(() => setSucesso(false), 3000); // volta ao estado normal
+      setTimeout(() => setSucesso(false), 3000);
     } catch (err) {
       console.error("Erro ao salvar configuração:", err);
       alert("❌ Erro ao salvar configurações.");
@@ -245,16 +244,20 @@ function ConfigLoja() {
 
         <button
           type="submit"
-          className={`btn ${
-            salvando ? "btn-azul" : sucesso ? "btn-verde" : "btn-vermelho"
+          className={`btn-salva-config-loja btn ${
+            salvando ? "btn-azul" : sucesso ? "btn-verde" : "btn-laranja"
           }`}
           disabled={salvando}
         >
-          {salvando
-            ? "⏳ Salvando..."
-            : sucesso
-            ? "✅ Configurações salvas!"
-            : "💾 Salvar Configurações"}
+          {salvando ? (
+            <span className="spinner">
+              <span className="loader"></span> Salvando...
+            </span>
+          ) : sucesso ? (
+            "✅ Configurações salvas!"
+          ) : (
+            "💾 Salvar Configurações"
+          )}
         </button>
       </form>
     </div>
