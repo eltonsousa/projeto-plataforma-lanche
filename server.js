@@ -753,7 +753,7 @@ app.get("/api/configuracoes-loja", async (req, res) => {
     const { data, error } = await supabase
       .from("configuracoes_loja")
       .select(
-        "nome, slug, telefone, chave_pix, endereco_loja, link_localizacao, cor_principal, cor_secundaria, logo_url, favicon_url"
+        "nome, slug, telefone, chave_pix, endereco_loja, link_localizacao, cor_principal, cor_secundaria, logo_url, favicon_url, slogan"
       )
       .eq("loja_id", loja_id)
       .single();
@@ -781,6 +781,7 @@ app.put("/api/configuracoes-loja", async (req, res) => {
       cor_secundaria,
       logo_url,
       favicon_url,
+      slogan,
     } = req.body;
 
     if (!loja_id)
@@ -801,6 +802,7 @@ app.put("/api/configuracoes-loja", async (req, res) => {
           cor_secundaria,
           logo_url,
           favicon_url,
+          slogan,
         },
         { onConflict: "loja_id" }
       )

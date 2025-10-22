@@ -1228,7 +1228,7 @@ function App() {
         {configLoja?.logo_url && (
           <img src={configLoja.logo_url} alt="Logo" style={{ height: 40 }} />
         )}
-        <p>Sua fome acaba aqui. Conheça nossos clássicos!</p>
+        <p>{configLoja?.slogan || "Conheça nossos clássicos!"}</p>
         <link
           href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
           rel="stylesheet"

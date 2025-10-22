@@ -114,6 +114,15 @@ function ConfigLoja() {
         </label>
 
         <label>
+          Slogan / Descrição curta:
+          <input
+            type="text"
+            value={config.slogan || ""}
+            onChange={(e) => setConfig({ ...config, slogan: e.target.value })}
+          />
+        </label>
+
+        <label>
           Slug (URL da loja):
           <input
             type="text"
