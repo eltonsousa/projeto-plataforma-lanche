@@ -1288,6 +1288,10 @@ app.get("/api/admin/status", async (req, res) => {
 app.put("/api/admin/configuracoes", async (req, res) => {
   const { loja_id, is_forced_open, schedule_config } = req.body;
 
+  if ("is_emergency_closed" in req.body) {
+    updateData.is_emergency_closed = req.body.is_emergency_closed;
+  }
+
   if (!loja_id) {
     return res
       .status(400)

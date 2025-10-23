@@ -566,6 +566,45 @@ function App() {
   const [isScheduleSaving, setIsScheduleSaving] = useState(false); // Estado de carregamento do formulário de horário
   const [scheduleSaveSuccess, setScheduleSaveSuccess] = useState(false); // Estado de sucesso (feedback visual)
 
+  // 🆘 ESTADO E FUNÇÃO DE FECHAMENTO EMERGENCIAL
+  const [isEmergencyClosed, setIsEmergencyClosed] = useState(false);
+
+  const handleEmergencyClose = async (newState) => {
+    try {
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        alert("⚠️ Nenhum lojaId encontrado. Faça login novamente.");
+        return;
+      }
+
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch("/api/admin/configuracoes", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          loja_id: lojaId,
+          is_emergency_closed: newState,
+        }),
+      });
+
+      if (!response.ok)
+        throw new Error("Falha ao atualizar status emergencial.");
+
+      setIsEmergencyClosed(newState);
+      alert(
+        newState
+          ? "🚨 Loja fechada emergencialmente!"
+          : "✅ Loja reaberta normalmente."
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar status emergencial:", error);
+      alert("Erro ao tentar alterar o status emergencial da loja.");
+    }
+  };
+
   // ESTADO E FUNÇÕES DO MENU HAMBÚRGUER (ADICIONE ESTE TRECHO)
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -1303,6 +1342,27 @@ function App() {
                 </button>
               </div>
             )}
+          </div>
+
+          <div className="config-card">
+            {/* 🆘 FECHAMENTO EMERGENCIAL */}
+            <div className="emergency-close-container">
+              <h3>🆘 Fechamento Emergencial</h3>
+              <p>
+                Use esta opção apenas em situações extraordinárias (ex: falta de
+                material, manutenção, pausa temporária). Isso fecha a loja
+                imediatamente e ignora horários e status forçado.
+              </p>
+
+              <button
+                className={`btn ${
+                  isEmergencyClosed ? "btn-vermelho" : "btn-azul"
+                }`}
+                onClick={() => handleEmergencyClose(!isEmergencyClosed)}
+              >
+                {isEmergencyClosed ? "Reabrir Loja" : "Fechar Imediatamente"}
+              </button>
+            </div>
           </div>
 
           {error && (
