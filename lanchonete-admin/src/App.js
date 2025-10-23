@@ -995,16 +995,16 @@ function App() {
   };
 
   // EFEITOS
+  const lojaId = localStorage.getItem("lojaId");
+
   useEffect(() => {
     const storedUser = sessionStorage.getItem("usuarioLogado");
     if (storedUser) {
       setUsuarioLogado(storedUser);
     }
 
-    // 🔹 função interna que busca categorias
     const fetchCategorias = async () => {
       try {
-        const lojaId = localStorage.getItem("lojaId");
         if (!lojaId) {
           console.warn(
             "lojaId não encontrado — categorias não serão carregadas."
@@ -1020,17 +1020,16 @@ function App() {
       }
     };
 
-    if (isLoggedIn) {
+    if (isLoggedIn && lojaId) {
       if (currentPage === "pedidos" || currentPage === "relatorios") {
         fetchRelatorio(filtroPeriodo, filtroStatus);
-        fetchStoreStatus();
+        fetchStoreStatus(); // já busca horário e status
       } else if (currentPage === "cardapio") {
-        // 🟢 carrega cardápio e categorias juntos
         fetchCardapio();
         fetchCategorias();
       }
     }
-  }, [isLoggedIn, currentPage, filtroPeriodo, filtroStatus]);
+  }, [isLoggedIn, currentPage, filtroPeriodo, filtroStatus, lojaId]); // 👈 usa a variável aqui
 
   if (!isLoggedIn) {
     return (

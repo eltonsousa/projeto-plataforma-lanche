@@ -1259,20 +1259,22 @@ app.get("/api/carrinho/:sessionId", async (req, res) => {
 // Rota para LER o status completo (consumida pelo lanchonete-app e lanchonete-admin)
 app.get("/api/admin/status", async (req, res) => {
   try {
+    const lojaId = req.query.loja_id;
+    if (!lojaId) {
+      return res.status(400).json({ message: "loja_id é obrigatório" });
+    }
+
     const { data, error } = await supabase
       .from("configuracoes")
-      // 🟢 Modificação: Seleciona os dois campos
       .select("is_forced_open, schedule_config")
+      .eq("loja_id", lojaId) // ✅ filtra pela loja
       .limit(1);
 
     if (error) throw error;
 
-    // Se o registro não existe, retorna valores padrão
-    const isForcedOpen = data.length > 0 ? data[0].is_forced_open : false;
-    // Retorna a configuração de horário ou null
-    const scheduleConfig = data.length > 0 ? data[0].schedule_config : null;
+    const isForcedOpen = data?.[0]?.is_forced_open ?? false;
+    const scheduleConfig = data?.[0]?.schedule_config ?? null;
 
-    // Retorna ambos os dados
     res.status(200).json({ isForcedOpen, scheduleConfig });
   } catch (err) {
     console.error("Erro GET /api/admin/status:", err);
