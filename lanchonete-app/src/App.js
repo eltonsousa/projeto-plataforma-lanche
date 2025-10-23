@@ -107,15 +107,26 @@ const useOperatingStatus = () => {
   // Função para buscar o status no seu backend a cada 30 segundos
   const fetchOverrideStatus = useCallback(async () => {
     try {
-      // Esta rota DEVE AGORA retornar { isForcedOpen, scheduleConfig }
-      const response = await fetch("/api/admin/status");
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        console.warn("⚠️ Nenhum lojaId encontrado — ignorando status.");
+        return;
+      }
+
+      // ✅ Consulta status por loja
+      const response = await fetch(`/api/admin/status?loja_id=${lojaId}`);
       if (response.ok) {
         const data = await response.json();
 
-        // 🟢 ATUALIZA O ESTADO COM AMBOS OS CAMPOS
+        // ✅ Corrige caso o schedule venha como string
+        const schedule =
+          typeof data.scheduleConfig === "string"
+            ? JSON.parse(data.scheduleConfig || "[]")
+            : data.scheduleConfig || [];
+
         setStoreOverride({
           isForcedOpen: data.isForcedOpen,
-          scheduleConfig: data.scheduleConfig,
+          scheduleConfig: schedule,
           isFetching: false,
         });
       }
