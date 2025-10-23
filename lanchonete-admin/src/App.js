@@ -799,29 +799,35 @@ function App() {
     setScheduleConfig(newSchedule);
   };
 
-  // 🟢 NOVO: Salva a configuração de horários no servidor
+  // 🟢 Salva a configuração de horários no servidor (multi-loja)
   const handleSaveSchedule = async (e) => {
     e.preventDefault();
     setIsScheduleSaving(true);
     setScheduleSaveSuccess(false);
 
     try {
-      // Usa a nova rota genérica de PUT
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        alert("⚠️ Nenhum lojaId encontrado. Faça login novamente.");
+        return;
+      }
+      const token = localStorage.getItem("adminToken"); // token recebido no login
       const response = await fetch("/api/admin/configuracoes", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        // Envia o payload com o nome do campo do banco de dados
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ envia o token JWT
+        },
         body: JSON.stringify({
-          loja_id: localStorage.getItem("lojaId"),
-          schedule_config: scheduleConfig,
+          loja_id: lojaId,
+          schedule_config: scheduleConfig, // 👈 importante manter esse nome
         }),
       });
 
       if (!response.ok) throw new Error("Falha ao salvar horários.");
 
       const data = await response.json();
-      setScheduleConfig(data.scheduleConfig); // Sincroniza com o valor confirmado do servidor
-
+      setScheduleConfig(data.scheduleConfig || scheduleConfig);
       setScheduleSaveSuccess(true);
       setTimeout(() => setScheduleSaveSuccess(false), 3000);
     } catch (err) {
@@ -853,17 +859,24 @@ function App() {
     }
   };
 
-  // 🟢 ATUALIZADA: Agora usa a rota genérica PUT /api/admin/configuracoes
+  // 🟢 Atualiza status da loja (aberta/fechada) no backend multi-loja
   const handleToggleStoreStatus = async (newState) => {
     setIsStatusLoading(true);
     try {
+      const lojaId = localStorage.getItem("lojaId");
+      if (!lojaId) {
+        alert("⚠️ Nenhum lojaId encontrado. Faça login novamente.");
+        return;
+      }
+      const token = localStorage.getItem("adminToken");
       const response = await fetch("/api/admin/configuracoes", {
-        // 👈 NOVA ROTA
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        // Envia o novo status no corpo com o nome do campo do banco de dados
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ envia o token JWT
+        },
         body: JSON.stringify({
-          loja_id: localStorage.getItem("lojaId"),
+          loja_id: lojaId,
           is_forced_open: newState,
         }),
       });
@@ -871,8 +884,7 @@ function App() {
       if (!response.ok) throw new Error("Falha ao atualizar status da loja.");
 
       const data = await response.json();
-      // Atualiza o estado local com o valor retornado pelo servidor
-      setIsStoreForcedOpen(data.isForcedOpen);
+      setIsStoreForcedOpen(data.isForcedOpen ?? newState);
 
       alert(
         `Status da Loja atualizado para: ${newState ? "ABERTO" : "FECHADO"}`
@@ -908,6 +920,7 @@ function App() {
 
       // ✅ Salva login e loja
       localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("adminToken", data.token); // ✅ salva o token
       localStorage.setItem("lojaId", data.loja_id);
       localStorage.setItem("usuarioNome", data.nome);
 
