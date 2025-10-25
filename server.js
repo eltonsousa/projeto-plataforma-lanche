@@ -1257,40 +1257,109 @@ app.get("/api/carrinho/:sessionId", async (req, res) => {
 // ---------------------------------------------
 
 // Rota para LER o status completo (consumida pelo lanchonete-app e lanchonete-admin)
-app.get("/api/admin/status", async (req, res) => {
+// =======================================
+// 🚨 FECHAMENTO EMERGENCIAL (Admin Toggle)
+// =======================================
+app.put("/api/configuracoes/emergencia", async (req, res) => {
   try {
-    const lojaId = req.query.loja_id;
-    if (!lojaId) {
-      return res.status(400).json({ message: "loja_id é obrigatório" });
+    const { loja_id, is_emergency_closed } = req.body;
+
+    if (!loja_id) {
+      return res.status(400).json({ error: "loja_id é obrigatório." });
     }
 
-    const { data, error } = await supabase
+    // Busca a configuração atual
+    const { data: configAtual, error: erroBusca } = await supabase
       .from("configuracoes")
-      .select("is_forced_open, schedule_config")
-      .eq("loja_id", lojaId) // ✅ filtra pela loja
-      .limit(1);
+      .select("*")
+      .eq("loja_id", loja_id)
+      .single();
 
-    if (error) throw error;
+    if (erroBusca && erroBusca.code !== "PGRST116") {
+      console.error("Erro ao buscar configuração:", erroBusca);
+      return res.status(500).json({ error: "Falha ao buscar configuração." });
+    }
 
-    const isForcedOpen = data?.[0]?.is_forced_open ?? false;
-    const scheduleConfig = data?.[0]?.schedule_config ?? null;
+    // Se existir, atualiza; senão, cria novo registro
+    if (configAtual) {
+      const { error: erroAtualiza } = await supabase
+        .from("configuracoes")
+        .update({ is_emergency_closed })
+        .eq("loja_id", loja_id);
 
-    res.status(200).json({ isForcedOpen, scheduleConfig });
-  } catch (err) {
-    console.error("Erro GET /api/admin/status:", err);
-    res.status(500).json({ message: "Erro ao buscar status de configuração." });
+      if (erroAtualiza) {
+        console.error("Erro ao atualizar emergência:", erroAtualiza);
+        return res
+          .status(500)
+          .json({ error: "Erro ao atualizar configuração." });
+      }
+
+      return res.json({
+        success: true,
+        message: `Status de emergência atualizado para ${is_emergency_closed}`,
+      });
+    } else {
+      const { error: erroInsere } = await supabase
+        .from("configuracoes")
+        .insert([{ loja_id, is_emergency_closed }]);
+
+      if (erroInsere) {
+        console.error("Erro ao inserir configuração:", erroInsere);
+        return res.status(500).json({ error: "Erro ao inserir configuração." });
+      }
+
+      return res.json({
+        success: true,
+        message: `Nova configuração criada com is_emergency_closed=${is_emergency_closed}`,
+      });
+    }
+  } catch (error) {
+    console.error("Erro geral em /api/configuracoes/emergencia:", error);
+    res.status(500).json({ error: "Erro interno no servidor." });
+  }
+});
+
+// =======================================
+// 📡 STATUS GERAL (usado pelo lanchonete-app)
+// =======================================
+app.get("/api/admin/status", async (req, res) => {
+  try {
+    const loja_id = req.query.loja_id;
+
+    if (!loja_id) {
+      return res.status(400).json({ error: "loja_id é obrigatório." });
+    }
+
+    const { data: config, error } = await supabase
+      .from("configuracoes")
+      .select("is_forced_open, schedule_config, is_emergency_closed")
+      .eq("loja_id", loja_id)
+      .single();
+
+    if (error) {
+      console.error("Erro ao buscar status do admin:", error);
+      return res.status(500).json({ error: "Erro ao buscar status." });
+    }
+
+    res.json({
+      isForcedOpen: config?.is_forced_open || false,
+      scheduleConfig:
+        typeof config?.schedule_config === "string"
+          ? JSON.parse(config.schedule_config)
+          : config?.schedule_config || [],
+      isEmergencyClosed: config?.is_emergency_closed || false,
+    });
+  } catch (error) {
+    console.error("Erro geral em /api/admin/status:", error);
+    res.status(500).json({ error: "Erro interno no servidor." });
   }
 });
 
 // -------------------------------------------------------------------
-// 🟢 NOVA ROTA: Rota genérica para ATUALIZAR QUALQUER CONFIGURAÇÃO
+// 🟢 ROTA GENÉRICA: ATUALIZAÇÃO DE CONFIGURAÇÕES NORMAIS (sem emergência)
 // -------------------------------------------------------------------
 app.put("/api/admin/configuracoes", async (req, res) => {
   const { loja_id, is_forced_open, schedule_config } = req.body;
-
-  if ("is_emergency_closed" in req.body) {
-    updateData.is_emergency_closed = req.body.is_emergency_closed;
-  }
 
   if (!loja_id) {
     return res

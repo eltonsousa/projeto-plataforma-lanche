@@ -80,8 +80,17 @@ const isStoreOpenBySchedule = (scheduleConfig) => {
 
 // 2. LÓGICA DE VERIFICAÇÃO (Agora aceita a configuração completa)
 const checkIsStoreOpen = (
-  overrideStatus = { isForcedOpen: false, scheduleConfig: null } // 🟢 Recebe a configuração
+  overrideStatus = {
+    isForcedOpen: false,
+    scheduleConfig: null,
+    isEmergencyClosed: false,
+  }
 ) => {
+  // 🚨 PRIORIDADE ABSOLUTA: Se estiver em modo de emergência, loja fica fechada
+  if (overrideStatus.isEmergencyClosed) {
+    return false;
+  }
+
   // 🟢 PRIORIDADE MÁXIMA: Se o painel de administração forçar a abertura, retorna TRUE.
   if (overrideStatus.isForcedOpen) {
     return true;
@@ -104,7 +113,6 @@ const useOperatingStatus = () => {
     checkIsStoreOpen({ isForcedOpen: false, scheduleConfig: null }) // Inicialização com valores nulos
   );
 
-  // Função para buscar o status no seu backend a cada 30 segundos
   const fetchOverrideStatus = useCallback(async () => {
     try {
       const lojaId = localStorage.getItem("lojaId");
@@ -125,10 +133,17 @@ const useOperatingStatus = () => {
             : data.scheduleConfig || [];
 
         setStoreOverride({
-          isForcedOpen: data.isForcedOpen,
-          scheduleConfig: schedule,
+          isForcedOpen: data.isForcedOpen || false,
+          scheduleConfig: schedule, // ✅ usa a variável tratada
+          isEmergencyClosed: data.isEmergencyClosed || false, // 🚨 novo campo
           isFetching: false,
         });
+      } else {
+        console.error(
+          "⚠️ Falha na resposta do servidor:",
+          await response.text()
+        );
+        setStoreOverride((prev) => ({ ...prev, isFetching: false }));
       }
     } catch (error) {
       console.error("Falha ao buscar status do Admin:", error);
