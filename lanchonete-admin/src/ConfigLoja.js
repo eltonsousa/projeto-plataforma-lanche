@@ -3,6 +3,7 @@ import { getApiUrl } from "./utils/api";
 import "./styles/ConfigLoja.css";
 
 function ConfigLoja() {
+  const lojaId = localStorage.getItem("lojaId");
   const [config, setConfig] = useState({
     chave_pix: "",
     endereco_loja: "",
@@ -269,6 +270,51 @@ function ConfigLoja() {
             )}
           </button>
         </form>
+      </div>
+
+      <div className="config-card">
+        <h3>💬 Conexão WhatsApp</h3>
+        <p>
+          Conecte o WhatsApp desta loja para enviar e receber mensagens
+          diretamente com seus clientes.
+        </p>
+
+        <div className="whatsapp-status">
+          <button
+            className="btn btn-verde"
+            onClick={() =>
+              window.open(
+                `/api/whatsapp/${lojaId}/qr`,
+                "_blank",
+                "width=500,height=600"
+              )
+            }
+          >
+            📲 Conectar WhatsApp
+          </button>
+
+          <button
+            className="btn btn-azul"
+            onClick={async () => {
+              try {
+                const res = await fetch(`/api/whatsapp/${lojaId}/status`);
+                const data = await res.json();
+                if (data.connected) {
+                  alert("✅ WhatsApp conectado com sucesso!");
+                } else if (data.has_qr) {
+                  alert("⚠️ Aguardando escanear o QR Code.");
+                } else {
+                  alert("❌ WhatsApp ainda não conectado.");
+                }
+              } catch (err) {
+                console.error("Erro ao verificar status do WhatsApp:", err);
+                alert("Erro ao verificar status do WhatsApp.");
+              }
+            }}
+          >
+            🔄 Verificar Status
+          </button>
+        </div>
       </div>
     </div>
   );

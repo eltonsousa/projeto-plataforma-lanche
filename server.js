@@ -7,6 +7,55 @@ const { formatPrice } = require("./utils/format");
 
 // Whatsapp
 const { Client, LocalAuth } = require("whatsapp-web.js");
+
+// ===============================
+// WhatsApp Multi-tenant
+// ===============================
+const clients = new Map(); // lojaId -> Client
+const qrCodes = new Map(); // lojaId -> ultimo QR recebido
+const readyState = new Map(); // lojaId -> boolean (conectado)
+
+async function ensureClient(lojaId) {
+  if (!lojaId) throw new Error("lojaId é obrigatório para WhatsApp.");
+
+  if (clients.has(lojaId)) {
+    return clients.get(lojaId);
+  }
+
+  // Cria client isolado por loja
+  const client = new Client({
+    authStrategy: new LocalAuth({ clientId: `loja_${lojaId}` }), // pasta: .wwebjs_auth/loja_lojaId
+    puppeteer: { headless: true, args: ["--no-sandbox"] },
+  });
+
+  // Eventos por loja
+  client.on("qr", (qr) => {
+    console.log(`QR RECEIVED (loja ${lojaId})`);
+    qrCodes.set(lojaId, qr);
+    readyState.set(lojaId, false);
+  });
+
+  client.on("ready", () => {
+    console.log(`WhatsApp pronto para loja ${lojaId}!`);
+    qrCodes.delete(lojaId);
+    readyState.set(lojaId, true);
+  });
+
+  client.on("disconnected", (reason) => {
+    console.warn(`WhatsApp desconectou (loja ${lojaId}):`, reason);
+    readyState.set(lojaId, false);
+    // Opcional: tentar reinitialize automático
+    // setTimeout(() => client.initialize().catch(console.error), 5000);
+  });
+
+  await client.initialize().catch((e) => {
+    console.error(`Falha ao inicializar WhatsApp da loja ${lojaId}:`, e);
+  });
+
+  clients.set(lojaId, client);
+  return client;
+}
+
 const qrcode = require("qrcode-terminal");
 const QRCode = require("qrcode");
 
@@ -170,44 +219,88 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Whatsapp Client
-let qrCodeAtual = null;
+// let qrCodeAtual = null;
 
-const client = new Client({
-  authStrategy: new LocalAuth(),
-  puppeteer: { headless: true, args: ["--no-sandbox"] },
-});
+// const client = new Client({
+//   authStrategy: new LocalAuth(),
+//   puppeteer: { headless: true, args: ["--no-sandbox"] },
+// });
 
-client.on("qr", (qr) => {
-  console.log("QR RECEIVED", qr);
-  qrcode.generate(qr, { small: true });
-  qrCodeAtual = qr;
-});
+// client.on("qr", (qr) => {
+//   console.log("QR RECEIVED", qr);
+//   qrcode.generate(qr, { small: true });
+//   qrCodeAtual = qr;
+// });
 
-client.on("ready", () => {
-  console.log("WhatsApp Client está rodando!");
-  qrCodeAtual = null;
-});
+// client.on("ready", () => {
+//   console.log("WhatsApp Client está rodando!");
+//   qrCodeAtual = null;
+// });
 
-client.initialize();
+// client.initialize();
 
 // Rota para exibir QR Code no navegador
-app.get("/api/whatsapp-qr", async (req, res) => {
-  if (!qrCodeAtual) {
-    return res
-      .status(200)
-      .send("<h2>✅ WhatsApp já conectado ou aguardando QR...</h2>");
-  }
+// app.get("/api/whatsapp-qr", async (req, res) => {
+//   if (!qrCodeAtual) {
+//     return res
+//       .status(200)
+//       .send("<h2>✅ WhatsApp já conectado ou aguardando QR...</h2>");
+//   }
+//   try {
+//     const qrImage = await QRCode.toDataURL(qrCodeAtual);
+//     res.send(`
+//       <html>
+//         <body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;">
+//           <h2>Escaneie o QR Code abaixo para conectar o WhatsApp 📱</h2>
+//           <img src="${qrImage}" style="width:300px;height:300px;"/>
+//         </body>
+//       </html>
+//     `);
+//   } catch (err) {
+//     res.status(500).send("Erro ao gerar QR Code.");
+//   }
+// });
+
+// ===============================
+// Rotas WhatsApp por loja
+// ===============================
+app.get("/api/whatsapp/:loja_id/status", async (req, res) => {
   try {
-    const qrImage = await QRCode.toDataURL(qrCodeAtual);
+    const { loja_id } = req.params;
+    await ensureClient(loja_id); // garante instância
+    res.json({
+      loja_id,
+      connected: readyState.get(loja_id) === true,
+      has_qr: qrCodes.has(loja_id),
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get("/api/whatsapp/:loja_id/qr", async (req, res) => {
+  try {
+    const { loja_id } = req.params;
+    await ensureClient(loja_id); // garante instância
+
+    const qr = qrCodes.get(loja_id);
+    if (!qr) {
+      return res
+        .status(200)
+        .send("<h2>✅ Já conectado ou aguardando evento de QR...</h2>");
+    }
+
+    const dataUrl = await QRCode.toDataURL(qr);
     res.send(`
       <html>
         <body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;font-family:sans-serif;">
-          <h2>Escaneie o QR Code abaixo para conectar o WhatsApp 📱</h2>
-          <img src="${qrImage}" style="width:300px;height:300px;"/>
+          <h2>Loja ${loja_id} — escaneie o QR para conectar</h2>
+          <img src="${dataUrl}" style="width:300px;height:300px;"/>
         </body>
       </html>
     `);
-  } catch (err) {
+  } catch (e) {
+    console.error("Erro ao gerar QR:", e);
     res.status(500).send("Erro ao gerar QR Code.");
   }
 });
@@ -967,7 +1060,8 @@ app.post("/api/pedidos", async (req, res) => {
         }`;
       }
 
-      client
+      const waClient = await ensureClient(lojaId);
+      waClient
         .sendMessage(numero, mensagemResumo)
         .then(() => console.log("Resumo do pedido enviado!"))
         .catch((err) => console.error("Erro ao enviar resumo:", err));
@@ -1059,7 +1153,8 @@ app.put("/api/pedidos/:id", async (req, res) => {
       console.log("📞 Enviando mensagem para:", numero);
       console.log("📦 Mensagem:", mensagem);
 
-      client
+      const waClient = await ensureClient(loja_id);
+      waClient
         .sendMessage(numero, mensagem)
         .then(() => console.log("Mensagem de status enviada com sucesso!"))
         .catch((err) => console.error("Erro ao enviar mensagem:", err));
