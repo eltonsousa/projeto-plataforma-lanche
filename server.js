@@ -36,7 +36,7 @@ async function ensureClient(lojaId) {
   const client = new Client({
     authStrategy: new LocalAuth({
       dataPath: path.join(__dirname, ".wwebjs_auth"),
-      clientId: `loja_${lojaId}`, // ✅ removido "session-" para evitar duplicação
+      clientId: `loja_${lojaId}`,
     }),
     puppeteer: {
       headless: true,
@@ -45,14 +45,9 @@ async function ensureClient(lojaId) {
         "--disable-setuid-sandbox",
         "--disable-gpu",
         "--disable-dev-shm-usage",
-        "--no-zygote",
-        "--no-first-run",
-        "--single-process",
-        "--disable-extensions",
-        `--user-data-dir=${sessionPath}`, // ⚡️ perfil Chromium isolado por loja
       ],
     },
-    logger: undefined, // 🚫 desativa logs automáticos (evita chrome_debug.log)
+    logger: undefined,
   });
 
   // ===============================
