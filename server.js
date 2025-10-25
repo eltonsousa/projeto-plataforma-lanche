@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken"); // ⬅️ NOVO!
 const { formatPrice } = require("./utils/format");
+const fs = require("fs");
+const path = require("path");
 
 // Whatsapp
 const { Client, LocalAuth } = require("whatsapp-web.js");
@@ -18,17 +20,44 @@ const readyState = new Map(); // lojaId -> boolean (conectado)
 async function ensureClient(lojaId) {
   if (!lojaId) throw new Error("lojaId é obrigatório para WhatsApp.");
 
+  // Retorna o client já existente
   if (clients.has(lojaId)) {
     return clients.get(lojaId);
   }
 
-  // Cria client isolado por loja
+  // 🔒 Diretório exclusivo por loja
+  const sessionPath = path.join(
+    __dirname,
+    `.wwebjs_auth/session-loja_${lojaId}`
+  );
+  fs.mkdirSync(sessionPath, { recursive: true }); // Garante que exista
+
+  // 🧩 Cria o client com perfil isolado
   const client = new Client({
-    authStrategy: new LocalAuth({ clientId: `loja_${lojaId}` }), // pasta: .wwebjs_auth/loja_lojaId
-    puppeteer: { headless: true, args: ["--no-sandbox"] },
+    authStrategy: new LocalAuth({
+      dataPath: path.join(__dirname, ".wwebjs_auth"),
+      clientId: `loja_${lojaId}`, // ✅ removido "session-" para evitar duplicação
+    }),
+    puppeteer: {
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--no-zygote",
+        "--no-first-run",
+        "--single-process",
+        "--disable-extensions",
+        `--user-data-dir=${sessionPath}`, // ⚡️ perfil Chromium isolado por loja
+      ],
+    },
+    logger: undefined, // 🚫 desativa logs automáticos (evita chrome_debug.log)
   });
 
-  // Eventos por loja
+  // ===============================
+  // Eventos de status por loja
+  // ===============================
   client.on("qr", (qr) => {
     console.log(`QR RECEIVED (loja ${lojaId})`);
     qrCodes.set(lojaId, qr);
@@ -36,18 +65,22 @@ async function ensureClient(lojaId) {
   });
 
   client.on("ready", () => {
-    console.log(`WhatsApp pronto para loja ${lojaId}!`);
+    console.log(`✅ WhatsApp pronto para loja ${lojaId}!`);
     qrCodes.delete(lojaId);
     readyState.set(lojaId, true);
   });
 
-  client.on("disconnected", (reason) => {
-    console.warn(`WhatsApp desconectou (loja ${lojaId}):`, reason);
+  client.on("disconnected", async (reason) => {
+    console.warn(`⚠️ WhatsApp desconectou (loja ${lojaId}):`, reason);
     readyState.set(lojaId, false);
-    // Opcional: tentar reinitialize automático
-    // setTimeout(() => client.initialize().catch(console.error), 5000);
+    try {
+      await client.destroy();
+    } catch (e) {
+      console.error(`Erro ao destruir cliente da loja ${lojaId}:`, e.message);
+    }
   });
 
+  // Inicializa e trata erros silenciosamente
   await client.initialize().catch((e) => {
     console.error(`Falha ao inicializar WhatsApp da loja ${lojaId}:`, e);
   });
@@ -65,7 +98,6 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const port = 3001;
-const path = require("path");
 
 // Inicializa Supabase
 const supabaseUrl = process.env.SUPABASE_URL;

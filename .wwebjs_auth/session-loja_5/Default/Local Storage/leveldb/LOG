@@ -1,3 +1,1 @@
-2025/10/24-23:24:50.125 23a8 Reusing MANIFEST C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session-loja_5\Default\Local Storage\leveldb/MANIFEST-000001
-2025/10/24-23:24:50.125 23a8 Recovering log #3
-2025/10/24-23:24:50.126 23a8 Reusing old log C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session-loja_5\Default\Local Storage\leveldb/000003.log 
+2025/10/25-01:07:41.786 14e0 Creating DB C:\apps-dev\projeto-plataforma-lanche\.wwebjs_auth\session-loja_5\Default\Local Storage\leveldb since it was missing.
