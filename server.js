@@ -1061,10 +1061,27 @@ app.post("/api/pedidos", async (req, res) => {
       }
 
       const waClient = await ensureClient(lojaId);
-      waClient
-        .sendMessage(numero, mensagemResumo)
-        .then(() => console.log("Resumo do pedido enviado!"))
-        .catch((err) => console.error("Erro ao enviar resumo:", err));
+      try {
+        const ownNumber = (await waClient.info?.wid?._serialized) || "";
+        if (numero === ownNumber) {
+          console.warn(
+            `⚠️ Tentativa de envio para o próprio número (${numero}) — ignorado.`
+          );
+        } else {
+          await waClient.sendMessage(numero, mensagemResumo);
+          console.log(
+            `📦 [Loja ${lojaId}] Mensagem de pedido enviada com sucesso para ${numero}`
+          );
+        }
+      } catch (err) {
+        if (err.code === "EBUSY") {
+          console.warn(
+            "⚠️ Arquivo de log ocupado (EBUSY). Ignorando com segurança..."
+          );
+        } else {
+          console.error("Erro ao enviar resumo:", err);
+        }
+      }
     }
 
     res.status(201).json({ message: "Pedido recebido com sucesso!", pedido });
@@ -1098,75 +1115,81 @@ app.get("/api/pedidos", async (req, res) => {
   }
 });
 
+// ---------------------------------------------
+// PEDIDOS (Atualização de status + envio WhatsApp)
+// ---------------------------------------------
 app.put("/api/pedidos/:id", async (req, res) => {
-  const pedidoId = req.params.id;
-  const { status, loja_id } = req.body;
-
-  if (!status) {
-    return res
-      .status(400)
-      .json({ message: "Status é obrigatório para atualização." });
-  }
-
-  if (!loja_id) {
-    return res
-      .status(400)
-      .json({ message: "⚠️ loja_id é obrigatório para controle multi-loja." });
-  }
-
   try {
-    const { data: pedidoAtualizado, error: updateError } = await supabase
+    const pedidoId = req.params.id;
+    const { status, loja_id } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status é obrigatório." });
+    }
+
+    if (!loja_id) {
+      return res
+        .status(400)
+        .json({ message: "⚠️ loja_id é obrigatório para atualização." });
+    }
+
+    // Atualiza o status do pedido
+    const { data, error } = await supabase
       .from("pedidos_lanche")
       .update({ status })
       .eq("id", pedidoId)
-      .eq("loja_id", loja_id) // 🟢 garante que a atualização seja apenas da loja correta
       .select();
 
-    if (updateError) throw updateError;
+    if (error) throw error;
+    const pedidoAtualizado = data[0];
+    console.log("Pedido atualizado:", pedidoAtualizado);
 
-    if (!pedidoAtualizado || pedidoAtualizado.length === 0) {
-      return res.status(404).json({ message: "Pedido não encontrado." });
-    }
-
-    const pedido = pedidoAtualizado[0];
-    console.log("Pedido atualizado:", pedido);
-
-    const { telefone_cliente, tipo_servico } = pedido;
-    let mensagem = "";
-
-    if (status.toLowerCase() === "pronto para entrega") {
-      if (tipo_servico.toLowerCase() === "entrega") {
-        mensagem = `Boa notícia *${pedido.cliente.nome}*!\nSeu pedido já está a caminho! 🚚`;
-      } else if (tipo_servico.toLowerCase() === "retirada") {
-        mensagem = `Boa notícia *${pedido.cliente.nome}*!\nSeu pedido já está pronto para retirada! 🏪`;
-      }
-    }
-
-    if (mensagem && telefone_cliente?.trim()) {
-      let telefoneLimpo = telefone_cliente.replace(/\D/g, "");
+    // Envio de mensagem de status via WhatsApp
+    if (pedidoAtualizado?.telefone_cliente) {
+      let telefoneLimpo = pedidoAtualizado.telefone_cliente.replace(/\D/g, "");
       if (telefoneLimpo.length === 11 && telefoneLimpo[2] === "9") {
         telefoneLimpo = telefoneLimpo.slice(0, 2) + telefoneLimpo.slice(3);
       }
-
       const numero = `55${telefoneLimpo}@c.us`;
 
-      console.log("📞 Enviando mensagem para:", numero);
-      console.log("📦 Mensagem:", mensagem);
+      const mensagemStatus = `Boa notícia *${
+        pedidoAtualizado.cliente?.nome || "cliente"
+      }*! \nSeu pedido já está *${status.toLowerCase()}*! 🏪`;
 
+      // Cliente WhatsApp específico da loja
       const waClient = await ensureClient(loja_id);
-      waClient
-        .sendMessage(numero, mensagem)
-        .then(() => console.log("Mensagem de status enviada com sucesso!"))
-        .catch((err) => console.error("Erro ao enviar mensagem:", err));
+
+      try {
+        // Evita autoenvio (enviar para o próprio número)
+        const ownNumber = (await waClient.info?.wid?._serialized) || "";
+        if (numero === ownNumber) {
+          console.warn(
+            `⚠️ Tentativa de envio para o próprio número (${numero}) — ignorado.`
+          );
+        } else {
+          await waClient.sendMessage(numero, mensagemStatus);
+          console.log(
+            `📦 [Loja ${loja_id}] Mensagem de status enviada com sucesso para ${numero}`
+          );
+        }
+      } catch (err) {
+        if (err.code === "EBUSY") {
+          console.warn(
+            "⚠️ Arquivo de log ocupado (EBUSY). Ignorando com segurança..."
+          );
+        } else {
+          console.error("Erro ao enviar mensagem de status:", err);
+        }
+      }
     }
 
     res.status(200).json({
-      message: "Status do pedido atualizado com sucesso.",
-      pedido,
+      message: "Status atualizado com sucesso!",
+      pedido: pedidoAtualizado,
     });
   } catch (err) {
-    console.error("Erro na rota PUT /api/pedidos/:id:", err);
-    res.status(500).json({ message: "Erro ao atualizar o status do pedido." });
+    console.error("Erro PUT /api/pedidos/:id:", err);
+    res.status(500).json({ message: "Erro interno ao atualizar pedido." });
   }
 });
 
