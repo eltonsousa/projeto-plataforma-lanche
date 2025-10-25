@@ -3,7 +3,6 @@ import { getApiUrl } from "./utils/api";
 import "./styles/ConfigLoja.css";
 
 function ConfigLoja() {
-  const lojaId = localStorage.getItem("lojaId");
   const [config, setConfig] = useState({
     chave_pix: "",
     endereco_loja: "",
@@ -272,6 +271,7 @@ function ConfigLoja() {
         </form>
       </div>
 
+      {/* 💬 Integração WhatsApp Multi-tenant */}
       <div className="config-card">
         <h3>💬 Conexão WhatsApp</h3>
         <p>
@@ -282,13 +282,20 @@ function ConfigLoja() {
         <div className="whatsapp-status">
           <button
             className="btn btn-verde"
-            onClick={() =>
-              window.open(
-                `/api/whatsapp/${lojaId}/qr`,
-                "_blank",
-                "width=500,height=600"
-              )
-            }
+            onClick={() => {
+              const lojaId = localStorage.getItem("lojaId");
+              if (!lojaId) {
+                alert("⚠️ Nenhum lojaId encontrado. Faça login novamente.");
+                return;
+              }
+
+              // 🔗 Base dinâmica: produção (env) ou localhost (fallback)
+              const apiBase =
+                process.env.REACT_APP_API_URL || "http://localhost:3001";
+
+              const url = `${apiBase}/api/whatsapp/${lojaId}/qr`;
+              window.open(url, "_blank", "width=500,height=600");
+            }}
           >
             📲 Conectar WhatsApp
           </button>
@@ -296,9 +303,20 @@ function ConfigLoja() {
           <button
             className="btn btn-azul"
             onClick={async () => {
+              const lojaId = localStorage.getItem("lojaId");
+              if (!lojaId) {
+                alert("⚠️ Nenhum lojaId encontrado. Faça login novamente.");
+                return;
+              }
+
+              const apiBase =
+                process.env.REACT_APP_API_URL || "http://localhost:3001";
+              const statusUrl = `${apiBase}/api/whatsapp/${lojaId}/status`;
+
               try {
-                const res = await fetch(`/api/whatsapp/${lojaId}/status`);
+                const res = await fetch(statusUrl);
                 const data = await res.json();
+
                 if (data.connected) {
                   alert("✅ WhatsApp conectado com sucesso!");
                 } else if (data.has_qr) {
