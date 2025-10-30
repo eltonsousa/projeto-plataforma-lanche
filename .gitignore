@@ -1,33 +1,108 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# =========================================================
+# 🌐 AMBIENTE NODE / MONOREPO (Backend + Frontend React)
+# =========================================================
 
-# dependencies
-/node_modules
-/lanchonete-app/node_modules
-/lanchonete-admin/node_modules
-/lanchonete-admin/build
-/lanchonete-app/build
-/.pnp
+# Dependências (Node)
+node_modules/
+*/node_modules/
+
+# Build de produção (React / Admin / App)
+build/
+lanchonete-app/build/
+lanchonete-admin/build/
+
+# Arquivos PnP e Yarn
+.pnp/
 .pnp.js
 
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
+# Logs e debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Não Envia dados da API Whatsapp
-.wwebjs_cache/
+# Cobertura de testes
+coverage/
+
+# Arquivos de cache do editor
+.DS_Store
+Thumbs.db
+
+# =========================================================
+# ⚙️ AMBIENTES E SEGREDOS (.env)
+# =========================================================
+
+# Variáveis de ambiente (NUNCA COMMITAR)
+.env
+.env.*
+!.env.example       
+# exceção útil para exemplo de estrutura
+
+# Railway / Supabase / Twilio / WhatsApp tokens etc.
+*.local
+*.development
+*.production
+
+# =========================================================
+# 🧰 CONFIGURAÇÕES DE DEPLOY / TEMPORÁRIOS
+# =========================================================
+
+# Cache / temporários locais
+.cache/
+.tmp/
+dist/
+
+# =========================================================
+# 💬 WHATSAPP-WEB.JS / SUPABASE AUTH
+# =========================================================
+
+# Sessões e cache do WhatsApp Web.js
 .wwebjs_auth/
+.wwebjs_cache/
 
+# Supabase local storage ou arquivos sensíveis
+supabase/.temp/
+supabase/.local/
+supabase/functions/.env
+
+# =========================================================
+# 🧑‍💻 IDEs / SISTEMAS OPERACIONAIS
+# =========================================================
+
+# VS Code
+.vscode/
+.history/
+*.code-workspace
+
+# MacOS / Windows
+.DS_Store
+ehthumbs.db
+Icon?
+desktop.ini
+
+# =========================================================
+# 🧪 TESTES / PLAYWRIGHT / CYPRESS
+# =========================================================
+
+# Ferramentas de teste (se usar futuramente)
+cypress/videos/
+cypress/screenshots/
+playwright-report/
+test-results/
+
+# =========================================================
+# ✅ OUTROS OPCIONAIS
+# =========================================================
+
+# Logs customizados do backend
+/logs/
+/uploads/temp/
+
+# Arquivos JSON locais (se usados apenas para debug)
+usuarios.json
+cardapio.json
+
+# =========================================================
+# 💡 FIM DO ARQUIVO
+# =========================================================
